@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --bb-blue:        #1a3a6b;
-  --bb-blue-light:  #2a55a0;
-  --bb-orange:      #f5a623;
-  --bb-orange-dark: #d4881e;
+  --bb-blue:        #0052CC;
+  --bb-blue-light:  #003da5;
+  --bb-orange:      #FF8C00;
+  --bb-orange-dark: #E67E00;
   --bb-white:       #ffffff;
   --bb-bg:          #f7f8fc;
 
@@ -49,15 +49,15 @@ img { max-width: 100%; display: block; }
   font-weight: 600;
   cursor: pointer;
   border: none;
-  transition: background 0.2s, transform 0.1s;
+  transition: background 0.2s, transform 0.1s, border-color 0.2s, backdrop-filter 0.2s, box-shadow 0.3s;
 }
 .btn:active { transform: scale(0.97); }
 .btn-primary  { background: var(--bb-blue);   color: var(--bb-white); }
-.btn-primary:hover  { background: var(--bb-blue-light); }
+.btn-primary:hover  { background: var(--bb-blue-light); box-shadow: 0 0 20px rgba(26, 58, 107, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1); }
 .btn-accent   { background: var(--bb-orange); color: var(--bb-white); }
-.btn-accent:hover   { background: var(--bb-orange-dark); }
-.btn-outline  { background: transparent; color: var(--bb-blue); border: 2px solid var(--bb-blue); }
-.btn-outline:hover  { background: var(--bb-gray-100); }
+.btn-accent:hover   { background: var(--bb-orange-dark); box-shadow: 0 0 20px rgba(245, 166, 35, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.1); }
+.btn-outline  { background: rgba(255, 255, 255, 0.4); color: var(--bb-blue); border: 1.5px solid rgba(26, 58, 107, 0.3); backdrop-filter: blur(8px); }
+.btn-outline:hover  { background: rgba(255, 255, 255, 0.6); border-color: rgba(26, 58, 107, 0.5); box-shadow: 0 0 20px rgba(26, 58, 107, 0.3); }
 .btn-sm { padding: 6px 14px; font-size: 13px; }
 
 .card {
