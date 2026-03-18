@@ -1,0 +1,93 @@
+<div class="profilo-wrapper">
+
+  <aside class="sidebar card">
+    <div class="avatar-small">📦</div>
+    <nav class="sidebar-nav">
+      <a routerLink="/profile" routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: true}">
+        👤 Il mio profilo
+      </a>
+      <a routerLink="/profile/ordini" routerLinkActive="active">
+        📦 I miei ordini
+        <span class="nav-badge">{{ ordini.length }}</span>
+      </a>
+      <a routerLink="/" class="link-catalogo">📚 Catalogo</a>
+    </nav>
+  </aside>
+
+  <main class="profilo-content">
+    <div class="card">
+      <h2 class="section-title">I miei ordini</h2>
+      <hr class="divider">
+
+      @if (loading) {
+        <p class="text-muted text-center">Caricamento ordini...</p>
+      }
+
+      @if (!loading && ordini.length === 0) {
+        <div class="empty">
+          <p>Non hai ancora effettuato ordini.</p>
+          <a routerLink="/" class="btn btn-accent mt-16">Vai al catalogo</a>
+        </div>
+      }
+
+      @if (!loading && ordini.length > 0) {
+        <div class="ordini-list">
+          @for (ordine of ordini; track ordine.id) {
+            <div class="ordine-card">
+
+              <div class="ordine-header" (click)="toggleDettaglio(ordine.id)">
+                <div class="ordine-meta">
+                  <span class="ordine-id">#{{ ordine.id }}</span>
+                  <span class="ordine-data">{{ ordine.dataOrdine | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="ordine-centro">
+                  <span [class]="badgeClasse(ordine.stato)">
+                    {{ iconaStato(ordine.stato) }} {{ ordine.stato }}
+                  </span>
+                  <span class="text-muted">
+                    {{ ordine.items.length }} articol{{ ordine.items.length === 1 ? 'o' : 'i' }}
+                  </span>
+                </div>
+                <div class="ordine-destra">
+                  <span class="price">€ {{ ordine.totale | number:'1.2-2' }}</span>
+                  <span class="toggle-icon">{{ ordineAperto === ordine.id ? '▲' : '▼' }}</span>
+                </div>
+              </div>
+
+              @if (ordineAperto === ordine.id) {
+                <div class="ordine-dettaglio">
+                  <div class="dettaglio-info">
+                    <span class="text-muted">Pagamento:</span>
+                    <strong>{{ ordine.metodoPagamento }}</strong>
+                  </div>
+                  <div class="ordine-items">
+                    @for (item of ordine.items; track item.id) {
+                      <div class="ordine-item">
+                        <img [src]="item.libro.copertina" [alt]="item.libro.titolo"
+                             onerror="this.src='https://placehold.co/60x80/1a3a6b/ffffff?text=📚'">
+                        <div class="item-info">
+                          <p class="item-titolo">{{ item.libro.titolo }}</p>
+                          <p class="text-muted">{{ item.libro.autore.nome }} {{ item.libro.autore.cognome }}</p>
+                          <p class="text-muted">Qtà: {{ item.quantita }}</p>
+                        </div>
+                        <span class="item-prezzo">€ {{ item.prezzoUnitarioAcquisto | number:'1.2-2' }}</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="ordine-totale">
+                    <span>Totale ordine</span>
+                    <span class="price">€ {{ ordine.totale | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+              }
+
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  </main>
+
+</div>

@@ -1,0 +1,44 @@
+<nav class="navbar">
+  <div class="navbar-inner">
+
+<a routerLink="/" class="navbar-logo">
+  <img src="favicon2.png" alt="BetaBooks Logo" class="logo-img">
+</a>
+    <!-- Link centrali desktop -->
+    <ul class="navbar-links">
+      <li><a routerLink="/" routerLinkActive="active" >Catalogo</a></li>
+      @if (auth.isLoggedIn()) {
+        <li><a routerLink="/cart" routerLinkActive="active">Carrello</a></li>
+        <li><a routerLink="/profile" routerLinkActive="active">Profilo</a></li>
+      }
+    </ul>
+
+    <!-- Azioni destra -->
+    <div class="navbar-actions">
+      @if (auth.isLoggedIn()) {
+        <span class="navbar-user">{{ (auth.utente$ | async)?.email }}</span>
+        <button class="btn btn-outline btn-sm" (click)="logout()">Esci</button>
+      } @else {
+        <a routerLink="/auth/login"    class="btn btn-outline btn-sm">Accedi</a>
+        <a routerLink="/auth/register" class="btn btn-accent btn-sm">Registrati</a>
+      }
+    </div>
+
+    <!-- Hamburger mobile -->
+    <button class="hamburger" (click)="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Menu mobile -->
+  <div class="mobile-menu" [class.open]="menuAperto">
+    <a routerLink="/" (click)="menuAperto=false">Catalogo</a>
+    @if (auth.isLoggedIn()) {
+      <a routerLink="/cart"    (click)="menuAperto=false">Carrello</a>
+      <a routerLink="/profile" (click)="menuAperto=false">Profilo</a>
+    } @else {
+      <a routerLink="/auth/login"    (click)="menuAperto=false">Accedi</a>
+      <a routerLink="/auth/register" (click)="menuAperto=false">Registrati</a>
+    }
+  </div>
+</nav>

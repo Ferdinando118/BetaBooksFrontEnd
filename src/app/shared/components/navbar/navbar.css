@@ -1,0 +1,143 @@
+.navbar {
+  background: var(--bb-white);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1); /* Ombra leggermente più morbida */
+  border-bottom: 1px solid #eeeeee;     /* Definizione extra per lo sfondo bianco */
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 70px; /* Aumentato leggermente per far respirare il logo */
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* Se usi ancora il testo accanto al logo */
+.logo-beta  { color: var(--bb-blue); } 
+.logo-books { color: var(--bb-orange); }
+
+.navbar-links {
+  display: flex;
+  background-color: transparent; 
+  gap: 8px;
+  list-style: none;
+  flex: 1;
+}
+
+.navbar-links a {
+  color: #444444; /* Grigio scuro per i link */
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: var(--bb-radius-sm);
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.navbar-links a:hover,
+.navbar-links a.active {
+  color: var(--bb-blue);
+  background: rgba(var(--bb-blue-rgb), 0.08); /* Sfondo leggerissimo al passaggio */
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.navbar-user {
+  color: #666666;
+  font-size: 13px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Bottoni nella navbar */
+.navbar-actions .btn-outline {
+  border: 1px solid var(--bb-blue);
+  color: var(--bb-blue);
+  background: transparent;
+}
+
+.navbar-actions .btn-outline:hover {
+  background: var(--bb-blue);
+  color: white;
+}
+
+/* Hamburger Menu (per Mobile) */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--bb-blue); /* Linee blu invece che bianche */
+  border-radius: 2px;
+}
+
+/* Menu Mobile */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: white; /* Mobile menu ora bianco */
+  border-bottom: 1px solid #eee;
+  padding: 12px 20px 20px;
+  gap: 4px;
+}
+
+.mobile-menu.open { display: flex; }
+
+.mobile-menu a {
+  color: #333;
+  padding: 12px;
+  border-radius: var(--bb-radius-sm);
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.mobile-menu a:hover {
+  background: #f5f5f5;
+  color: var(--bb-blue);
+}
+
+@media (max-width: 768px) {
+  .navbar-links, .navbar-actions { display: none; }
+  .hamburger { display: flex; }
+}
+
+/* Logo Image */
+.logo-img {
+  height: 80px; /* 80px era un po' alto per una navbar standard da 64-70px */
+  width: auto;  /* Importante: mantieni auto per non schiacciare il logo */
+  display: block;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}
