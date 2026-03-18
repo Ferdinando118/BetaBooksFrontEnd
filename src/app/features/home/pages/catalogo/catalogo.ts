@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LibroService } from '../../../../core/services/libro';
+import { CarrelloService } from '../../../../core/services/carrello';
 import { Libro } from '../../../../core/models/models';
 
 @Component({
@@ -22,7 +23,10 @@ export class Catalogo implements OnInit {
   ordinamento = 'titolo';
   loading = true;
 
-  constructor(private libroService: LibroService) {}
+  constructor(
+    private libroService: LibroService,
+    private carrelloService: CarrelloService
+  ) {}
 
   ngOnInit(): void {
     this.libroService.getAll().subscribe(libri => {
@@ -35,7 +39,6 @@ export class Catalogo implements OnInit {
 
   filtra(): void {
     let risultati = [...this.libri];
-
     if (this.ricerca.trim()) {
       const q = this.ricerca.toLowerCase();
       risultati = risultati.filter(l =>
@@ -44,20 +47,17 @@ export class Catalogo implements OnInit {
         l.autore.cognome.toLowerCase().includes(q)
       );
     }
-
     if (this.categoriaSelezionata) {
       risultati = risultati.filter(l =>
         l.categorie?.some(c => c.nome === this.categoriaSelezionata)
       );
     }
-
     switch (this.ordinamento) {
       case 'prezzo-asc':  risultati.sort((a, b) => a.prezzo - b.prezzo); break;
       case 'prezzo-desc': risultati.sort((a, b) => b.prezzo - a.prezzo); break;
       case 'voto':        risultati.sort((a, b) => (b.valutazioneMedia ?? 0) - (a.valutazioneMedia ?? 0)); break;
       default:            risultati.sort((a, b) => a.titolo.localeCompare(b.titolo));
     }
-
     this.libriFiltrati = risultati;
   }
 
@@ -66,6 +66,11 @@ export class Catalogo implements OnInit {
     this.categoriaSelezionata = '';
     this.ordinamento = 'titolo';
     this.filtra();
+  }
+
+  aggiungiAlCarrello(event: Event, libro: Libro): void {
+    event.stopPropagation();
+    this.carrelloService.aggiungi(libro);
   }
 
   stelle(n: number): string {

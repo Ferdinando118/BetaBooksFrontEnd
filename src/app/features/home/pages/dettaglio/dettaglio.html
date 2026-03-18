@@ -1,0 +1,129 @@
+@if (loading) {
+  <p class="text-muted text-center" style="padding: 60px">Caricamento...</p>
+}
+
+@if (!loading && libro) {
+  <div class="dettaglio-wrapper">
+
+    <!-- Colonna sinistra: copertina -->
+    <aside class="dettaglio-cover">
+      <img [src]="libro.copertina" [alt]="libro.titolo"
+           onerror="this.src='https://placehold.co/300x420/1a3a6b/ffffff?text=📚'">
+
+      @if (libro.quantita > 0) {
+        <button class="btn btn-accent w-full"
+                (click)="aggiungiAlCarrello()"
+                [disabled]="aggiunto">
+          {{ aggiunto ? '✅ Aggiunto!' : '🛒 Aggiungi al carrello' }}
+        </button>
+      } @else {
+        <button class="btn btn-outline w-full" disabled>Esaurito</button>
+      }
+
+      <a routerLink="/cart" class="btn btn-outline w-full" style="margin-top: 8px">
+        Vai al carrello
+      </a>
+    </aside>
+
+    <!-- Colonna destra: info -->
+    <div class="dettaglio-info">
+      <div class="card">
+        <h1 class="libro-titolo">{{ libro.titolo }}</h1>
+
+        @if (libro.volume) {
+          <span class="badge badge-volume">{{ libro.volume }}</span>
+        }
+
+        <p class="libro-autore">
+          di <strong>{{ libro.autore.nome }} {{ libro.autore.cognome }}</strong>
+          @if (libro.autore.nazionalita) {
+            · {{ libro.autore.nazionalita }}
+          }
+        </p>
+
+        <div class="libro-meta">
+          @if (libro.editore) {
+            <span>🏢 {{ libro.editore.nome }}</span>
+          }
+          @if (libro.anno) {
+            <span>📅 {{ libro.anno }}</span>
+          }
+          <span>🌐 {{ libro.lingua }}</span>
+          <span>📦 {{ libro.quantita > 0 ? libro.quantita + ' disponibili' : 'Esaurito' }}</span>
+        </div>
+
+        @if (libro.categorie && libro.categorie.length > 0) {
+          <div class="categorie">
+            @for (cat of libro.categorie; track cat.id) {
+              <span class="badge-categoria">{{ cat.nome }}</span>
+            }
+          </div>
+        }
+
+        <div class="prezzo-box">
+          <span class="price">€ {{ libro.prezzo | number:'1.2-2' }}</span>
+          @if (libro.valutazioneMedia) {
+            <span class="stelle-media">
+              ★ {{ libro.valutazioneMedia }} / 5
+              <span class="text-muted">({{ recensioni.length }} recensioni)</span>
+            </span>
+          }
+        </div>
+
+        @if (libro.descrizione) {
+          <hr class="divider">
+          <p class="libro-descrizione">{{ libro.descrizione }}</p>
+        }
+      </div>
+
+      <!-- Recensioni -->
+      <div class="card" style="margin-top: 24px">
+        <h2 class="section-title">Recensioni</h2>
+        <hr class="divider">
+
+        @if (recensioni.length === 0) {
+          <p class="text-muted">Nessuna recensione ancora. Sii il primo!</p>
+        }
+
+        @for (r of recensioni; track r.id) {
+          <div class="recensione">
+            <div class="rec-header">
+              <span class="rec-stelle">{{ stelle(r.valutazione) }}</span>
+              <span class="text-muted">{{ r.data | date:'dd/MM/yyyy' }}</span>
+            </div>
+            @if (r.descrizione) {
+              <p class="rec-testo">{{ r.descrizione }}</p>
+            }
+          </div>
+        }
+
+        <!-- Form nuova recensione -->
+        @if (auth.isLoggedIn() && !recensioneInviata) {
+          <hr class="divider">
+          <h3 style="font-size:15px; font-weight:600; color:var(--bb-blue); margin-bottom:12px">
+            Lascia una recensione
+          </h3>
+          <form [formGroup]="formRecensione" (ngSubmit)="inviaRecensione()">
+            <div class="form-group">
+              <label>Voto (1-5)</label>
+              <input type="number" formControlName="valutazione" min="1" max="5">
+            </div>
+            <div class="form-group">
+              <label>Commento</label>
+              <textarea formControlName="descrizione" rows="3"
+                        placeholder="Cosa ne pensi di questo libro?"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Invia recensione</button>
+          </form>
+        }
+
+        @if (recensioneInviata) {
+          <div class="alert-success" style="margin-top: 16px">
+            ✅ Recensione inviata con successo!
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+}
