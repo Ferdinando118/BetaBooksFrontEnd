@@ -4,11 +4,12 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LibroService } from '../../../../core/services/libro';
 import { Libro } from '../../../../core/models/models';
+import { BookHoverDirective } from '../../../../shared/directives/book-hover.directive';
 
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, BookHoverDirective],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css'
 })

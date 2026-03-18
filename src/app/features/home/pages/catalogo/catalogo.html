@@ -29,6 +29,7 @@
     <option value="titolo">A → Z</option>
     <option value="prezzo-asc">Prezzo ↑</option>
     <option value="prezzo-desc">Prezzo ↓</option>
+    <option value="tendenza">Di tendenza</option>
     <option value="voto">Più votati</option>
   </select>
 
@@ -58,8 +59,8 @@
         <div class="book-card card" [routerLink]="['/libro', libro.id]">
 
           <div class="book-cover">
-            <img [src]="libro.copertina" [alt]="libro.titolo"
-                 onerror="this.src='https://placehold.co/200x280/1a3a6b/ffffff?text=📚'">
+            <img appBookHover [src]="libro.copertina" [alt]="libro.titolo"
+                 onerror="this.src='https://placehold.co/200x280/0052CC/ffffff?text=Book'">
             @if (libro.quantita === 0) {
               <span class="badge-esaurito">Esaurito</span>
             }
