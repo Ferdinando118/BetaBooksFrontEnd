@@ -65,7 +65,7 @@
                     @for (item of ordine.items; track item.id) {
                       <div class="ordine-item">
                         <img [src]="item.libro.copertina" [alt]="item.libro.titolo"
-                             onerror="this.src='https://placehold.co/60x80/0052CC/ffffff?text=Book'">
+                             onerror="this.src='https://placehold.co/60x80/1a3a6b/ffffff?text=📚'">
                         <div class="item-info">
                           <p class="item-titolo">{{ item.libro.titolo }}</p>
                           <p class="text-muted">{{ item.libro.autore.nome }} {{ item.libro.autore.cognome }}</p>

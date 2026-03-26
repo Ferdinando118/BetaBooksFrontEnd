@@ -5,12 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { LibroService } from '../../../../core/services/libro';
 import { CarrelloService } from '../../../../core/services/carrello';
 import { Libro } from '../../../../core/models/models';
-import { BookHoverDirective } from '../../../../shared/directives/book-hover.directive';
 
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, BookHoverDirective],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css'
 })
@@ -22,6 +21,7 @@ export class Catalogo implements OnInit {
   ricerca = '';
   categoriaSelezionata = '';
   ordinamento = 'titolo';
+  soloPreferiti = false;
   loading = true;
 
   constructor(
@@ -40,6 +40,12 @@ export class Catalogo implements OnInit {
 
   filtra(): void {
     let risultati = [...this.libri];
+    
+    // Filtra per preferiti
+    if (this.soloPreferiti) {
+      risultati = risultati.filter(l => l.miPiace);
+    }
+    
     if (this.ricerca.trim()) {
       const q = this.ricerca.toLowerCase();
       risultati = risultati.filter(l =>
@@ -66,6 +72,7 @@ export class Catalogo implements OnInit {
     this.ricerca = '';
     this.categoriaSelezionata = '';
     this.ordinamento = 'titolo';
+    this.soloPreferiti = false;
     this.filtra();
   }
 
@@ -76,5 +83,11 @@ export class Catalogo implements OnInit {
 
   stelle(n: number): string {
     return '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
+  }
+
+  toggleMiPiace(event: Event, libro: Libro): void {
+    event.stopPropagation();
+    this.libroService.toggleMiPiace(libro.id);
+    libro.miPiace = !libro.miPiace;
   }
 }
