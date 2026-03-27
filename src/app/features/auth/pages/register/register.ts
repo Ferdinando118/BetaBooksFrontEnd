@@ -6,8 +6,7 @@ import { AuthService } from '../../../../core/services/auth';
 
 @Component({
   selector: 'app-register',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  standalone: false,
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
@@ -34,8 +33,17 @@ export class Register {
     this.loading = true;
     this.errore = null;
 
-    this.auth.register(this.form.value).subscribe({
-      next: () => this.router.navigate(['/']),
+    // Estraiamo SOLO email e password dal form, ignorando nome e cognome per ora
+    const payload = {
+      email: this.form.value.email,
+      password: this.form.value.password
+    };
+
+    this.auth.register(payload).subscribe({
+      next: () => {
+        // Dopo la registrazione, mandiamolo alla pagina di login!
+        this.router.navigate(['/auth/login']); 
+      },
       error: () => {
         this.errore = 'Registrazione fallita. Email già in uso?';
         this.loading = false;

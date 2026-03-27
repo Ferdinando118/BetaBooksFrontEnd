@@ -36,9 +36,6 @@
       <div class="form-group">
         <label>Password</label>
         <input type="password" formControlName="password" placeholder="••••••••">
-        @if (password.invalid && password.touched) {
-          <span class="error-msg">Minimo 6 caratteri</span>
-        }
       </div>
 
       @if (errore) {

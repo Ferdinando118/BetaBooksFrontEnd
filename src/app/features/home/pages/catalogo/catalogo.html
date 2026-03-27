@@ -1,11 +1,18 @@
-<!-- Hero -->
 <div class="hero">
   <h1>Scopri il tuo <span>prossimo capitolo</span></h1>
   <p>Migliaia di libri ti aspettano</p>
 </div>
 
-<!-- Filtri -->
-<div class="filtri-bar">
+@if (auth.isAdmin()) {
+  <div class="admin-actions mb-4 container">
+    <button class="btn btn-primary" routerLink="/admin/nuovo-libro">
+      + Inserisci Nuovo Libro
+    </button>
+  </div> 
+  <br>
+}
+
+<div class="filtri-bar container">
   <div class="filtro-search">
     <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="11" cy="11" r="8"></circle>
@@ -14,79 +21,81 @@
     <input
       type="text"
       [(ngModel)]="ricerca"
-      (ngModelChange)="filtra()"
-      placeholder="Cerca titolo o autore...">
+      (ngModelChange)="aggiornaFiltri()"
+      placeholder="Cerca titolo, autore o editore...">
   </div>
 
-  <select [(ngModel)]="categoriaSelezionata" (ngModelChange)="filtra()" class="filtro-select">
+  <select [(ngModel)]="categoriaSelezionata" (ngModelChange)="aggiornaFiltri()" class="filtro-select">
     <option value="">Tutte le categorie</option>
-    @for (cat of categorie; track cat) {
+    @for (cat of categorie(); track cat) {
       <option [value]="cat">{{ cat }}</option>
     }
   </select>
 
-  <select [(ngModel)]="ordinamento" (ngModelChange)="filtra()" class="filtro-select">
+  <select [(ngModel)]="ordinamento" (ngModelChange)="aggiornaFiltri()" class="filtro-select">
     <option value="titolo">A → Z</option>
     <option value="prezzo-asc">Prezzo ↑</option>
     <option value="prezzo-desc">Prezzo ↓</option>
-    <option value="voto">Più votati</option>
   </select>
 
   <button class="btn btn-outline btn-sm" (click)="reset()">Reset</button>
 </div>
 
-<!-- Risultati -->
-<div class="risultati-header">
-  <span class="text-muted">{{ libriFiltrati.length }} libri trovati</span>
+<div class="risultati-header container">
+  <span class="text-muted">{{ libriFiltrati().length }} libri trovati</span>
 </div>
 
-<!-- Loading -->
-@if (loading) {
-  <div class="loading">Caricamento...</div>
+@if (loading()) {
+  <div class="loading text-center py-5">
+    <div class="spinner"></div>
+    <p>Caricamento libri...</p>
+  </div>
 }
 
-<!-- Griglia -->
-@if (!loading) {
-  @if (libriFiltrati.length === 0) {
-    <div class="empty">
+@if (!loading()) {
+  @if (libriFiltrati().length === 0) {
+    <div class="empty text-center py-5">
       <p>Nessun libro trovato.</p>
-      <button class="btn btn-outline btn-sm mt-16" (click)="reset()">Mostra tutti</button>
+      <button class="btn btn-outline btn-sm mt-3" (click)="reset()">Mostra tutti</button>
     </div>
   } @else {
-    <div class="books-grid">
-      @for (libro of libriFiltrati; track libro.id) {
-        <div class="book-card card" [routerLink]="['/libro', libro.id]">
-
-          <div class="book-cover">
-            <img [src]="libro.copertina" [alt]="libro.titolo"
-                 onerror="this.src='https://placehold.co/200x280/1a3a6b/ffffff?text=📚'">
-            @if (libro.quantita === 0) {
-              <span class="badge-esaurito">Esaurito</span>
-            }
-          </div>
-
-          <div class="book-info">
-            <h3 class="book-title">{{ libro.titolo }}</h3>
-            <p class="book-author">{{ libro.autore.nome }} {{ libro.autore.cognome }}</p>
-
-            @if (libro.valutazioneMedia) {
-              <div class="book-stars">
-                <span class="stars">{{ stelle(libro.valutazioneMedia) }}</span>
-                <span class="voto">{{ libro.valutazioneMedia }}</span>
-              </div>
-            }
-
-            <div class="book-footer">
-              <span class="price">€ {{ libro.prezzo | number:'1.2-2' }}</span>
-              @if (libro.quantita > 0) {
-                <button class="btn btn-accent btn-sm"
-                        (click)="$event.stopPropagation()">
-                  + Carrello
-                </button>
+    <div class="books-grid container">
+      @for (libro of libriFiltrati(); track libro.id) {
+        <div class="book-card card">
+          <div class="card-content">
+            <div class="book-cover" [routerLink]="auth.isAdmin() ? null : ['/libro', libro.id]" style="cursor: pointer;">
+              <img [src]="libro.copertina" (error)="libro.copertina = 'assets/images/default-book.png'" alt="Copertina Libro">
+              @if (libro.quantita === 0) {
+                <span class="badge-esaurito">Esaurito</span>
               }
             </div>
-          </div>
 
+            <div class="book-info">
+              <h3 class="book-title" [routerLink]="auth.isAdmin() ? null : ['/libro', libro.id]" style="cursor: pointer;">
+                {{ libro.titolo }}
+              </h3>
+              
+              <p class="book-author">di <strong>{{ libro.autore?.nome }} {{ libro.autore?.cognome }}</strong></p>
+              <p class="book-publisher"><small>Editore: {{ libro.editore?.nome }}</small></p>
+
+              <div class="book-footer">
+                <span class="price">€ {{ libro.prezzo | number:'1.2-2' }}</span>
+                
+                <div class="actions">
+                  @if (auth.isAdmin()) {
+                    <button class="btn btn-warning btn-sm" [routerLink]="['/admin/modifica-libro', libro.id]">
+                      Modifica
+                    </button>
+                  } 
+                  @else if (libro.quantita > 0) {
+                    <button class="btn btn-accent btn-sm" (click)="aggiungiAlCarrello($event, libro)">
+                      + Carrello
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       }
     </div>

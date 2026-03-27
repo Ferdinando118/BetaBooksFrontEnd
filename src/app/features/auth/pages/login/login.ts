@@ -6,8 +6,7 @@ import { AuthService } from '../../../../core/services/auth';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  standalone: false,
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -23,7 +22,7 @@ export class Login {
   ) {
     this.form = this.fb.group({
       email:    ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(3)]]
     });
   }
 

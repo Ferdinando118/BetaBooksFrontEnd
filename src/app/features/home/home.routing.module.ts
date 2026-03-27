@@ -4,8 +4,8 @@ import { Catalogo } from './pages/catalogo/catalogo';
 import { Dettaglio } from './pages/dettaglio/dettaglio';
 
 const routes: Routes = [
-  { path: '',        component: Catalogo },
-  { path: 'libro/:id', component: Dettaglio }
+  { path: '',            component: Catalogo },
+  { path: 'libro/:id',   component: Dettaglio }
 ];
 
 @NgModule({

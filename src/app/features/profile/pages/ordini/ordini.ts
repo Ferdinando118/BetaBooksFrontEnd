@@ -6,8 +6,7 @@ import { Ordine } from '../../../../core/models/models';
 
 @Component({
   selector: 'app-ordini',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
+  standalone: false,
   templateUrl: './ordini.html',
   styleUrl: './ordini.css'
 })

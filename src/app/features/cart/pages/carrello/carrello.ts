@@ -6,8 +6,7 @@ import { CarrelloItem } from '../../../../core/models/models';
 
 @Component({
   selector: 'app-carrello',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
+  standalone: false,
   templateUrl: './carrello.html',
   styleUrl: './carrello.css'
 })

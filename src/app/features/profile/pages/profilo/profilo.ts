@@ -8,8 +8,7 @@ import { Utente, Ordine } from '../../../../core/models/models';
 
 @Component({
   selector: 'app-profilo',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  standalone: false,
   templateUrl: './profilo.html',
   styleUrl: './profilo.css'
 })
@@ -32,7 +31,7 @@ export class Profilo implements OnInit {
   }
 
   ngOnInit(): void {
-    this.utente = this.auth.getUtente();
+    this.utente = this.auth.grant().utente;
     this.ordineService.getOrdiniUtente().subscribe((ordini: Ordine[]) => {
       this.totaleOrdini = ordini.length;
     });

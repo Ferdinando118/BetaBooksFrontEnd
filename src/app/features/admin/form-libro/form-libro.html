@@ -1,0 +1,96 @@
+<div class="admin-container">
+  <div class="form-card shadow">
+    <div class="form-header">
+      <h2>{{ editMode ? '📝 Modifica Libro' : '📚 Nuovo Libro' }}</h2>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="salva()" class="row g-4">
+      
+      <div class="col-md-12">
+        <label class="form-label">Titolo *</label>
+        <input type="text" formControlName="titolo" class="form-control" 
+               [class.is-invalid]="form.get('titolo')?.invalid && form.get('titolo')?.touched">
+        @if (form.get('titolo')?.invalid && form.get('titolo')?.touched) {
+          <small class="text-danger">Titolo obbligatorio (min 3 caratteri).</small>
+        }
+      </div>
+
+      <div class="col-md-12">
+        <label class="form-label">Descrizione *</label>
+        <textarea formControlName="descrizione" class="form-control" rows="3"
+                  [class.is-invalid]="form.get('descrizione')?.invalid && form.get('descrizione')?.touched"></textarea>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Autore *</label>
+        <select formControlName="idAutore" class="form-select">
+          <option [ngValue]="null">Seleziona Autore...</option>
+          @for (a of autori(); track (a.id || a.id_autore)) {
+            <option [ngValue]="a.id || a.id_autore">{{ a.nome }} {{ a.cognome }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Editore *</label>
+        <select formControlName="idEditore" class="form-select">
+          <option [ngValue]="null">Seleziona Editore...</option>
+          @for (e of editori(); track (e.id || e.id_editore)) {
+            <option [ngValue]="e.id || e.id_editore">{{ e.nome }}</option>
+          }
+        </select>
+      </div>
+
+      <hr>
+      <h5 class="mb-0">Dettagli Formato e Prezzo</h5>
+      <p class="text-muted small">Questi dati verranno salvati nel formato del libro.</p>
+
+      <div class="col-md-3">
+        <label class="form-label">Prezzo (€) *</label>
+        <input type="number" formControlName="prezzo" class="form-control" step="0.01">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Quantità a Stock *</label>
+        <input type="number" formControlName="stock" class="form-control">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Supporto</label>
+        <select formControlName="tipoSupporto" class="form-select">
+          <option value="CARTACEO">Cartaceo</option>
+          <option value="EBOOK">E-book</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Copertina</label>
+        <select formControlName="tipoCopertina" class="form-select">
+          <option value="FLESSIBILE">Flessibile</option>
+          <option value="RIGIDA">Rigida</option>
+        </select>
+      </div>
+
+      <div class="col-md-12">
+        <label class="form-label">Immagine Copertina</label>
+        <input type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
+        @if (selectedFile) {
+          <small class="text-success d-block mt-1">File pronto: {{ selectedFile.name }}</small>
+        }
+      </div>
+
+      <div class="col-12 form-actions mt-4">
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Salvataggio...
+          } @else {
+            <span>Salva Libro e Formato</span>
+          }
+        </button>
+        <button type="button" class="btn btn-secondary ms-2" routerLink="/catalogo" [disabled]="loading">Annulla</button>
+      </div>
+      
+    </form>
+  </div>
+</div>

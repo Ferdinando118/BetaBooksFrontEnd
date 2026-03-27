@@ -1,79 +1,117 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LibroService } from '../../../../core/services/libro';
 import { CarrelloService } from '../../../../core/services/carrello';
-import { Libro } from '../../../../core/models/models';
+import { AuthService } from '../../../../core/services/auth';
+import { LibroDTO } from '../../../../core/models/libro.model';
 
 @Component({
   selector: 'app-catalogo',
-  standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  standalone: false,
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css'
 })
 export class Catalogo implements OnInit {
-  libri: Libro[] = [];
-  libriFiltrati: Libro[] = [];
-  categorie: string[] = [];
+  public readonly auth = inject(AuthService);
+  private readonly libroService = inject(LibroService);
+  private readonly carrelloService = inject(CarrelloService);
 
+  // --- Signals per lo Stato ---
+  libri = signal<any[]>([]);
+  categorie = signal<string[]>([]);
+  loading = signal(true);
+
+  // --- Filtri ---
   ricerca = '';
   categoriaSelezionata = '';
   ordinamento = 'titolo';
-  loading = true;
 
-  constructor(
-    private libroService: LibroService,
-    private carrelloService: CarrelloService
-  ) {}
+  libriFiltrati = computed(() => {
+    let risultati = [...this.libri()];
+
+// catalogo.ts - dentro libriFiltrati
+if (this.ricerca.trim()) {
+  const query = this.ricerca.toLowerCase();
+  risultati = risultati.filter(l =>
+    l.titolo?.toLowerCase().includes(query) ||
+    l.autore?.nome?.toLowerCase().includes(query) ||
+    l.autore?.cognome?.toLowerCase().includes(query) ||
+    l.editore?.nome?.toLowerCase().includes(query) // Aggiungi questo per l'editore!
+  );
+}
+
+    if (this.categoriaSelezionata) {
+      risultati = risultati.filter(l =>
+        l.categorie?.some((c: any) => c.nome === this.categoriaSelezionata)
+      );
+    }
+
+    switch (this.ordinamento) {
+      case 'prezzo-asc':  risultati.sort((a, b) => (a.prezzo || 0) - (b.prezzo || 0)); break;
+      case 'prezzo-desc': risultati.sort((a, b) => (b.prezzo || 0) - (a.prezzo || 0)); break;
+      default:            risultati.sort((a, b) => a.titolo?.localeCompare(b.titolo));
+    }
+
+    return risultati;
+  });
 
   ngOnInit(): void {
-    this.libroService.getAll().subscribe(libri => {
-      this.libri = libri;
-      this.categorie = [...new Set(libri.flatMap(l => l.categorie?.map(c => c.nome) ?? []))];
-      this.filtra();
-      this.loading = false;
+    this.inizializzaCatalogo();
+  }
+
+  private inizializzaCatalogo(): void {
+    this.loading.set(true);
+    this.libroService.getAll().subscribe({
+      next: (data: LibroDTO[]) => {
+        const mappati = data.map(libro => {
+          const f = libro.formati?.[0];
+          
+          // Costruzione URL immagine
+          const urlServer = 'http://localhost:8080/uploads/'; 
+          // Se f.copertina è già un URL (http...) lo usiamo, altrimenti aggiungiamo il prefisso
+          const copertinaUrl = f?.copertina 
+            ? (f.copertina.startsWith('http') ? f.copertina : urlServer + f.copertina) 
+            : 'assets/images/default-book.png'; // Un'immagine di default se non c'è la copertina
+
+          return {
+            ...libro,
+            prezzo: f?.prezzo || 0,
+            quantita: f?.quantita || 0,
+            copertina: copertinaUrl
+          };
+        });
+
+        this.libri.set(mappati);
+        
+        // Estrazione categorie
+        const nomiCat = data.flatMap(l => l.categorie?.map(c => c.nome) ?? []);
+        this.categorie.set([...new Set<string>(nomiCat)]);
+        
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Errore API Catalogo:', err);
+        this.loading.set(false);
+      }
     });
   }
 
-  filtra(): void {
-    let risultati = [...this.libri];
-    if (this.ricerca.trim()) {
-      const q = this.ricerca.toLowerCase();
-      risultati = risultati.filter(l =>
-        l.titolo.toLowerCase().includes(q) ||
-        l.autore.nome.toLowerCase().includes(q) ||
-        l.autore.cognome.toLowerCase().includes(q)
-      );
-    }
-    if (this.categoriaSelezionata) {
-      risultati = risultati.filter(l =>
-        l.categorie?.some(c => c.nome === this.categoriaSelezionata)
-      );
-    }
-    switch (this.ordinamento) {
-      case 'prezzo-asc':  risultati.sort((a, b) => a.prezzo - b.prezzo); break;
-      case 'prezzo-desc': risultati.sort((a, b) => b.prezzo - a.prezzo); break;
-      case 'voto':        risultati.sort((a, b) => (b.valutazioneMedia ?? 0) - (a.valutazioneMedia ?? 0)); break;
-      default:            risultati.sort((a, b) => a.titolo.localeCompare(b.titolo));
-    }
-    this.libriFiltrati = risultati;
+  // --- Metodi Utility ---
+  aggiornaFiltri(): void {
+    this.libri.set([...this.libri()]);
   }
 
   reset(): void {
     this.ricerca = '';
     this.categoriaSelezionata = '';
     this.ordinamento = 'titolo';
-    this.filtra();
+    this.aggiornaFiltri();
   }
 
-  aggiungiAlCarrello(event: Event, libro: Libro): void {
+  aggiungiAlCarrello(event: Event, libro: any): void {
     event.stopPropagation();
     this.carrelloService.aggiungi(libro);
-  }
-
-  stelle(n: number): string {
-    return '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
   }
 }

@@ -7,8 +7,7 @@ import { CarrelloItem, MetodoPagamento } from '../../../../core/models/models';
 
 @Component({
   selector: 'app-checkout',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  standalone: false,
   templateUrl: './checkout.html',
   styleUrl: './checkout.css'
 })

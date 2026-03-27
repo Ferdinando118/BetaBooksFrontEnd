@@ -16,7 +16,7 @@
     <!-- Azioni destra -->
     <div class="navbar-actions">
       @if (auth.isLoggedIn()) {
-        <span class="navbar-user">{{ (auth.utente$ | async)?.email }}</span>
+        <span class="navbar-user">{{ auth.grant().utente?.email }}</span>
         <button class="btn btn-outline btn-sm" (click)="logout()">Esci</button>
       } @else {
         <a routerLink="/auth/login"    class="btn btn-outline btn-sm">Accedi</a>

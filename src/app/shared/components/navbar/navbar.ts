@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule, AsyncPipe } from '@angular/common';
+import { CommonModule} from '@angular/common';
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-navbar',
-  standalone: true,
-  imports: [CommonModule, RouterModule, AsyncPipe],
+  standalone: false,
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
