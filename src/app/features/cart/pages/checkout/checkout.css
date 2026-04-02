@@ -1,80 +1,46 @@
-.page-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--bb-blue);
-  margin-bottom: 24px;
-}
-
-.success {
-  text-align: center;
-  padding: 60px 20px;
-  max-width: 480px;
-  margin: 60px auto;
-}
-
-.success h2 { font-size: 24px; font-weight: 700; color: var(--bb-blue); margin-top: 16px; }
-
-.checkout-layout {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 24px;
-  align-items: start;
-}
-
-.checkout-form h2 { font-size: 17px; font-weight: 700; color: var(--bb-blue); }
-
-.form-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; }
-
-.metodi-grid {
+.indirizzi-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-.metodo-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  border: 1.5px solid var(--bb-gray-200);
-  border-radius: var(--bb-radius-sm);
+.indirizzo-card {
+  border: 2px solid #eee;
+  border-radius: 8px;
+  padding: 16px;
   cursor: pointer;
-  font-size: 14px;
-  transition: border-color 0.2s, background 0.2s;
+  transition: all 0.2s ease;
 }
 
-.metodo-option input { display: none; }
-.metodo-option.selected {
-  border-color: var(--bb-blue);
-  background: #eef2fb;
-  font-weight: 600;
-  color: var(--bb-blue);
+.indirizzo-card:hover {
+  border-color: #ccc;
 }
 
-.riepilogo { position: sticky; top: 80px; }
-.riepilogo h2 { font-size: 18px; font-weight: 700; color: var(--bb-blue); }
+.indirizzo-card.selected {
+  border-color: #007bff; /* Sostituisci con il tuo colore primario */
+  background-color: #f8fbff;
+}
 
-.riepilogo-row {
+.ind-header {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
-  color: var(--bb-gray-600);
   margin-bottom: 8px;
 }
 
-.riepilogo-totale {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 700;
-  font-size: 16px;
+.ind-radio {
+  margin-top: 12px;
+  font-size: 0.9em;
+  font-weight: bold;
 }
 
-.w-full { width: 100%; justify-content: center; }
+.mb-4 {
+  margin-bottom: 24px;
+}
 
-@media (max-width: 768px) {
-  .checkout-layout { grid-template-columns: 1fr; }
-  .riepilogo { position: static; }
-  .metodi-grid { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
+.new-address-form {
+  background-color: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px dashed #ccc;
 }

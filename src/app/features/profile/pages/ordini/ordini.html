@@ -61,20 +61,23 @@
                     <span class="text-muted">Pagamento:</span>
                     <strong>{{ ordine.metodoPagamento }}</strong>
                   </div>
+                  
                   <div class="ordine-items">
                     @for (item of ordine.items; track item.id) {
                       <div class="ordine-item">
-                        <img [src]="item.libro.copertina" [alt]="item.libro.titolo"
-                             onerror="this.src='https://placehold.co/60x80/1a3a6b/ffffff?text=📚'">
+                        <img [src]="'http://localhost:8080/uploads/' + item.copertina" 
+                             [alt]="item.titoloLibro"
+                             onerror="this.onerror=null; this.src='/images/default_book.png'">
+                        
                         <div class="item-info">
-                          <p class="item-titolo">{{ item.libro.titolo }}</p>
-                          <p class="text-muted">{{ item.libro.autore.nome }} {{ item.libro.autore.cognome }}</p>
+                          <p class="item-titolo">{{ item.titoloLibro }}</p>
                           <p class="text-muted">Qtà: {{ item.quantita }}</p>
                         </div>
                         <span class="item-prezzo">€ {{ item.prezzoUnitarioAcquisto | number:'1.2-2' }}</span>
                       </div>
                     }
                   </div>
+
                   <div class="ordine-totale">
                     <span>Totale ordine</span>
                     <span class="price">€ {{ ordine.totale | number:'1.2-2' }}</span>

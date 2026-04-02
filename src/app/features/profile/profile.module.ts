@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ProfileRoutingModule } from './profile.routing.module';
 import { Profilo } from './pages/profilo/profilo';
-import { OrdiniComponent } from './pages/ordini/ordini';
+import { Ordini } from './pages/ordini/ordini';
 
 @NgModule({
   declarations: [
     Profilo,
-    OrdiniComponent
+    Ordini
   ],
   imports: [
     CommonModule,

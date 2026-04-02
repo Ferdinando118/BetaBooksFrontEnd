@@ -1,7 +1,7 @@
 <div class="carrello-wrapper">
   <h1 class="page-title">Il tuo carrello</h1>
 
-  @if (items.length === 0) {
+  @if (!carrello || !carrello.items || carrello.items.length === 0) {
     <div class="empty card">
       <p style="font-size: 48px;">🛒</p>
       <p>Il carrello è vuoto</p>
@@ -9,51 +9,54 @@
     </div>
   }
 
-  @if (items.length > 0) {
+  @if (carrello && carrello.items && carrello.items.length > 0) {
     <div class="carrello-layout">
 
-      <!-- Lista items -->
       <div class="items-list">
-        @for (item of items; track item.id) {
+        @for (item of carrello.items; track item.id) {
           <div class="item-card card">
-            <img [src]="item.libro.copertina" [alt]="item.libro.titolo"
-                 onerror="this.src='https://placehold.co/80x110/1a3a6b/ffffff?text=📚'">
+            
+            <img src="https://placehold.co/80x110/1a3a6b/ffffff?text=📚" alt="Copertina Libro">
+            
             <div class="item-info">
-              <h3>{{ item.libro.titolo }}</h3>
-              <p class="text-muted">
-                {{ item.libro.autore.nome }} {{ item.libro.autore.cognome }}
-              </p>
-              <p class="item-prezzo-unit">€ {{ item.libro.prezzo | number:'1.2-2' }} cad.</p>
+              <h3>{{ item.titoloLibro }}</h3>
+              <p class="text-muted">Autore non specificato</p>
+              <p class="item-prezzo-unit">€ {{ item.prezzoUnitario | number:'1.2-2' }} cad.</p>
             </div>
+            
             <div class="item-azioni">
               <div class="quantita-ctrl">
-                <button (click)="diminuisci(item.libro.id, item.quantita)">−</button>
+                <button (click)="diminuisci(item.id)">−</button>
                 <span>{{ item.quantita }}</span>
-                <button (click)="aumenta(item.libro.id, item.quantita)">+</button>
+                <button (click)="aumenta(item.id)">+</button>
               </div>
-              <p class="item-subtotale">€ {{ item.prezzoPezzi | number:'1.2-2' }}</p>
-              <button class="btn-rimuovi" (click)="rimuovi(item.libro.id)">🗑</button>
+              
+              <p class="item-subtotale">€ {{ item.prezzoTotaleRiga | number:'1.2-2' }}</p>
+              
+              <button class="btn-rimuovi" (click)="rimuovi(item.id)">🗑</button>
             </div>
+
           </div>
         }
-      </div>
+      </div> 
 
-      <!-- Riepilogo -->
       <aside class="riepilogo card">
         <h2>Riepilogo ordine</h2>
         <hr class="divider">
 
-        @for (item of items; track item.id) {
+        @for (item of carrello.items; track item.id) {
           <div class="riepilogo-row">
-            <span>{{ item.libro.titolo | slice:0:25 }}{{ item.libro.titolo.length > 25 ? '…' : '' }} x{{ item.quantita }}</span>
-            <span>€ {{ item.prezzoPezzi | number:'1.2-2' }}</span>
+            <span>
+              {{ item.titoloLibro | slice:0:25 }}{{ item.titoloLibro.length > 25 ? '…' : '' }} x{{ item.quantita }}
+            </span>
+            <span>€ {{ item.prezzoTotaleRiga | number:'1.2-2' }}</span>
           </div>
         }
 
         <hr class="divider">
         <div class="riepilogo-totale">
           <span>Totale</span>
-          <span class="price">€ {{ totale | number:'1.2-2' }}</span>
+          <span class="price">€ {{ carrello.prezzoTotaleComplessivo | number:'1.2-2' }}</span>
         </div>
 
         <a routerLink="/cart/checkout" class="btn btn-accent w-full mt-16">

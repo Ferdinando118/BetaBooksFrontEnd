@@ -11,7 +11,7 @@ export interface Utente {
 }
 
 export interface ProfiloUtente {
-  id: number;
+  id?: number; // <-- Aggiungi il punto interrogativo qui
   idUtente: number;
   nome: string;
   cognome: string;
@@ -19,7 +19,7 @@ export interface ProfiloUtente {
 }
 
 export interface Indirizzo {
-  id: number;
+  id?: number; // <-- Aggiungi il punto interrogativo qui
   idUtente: number;
   isDefault: boolean;
   via: string;
@@ -70,12 +70,20 @@ export interface Libro {
 }
 
 // ── CARRELLO ──────────────────────────────────────
-export interface CarrelloItem {
+export interface CarrelloDTO {
   id: number;
   idUtente: number;
-  libro: Libro;
+  items: CarrelloItemDTO[];
+  prezzoTotaleComplessivo: number; // Il totale calcolato da Spring Boot!
+}
+
+export interface CarrelloItemDTO {
+  id: number;
+  idFormatoLibro: number;
+  titoloLibro: string;
   quantita: number;
-  prezzoPezzi: number;
+  prezzoUnitario: number;
+  prezzoTotaleRiga: number; // Fornito direttamente dal backend!
 }
 
 // ── ORDINE ────────────────────────────────────────
@@ -97,6 +105,14 @@ export interface Ordine {
   items: OrdineItem[];
 }
 
+export interface OrdineDTO {
+    id: number;
+    dataOrdine: string;
+    stato: string;
+    totale: number;
+    metodoPagamento: string;
+    items: any[]; // O usa l'interfaccia specifica degli item se l'hai creata
+}
 // ── RECENSIONE & WISHLIST ─────────────────────────
 export interface Recensione {
   id: number;
@@ -111,4 +127,9 @@ export interface WishlistItem {
   id: number;
   idUtente: number;
   libro: Libro;
+}
+
+export interface Resp {
+    message: string;
+    obj?: any; // Il campo dove Java mette i dati (es. l'ordine o la lista)
 }

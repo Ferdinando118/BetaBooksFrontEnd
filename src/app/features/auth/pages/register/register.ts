@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
+import { ProfiloService } from '../../../../core/services/profilo';
 
 @Component({
   selector: 'app-register',
@@ -16,6 +17,7 @@ export class Register {
   errore: string | null = null;
 
   constructor(
+    private profiloService: ProfiloService,
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router
@@ -29,27 +31,43 @@ export class Register {
   }
 
   submit(): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    this.loading = true;
-    this.errore = null;
+  if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+  this.loading = true;
 
-    // Estraiamo SOLO email e password dal form, ignorando nome e cognome per ora
-    const payload = {
-      email: this.form.value.email,
-      password: this.form.value.password
-    };
+  const payloadUtente = {
+    email: this.form.value.email,
+    password: this.form.value.password
+  };
 
-    this.auth.register(payload).subscribe({
-      next: () => {
-        // Dopo la registrazione, mandiamolo alla pagina di login!
-        this.router.navigate(['/auth/login']); 
-      },
-      error: () => {
-        this.errore = 'Registrazione fallita. Email già in uso?';
-        this.loading = false;
+  // 1. Registriamo l'utente (Email e Password)
+  this.auth.register(payloadUtente).subscribe({
+    next: (nuovoUtente: any) => {
+      // 2. L'utente è stato creato. Ora creiamo il suo Profilo Anagrafico!
+      // Assicurati che Java restituisca l'ID dell'utente appena creato
+      const idDelNuovoUtente = nuovoUtente.id || nuovoUtente.obj; 
+
+      if (idDelNuovoUtente) {
+        const payloadProfilo = {
+          idUtente: idDelNuovoUtente,
+          nome: this.form.value.nome,
+          cognome: this.form.value.cognome
+        };
+        
+        // Chiamata al ProfiloService (dovrai iniettarlo nel costruttore di Register)
+        this.profiloService.saveProfilo(payloadProfilo).subscribe({
+          next: () => this.router.navigate(['/auth/login']),
+          error: () => { /* Gestisci eventuale errore profilo */ }
+        });
+      } else {
+        this.router.navigate(['/auth/login']);
       }
-    });
-  }
+    },
+    error: () => {
+      this.errore = 'Registrazione fallita. Email già in uso?';
+      this.loading = false;
+    }
+  });
+}
 
   get nome()     { return this.form.get('nome')!; }
   get cognome()  { return this.form.get('cognome')!; }

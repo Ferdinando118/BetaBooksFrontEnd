@@ -77,6 +77,7 @@ if (this.ricerca.trim()) {
 
           return {
             ...libro,
+            idFormato: f?.id,
             prezzo: f?.prezzo || 0,
             quantita: f?.quantita || 0,
             copertina: copertinaUrl
@@ -110,8 +111,29 @@ if (this.ricerca.trim()) {
     this.aggiornaFiltri();
   }
 
-  aggiungiAlCarrello(event: Event, libro: any): void {
-    event.stopPropagation();
-    this.carrelloService.aggiungi(libro);
+aggiungiAlCarrello(event: Event, libro: any): void {
+  event.stopPropagation(); // Evita di aprire la scheda libro se hai un link sul contenitore
+  
+  if (!this.auth.isLoggedIn()) {
+    alert('Devi essere loggato per aggiungere prodotti al carrello!');
+    // Opzionale: this.router.navigate(['/auth/login']);
+    return;
   }
+
+  if (libro.idFormato) {
+    this.carrelloService.aggiungi(libro.idFormato).subscribe({
+      next: (res) => {
+        // Opzionale: un feedback visivo (es. un toast o un alert)
+        console.log('Prodotto aggiunto!', res);
+        alert('Libro aggiunto al carrello!');
+      },
+      error: (err) => {
+        console.error('Errore durante l\'aggiunta:', err);
+        alert('Errore: ' + (err.error?.message || 'Impossibile aggiungere il libro'));
+      }
+    });
+  } else {
+    console.error('Errore: Il libro non ha un formato valido.');
+  }
+}
 }

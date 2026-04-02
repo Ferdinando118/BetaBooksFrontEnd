@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { CarrelloService } from '../../../../core/services/carrello';
-import { CarrelloItem } from '../../../../core/models/models';
+import { CarrelloDTO } from '../../../../core/models/models';
 
 @Component({
   selector: 'app-carrello',
@@ -11,27 +9,39 @@ import { CarrelloItem } from '../../../../core/models/models';
   styleUrl: './carrello.css'
 })
 export class Carrello implements OnInit {
-  items: CarrelloItem[] = [];
-  totale = 0;
+  carrello: CarrelloDTO | null = null;
 
   constructor(public carrelloService: CarrelloService) {}
 
   ngOnInit(): void {
-    this.carrelloService.items$.subscribe((items: CarrelloItem[]) => {
-      this.items = items;
-      this.totale = this.carrelloService.getTotale();
+    this.carrelloService.loadCarrello();
+
+    this.carrelloService.carrello$.subscribe((data) => {
+      this.carrello = data;
     });
   }
 
-  aumenta(libroId: number, quantita: number): void {
-    this.carrelloService.aggiornaQuantita(libroId, quantita + 1);
+  aumenta(idItem: number): void {
+    this.carrelloService.aumenta(idItem).subscribe();
   }
 
-  diminuisci(libroId: number, quantita: number): void {
-    this.carrelloService.aggiornaQuantita(libroId, quantita - 1);
+  diminuisci(idItem: number): void {
+    // Nota: Il backend dovrebbe gestire se la quantità arriva a 0, 
+    // solitamente o lo impedisce o elimina l'item.
+    this.carrelloService.diminuisci(idItem).subscribe();
   }
 
-  rimuovi(libroId: number): void {
-    this.carrelloService.rimuovi(libroId);
+  rimuovi(idItem: number): void {
+    if(confirm("Sei sicuro di voler rimuovere questo articolo?")) {
+      this.carrelloService.rimuovi(idItem).subscribe();
+    }
+  }
+
+  // NUOVA AZIONE
+  spostaInWishlist(idItem: number): void {
+    this.carrelloService.spostaInWishlist(idItem).subscribe({
+      next: () => console.log("Spostato in wishlist"),
+      error: (err) => alert("Errore durante lo spostamento: " + err.error.message)
+    });
   }
 }
