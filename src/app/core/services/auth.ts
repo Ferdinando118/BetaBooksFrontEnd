@@ -14,7 +14,7 @@ interface AuthResponse {
 export class AuthService {
 
   private readonly API_UTENTI = 'http://localhost:8080/api/utenti';
-  private readonly API_AUTH = 'http://localhost:8080/api/utenti'; 
+  private readonly API_AUTH = 'http://localhost:8080/api/auth'; 
 
   // Usiamo il SIGNAL come nell'esempio che mi hai dato!
   grant = signal({
@@ -23,7 +23,7 @@ export class AuthService {
     token: null as string | null,
     utente: null as Utente | null
   });
-
+/*
   constructor(
     private http: HttpClient, 
     private router: Router,
@@ -44,8 +44,35 @@ export class AuthService {
         });
       }
     }
+  }*/
+ // Nel tuo auth.ts (AuthService)
+constructor(
+  private http: HttpClient, 
+  private router: Router,
+  @Inject(PLATFORM_ID) private platformId: Object
+) {
+  if (isPlatformBrowser(this.platformId)) {
+    const token = localStorage.getItem('bb_token');
+    const utenteStr = localStorage.getItem('bb_utente');
+    
+    // CONTROLLO DI SICUREZZA: Verifichiamo che i dati esistano e non siano "undefined"
+    if (token && utenteStr && utenteStr !== 'undefined') {
+      try {
+        const utente: Utente = JSON.parse(utenteStr);
+        this.grant.set({
+          isLogged: true,
+          isAdmin: utente.ruolo === 'ADMIN',
+          token: token,
+          utente: utente
+        });
+      } catch (e) {
+        console.error("Errore nel recupero utente dal localStorage", e);
+        this.logout(); // Puliamo tutto se il JSON è rotto
+      }
+    }
   }
-
+}
+/*
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.API_AUTH}/login`, { email, password }).pipe(
       tap(res => {
@@ -64,7 +91,32 @@ export class AuthService {
         }
       })
     );
-  }
+  }*/
+
+    login(email: string, password: string): Observable<any> {
+  return this.http.post<any>(`${this.API_AUTH}/login`, { email, password }).pipe(
+    tap(res => {
+      if (isPlatformBrowser(this.platformId)) {
+        // 'res' è già l'utente (id, email, ruolo) perché Java manda UtenteDTO
+        const utenteLoggato: Utente = res; 
+
+        // Salviamo un token finto per ora, visto che non abbiamo ancora il JWT
+        localStorage.setItem('bb_token', 'finto-token-per-ora');
+        localStorage.setItem('bb_utente', JSON.stringify(utenteLoggato));
+        
+        // Aggiorniamo il signal
+        this.grant.set({
+          isLogged: true,
+          isAdmin: utenteLoggato.ruolo === 'ADMIN',
+          token: 'finto-token-per-ora',
+          utente: utenteLoggato
+        });
+        
+        console.log("LOGIN COMPLETATO CON SUCCESSO!", utenteLoggato);
+      }
+    })
+  );
+}
 
   register(data: { email: string; password: string }): Observable<Utente> {
     return this.http.post<Utente>(`${this.API_UTENTI}/register`, data);
