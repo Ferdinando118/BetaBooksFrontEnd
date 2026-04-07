@@ -123,7 +123,15 @@
               <textarea formControlName="descrizione" rows="3"
                         placeholder="Cosa ne pensi di questo libro?"></textarea>
             </div>
+
             <button type="submit" class="btn btn-primary btn-sm">Invia recensione</button>
+
+            @if (erroreRecensione()) {
+              <div class="text-danger small fw-bold" style="display: block; margin-top: 15px !important;">
+                ⚠️ {{ erroreRecensione() }}
+              </div>
+            }
+
           </form>
         }
 

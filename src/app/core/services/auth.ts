@@ -23,29 +23,8 @@ export class AuthService {
     token: null as string | null,
     utente: null as Utente | null
   });
+
 /*
-  constructor(
-    private http: HttpClient, 
-    private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {
-    // Al riavvio dell'app (es. F5), recuperiamo i dati dal localStorage per non far sbloccare l'utente
-    if (isPlatformBrowser(this.platformId)) {
-      const token = localStorage.getItem('bb_token');
-      const utenteStr = localStorage.getItem('bb_utente');
-      
-      if (token && utenteStr) {
-        const utente: Utente = JSON.parse(utenteStr);
-        this.grant.set({
-          isLogged: true,
-          isAdmin: utente.ruolo === 'ADMIN',
-          token: token,
-          utente: utente
-        });
-      }
-    }
-  }*/
- // Nel tuo auth.ts (AuthService)
 constructor(
   private http: HttpClient, 
   private router: Router,
@@ -71,28 +50,27 @@ constructor(
       }
     }
   }
-}
-/*
-  login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_AUTH}/login`, { email, password }).pipe(
-      tap(res => {
-        if (isPlatformBrowser(this.platformId)) {
-          // Salviamo i dati al sicuro nel browser
-          localStorage.setItem('bb_token', res.token);
-          localStorage.setItem('bb_utente', JSON.stringify(res.utente));
-          
-          // Aggiorniamo il signal (la UI si aggiornerà automaticamente!)
-          this.grant.set({
-            isLogged: true,
-            isAdmin: res.utente.ruolo === 'ADMIN',
-            token: res.token,
-            utente: res.utente
-          });
-        }
-      })
-    );
-  }*/
+}*/
 
+constructor(
+  private http: HttpClient, 
+  private router: Router,
+  @Inject(PLATFORM_ID) private platformId: Object
+) {
+  if (isPlatformBrowser(this.platformId)) {
+    const token = localStorage.getItem('bb_token');
+    
+    if (token) {
+      // Invece di fidarci solo del localStorage, chiediamo conferma al server
+      this.checkMe().subscribe({
+        next: (u) => console.log("Sessione ripristinata per:", u.email),
+        error: () => this.logout() // Se il server dice 401, puliamo tutto
+      });
+    }
+  }
+}
+
+/*
     login(email: string, password: string): Observable<any> {
   return this.http.post<any>(`${this.API_AUTH}/login`, { email, password }).pipe(
     tap(res => {
@@ -116,8 +94,35 @@ constructor(
       }
     })
   );
-}
+}*/
 
+login(email: string, password: string): Observable<any> {
+  // 1. Generiamo il token SUBITO
+  const basicToken = btoa(unescape(encodeURIComponent(`${email}:${password}`)));
+  
+  // Rimuovi eventuali vecchi dati sporchi prima di settare i nuovi
+    localStorage.removeItem('bb_token');
+  // 2. Lo salviamo temporaneamente per farlo usare all'interceptor 
+  // o lo passiamo manualmente nella chiamata
+  localStorage.setItem('bb_token', basicToken);
+
+  // 3. Invece di /login (POST), usiamo /me (GET) come test di ingresso
+  return this.http.get<Utente>(`${this.API_AUTH}/me`).pipe(
+    tap(utenteLoggato => {
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('bb_utente', JSON.stringify(utenteLoggato));
+        
+        // Aggiorniamo il signal
+        this.grant.set({
+          isLogged: true,
+          isAdmin: utenteLoggato.ruolo === 'ADMIN',
+          token: basicToken,
+          utente: utenteLoggato
+        });
+      }
+    })
+  );
+}
   register(data: { email: string; password: string }): Observable<Utente> {
     return this.http.post<Utente>(`${this.API_UTENTI}/register`, data);
   }
@@ -136,6 +141,24 @@ constructor(
       this.router.navigate(['/auth/login']);
     }
   }
+
+
+checkMe(): Observable<Utente> {
+  return this.http.get<Utente>(`${this.API_AUTH}/me`).pipe(
+    tap(utente => {
+      if (isPlatformBrowser(this.platformId)) {
+        // Se il server risponde, aggiorniamo il Signal con i dati freschi
+        this.grant.set({
+          isLogged: true,
+          isAdmin: utente.ruolo === 'ADMIN',
+          token: localStorage.getItem('bb_token'),
+          utente: utente
+        });
+        localStorage.setItem('bb_utente', JSON.stringify(utente));
+      }
+    })
+  );
+}
 
   // Comodi metodi per leggere velocemente lo stato
   getToken(): string | null { return this.grant().token; }

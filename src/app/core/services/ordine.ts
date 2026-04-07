@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { OrdineDTO, MetodoPagamento, StatoOrdine, Resp } from '../models/models';
+import { OrdineDTO, MetodoPagamento, StatoOrdine, Resp, FiltroTemporale } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class OrdineService {
@@ -42,4 +42,14 @@ export class OrdineService {
     const params = new HttpParams().set('nuovoStato', nuovoStato);
     return this.http.patch<Resp>(`${this.API}/${id}/cambiaStato`, null, { params });
   }
+
+  getOrdiniFiltrati(idUtente: number, completati: boolean, periodo: FiltroTemporale): Observable<OrdineDTO[]> {
+  const params = new HttpParams()
+    .set('completati', completati.toString())
+    .set('periodo', periodo);
+
+  return this.http.get<Resp>(`${this.API}/storico/${idUtente}/filtrato`, { params }).pipe(
+    map((res: Resp) => res.obj as OrdineDTO[])
+  );
+}
 }

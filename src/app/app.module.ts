@@ -7,6 +7,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { AppComponent } from './app'; 
 import { routes } from './app.routes';
 import { jwtInterceptor } from './jwt-interceptor';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 // Importa Navbar e Footer
 import { Navbar } from './shared/components/navbar/navbar';
@@ -24,7 +25,7 @@ import { Footer } from './shared/components/footer/footer';
   ],
   providers: [
     // Qui lasciamo solo l'interceptor per il token!
-    provideHttpClient(withInterceptors([jwtInterceptor]))
+    provideHttpClient(withInterceptors([authInterceptor,jwtInterceptor]))
   ],
   bootstrap: [AppComponent] 
 })

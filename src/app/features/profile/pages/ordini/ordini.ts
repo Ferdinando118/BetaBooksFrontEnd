@@ -1,7 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { OrdineService } from '../../../../core/services/ordine'; 
 import { AuthService } from '../../../../core/services/auth'; 
-import { OrdineDTO } from '../../../../core/models/models';
+import { OrdineDTO, FiltroTemporale } from '../../../../core/models/models';
+
 
 @Component({
   selector: 'app-ordini',
@@ -17,6 +18,17 @@ export class Ordini implements OnInit {
   loading = false;
   ordineAperto: number | null = null;
 
+  filtroCompletati: boolean = false;
+  filtroPeriodo: string = 'TUTTO';
+
+  opzioniPeriodo = [
+    { label: 'Tutto lo storico', value: 'TUTTO' },
+    { label: 'Ultimi 30 giorni', value: 'ULTIMI_30_GIORNI' },
+    { label: 'Ultimi 3 mesi', value: 'ULTIMI_3_MESI' },
+    { label: 'Ultimi 6 mesi', value: 'ULTIMI_6_MESI' },
+    { label: 'Ultimo anno', value: 'ULTIMO_ANNO' }
+  ];
+
   ngOnInit(): void {
     this.caricaOrdini();
   }
@@ -25,8 +37,10 @@ export class Ordini implements OnInit {
     const utente = this.auth.grant().utente;
     if (utente) {
       this.loading = true;
-      this.ordineService.getOrdiniUtente(utente.id).subscribe({
-        next: (ordini: OrdineDTO[]) => {
+      //this.ordineService.getOrdiniUtente(utente.id).subscribe({
+      this.ordineService.getOrdiniFiltrati(utente.id, this.filtroCompletati, this.filtroPeriodo as any).subscribe({
+        //next: (ordini: OrdineDTO[]) => {
+        next: (ordini) => {
           // SPIAMO I DATI DAL SERVER:
           console.log("DATI DAL SERVER:", ordini); 
           
@@ -39,6 +53,12 @@ export class Ordini implements OnInit {
         }
       });
     }
+  }
+
+  // Metodo chiamato al cambio dei filtri nel template
+  onFiltroChange(): void {
+    this.ordineAperto = null; // Chiudiamo eventuali dettagli aperti
+    this.caricaOrdini();
   }
 
   toggleDettaglio(id: number): void {
@@ -70,7 +90,7 @@ export class Ordini implements OnInit {
   // --- NUOVO METODO PER IL BUG DELLE IMMAGINI ---
   getImmagine(copertina: string | undefined | null): string {
     if (!copertina) {
-      return '/images/default-book.png'; 
+      return '/images/default_book.png'; 
     }
     if (copertina.startsWith('http')) {
       return copertina;

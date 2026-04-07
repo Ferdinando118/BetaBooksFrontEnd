@@ -2,7 +2,13 @@
 export enum RuoloUtente   { USER = 'USER', ADMIN = 'ADMIN' }
 export enum StatoOrdine   { IN_ATTESA = 'IN_ATTESA', SPEDITO = 'SPEDITO', CONSEGNATO = 'CONSEGNATO' }
 export enum MetodoPagamento { CARTA = 'CARTA', PAYPAL = 'PAYPAL', CONSEGNA = 'CONSEGNA', BONIFICO = 'BONIFICO' }
-
+export enum FiltroTemporale {
+  ULTIMI_30_GIORNI = 'ULTIMI_30_GIORNI',
+  ULTIMI_3_MESI = 'ULTIMI_3_MESI',
+  ULTIMI_6_MESI = 'ULTIMI_6_MESI',
+  ULTIMO_ANNO = 'ULTIMO_ANNO',
+  TUTTO = 'TUTTO'
+}
 // ── UTENTE ────────────────────────────────────────
 export interface Utente {
   id: number;

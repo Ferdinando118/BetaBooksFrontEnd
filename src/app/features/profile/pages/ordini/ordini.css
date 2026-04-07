@@ -115,8 +115,49 @@
   font-weight: 600;
 }
 
+.header-ordini {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.filtri-container {
+  display: flex;
+  gap: 12px;
+}
+
+.filtro-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filtro-group label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+}
+
+.filtro-group select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filtro-group select:focus {
+  outline: none;
+  border-color: #007bff; /* O il tuo colore accent */
+}
+
 @media (max-width: 768px) {
   .profilo-wrapper { grid-template-columns: 1fr; }
   .sidebar { position: static; }
   .ordine-header { flex-wrap: wrap; gap: 8px; }
 }
+

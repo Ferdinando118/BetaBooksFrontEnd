@@ -10,36 +10,43 @@ export class ProfiloService {
 
   constructor(private http: HttpClient) {}
 
+  // 1. GET con withCredentials
   findByUtente(idUtente: number): Observable<ProfiloUtente> {
-    return this.http.get<ProfiloUtente>(`${this.API_PROFILI}/utente/${idUtente}`);
+    return this.http.get<ProfiloUtente>(`${this.API_PROFILI}/utente/${idUtente}`, { withCredentials: true });
   }
 
   saveProfilo(profilo: ProfiloUtente): Observable<any> {
+    // Definiamo le opzioni complete
+    const options = { withCredentials: true, responseType: 'text' as 'json' };
+
     if (profilo.id) {
-      // È una modifica (PUT): Diciamo ad Angular di non cercare un JSON
-      return this.http.put(`${this.API_PROFILI}/${profilo.id}`, profilo, { responseType: 'text' });
+      // USIAMO 'options' qui
+      return this.http.put(`${this.API_PROFILI}/${profilo.id}`, profilo, options);
     } else {
-      // È una creazione (POST)
-      return this.http.post(this.API_PROFILI, profilo);
+      return this.http.post(this.API_PROFILI, profilo, { withCredentials: true });
     }
   }
 
+  // 2. GET con withCredentials
   findIndirizziByUser(idUtente: number): Observable<Indirizzo[]> {
-    return this.http.get<Indirizzo[]>(`${this.API_INDIRIZZI}/user/${idUtente}`);
+    return this.http.get<Indirizzo[]>(`${this.API_INDIRIZZI}/user/${idUtente}`, { withCredentials: true });
   }
 
   saveIndirizzo(indirizzo: Indirizzo): Observable<any> {
+    const options = { withCredentials: true, responseType: 'text' as 'json' };
+
     if (indirizzo.id) {
-      // È una modifica (PUT): Diciamo ad Angular di non cercare un JSON
-      return this.http.put(`${this.API_INDIRIZZI}/${indirizzo.id}`, indirizzo, { responseType: 'text' });
+      // USIAMO 'options' qui
+      return this.http.put(`${this.API_INDIRIZZI}/${indirizzo.id}`, indirizzo, options);
     } else {
-      // È una creazione (POST)
-      return this.http.post(this.API_INDIRIZZI, indirizzo);
+      return this.http.post(this.API_INDIRIZZI, indirizzo, { withCredentials: true });
     }
   }
 
   deleteIndirizzo(id: number): Observable<any> {
-    // È un'eliminazione (DELETE): Java restituirà 204 No Content
-    return this.http.delete(`${this.API_INDIRIZZI}/${id}`, { responseType: 'text' });
+    return this.http.delete(`${this.API_INDIRIZZI}/${id}`, { 
+      withCredentials: true, 
+      responseType: 'text' 
+    });
   }
 }

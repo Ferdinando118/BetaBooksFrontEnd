@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ProfileRoutingModule } from './profile.routing.module';
 import { Profilo } from './pages/profilo/profilo';
 import { Ordini } from './pages/ordini/ordini';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { Ordini } from './pages/ordini/ordini';
   imports: [
     CommonModule,
     ReactiveFormsModule, // Necessario per il form del Profilo
-    ProfileRoutingModule
+    ProfileRoutingModule,
+    FormsModule
   ]
 })
 export class ProfileModule {}
