@@ -90,7 +90,7 @@ export class Ordini implements OnInit {
   // --- NUOVO METODO PER IL BUG DELLE IMMAGINI ---
   getImmagine(copertina: string | undefined | null): string {
     if (!copertina) {
-      return '/images/default_book.png'; 
+      return '/assets/images/default-book.png'; 
     }
     if (copertina.startsWith('http')) {
       return copertina;

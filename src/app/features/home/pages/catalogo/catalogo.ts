@@ -73,7 +73,7 @@ if (this.ricerca.trim()) {
           // Se f.copertina è già un URL (http...) lo usiamo, altrimenti aggiungiamo il prefisso
           const copertinaUrl = f?.copertina 
             ? (f.copertina.startsWith('http') ? f.copertina : urlServer + f.copertina) 
-            : 'images/default_book.png'; // Un'immagine di default se non c'è la copertina
+            : '/assets/images/default-book.png'; // Un'immagine di default se non c'è la copertina
 
           return {
             ...libro,

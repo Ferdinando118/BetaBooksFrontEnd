@@ -64,7 +64,7 @@
         <div class="book-card card">
           <div class="card-content">
             <div class="book-cover" [routerLink]="auth.isAdmin() ? null : ['/libro', libro.id]" style="cursor: pointer;">
-              <img [src]="libro.copertina" (error)="libro.copertina = 'assets/images/default-book.png'" alt="Copertina Libro">
+              <img [src]="libro.copertina" (error)="libro.copertina = '/assets/images/default-book.png'" alt="Copertina Libro">
               @if (libro.quantita === 0) {
                 <span class="badge-esaurito">Esaurito</span>
               }

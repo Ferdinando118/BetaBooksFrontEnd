@@ -6,12 +6,12 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 // Importa i tuoi file principali
 import { AppComponent } from './app'; 
 import { routes } from './app.routes';
-import { jwtInterceptor } from './jwt-interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 // Importa Navbar e Footer
 import { Navbar } from './shared/components/navbar/navbar';
 import { Footer } from './shared/components/footer/footer';
+import { skipUploadsInterceptor} from './core/interceptors/skip.interceptor';
 
 @NgModule({
   declarations: [
@@ -25,7 +25,7 @@ import { Footer } from './shared/components/footer/footer';
   ],
   providers: [
     // Qui lasciamo solo l'interceptor per il token!
-    provideHttpClient(withInterceptors([authInterceptor,jwtInterceptor]))
+    provideHttpClient(withInterceptors([authInterceptor, skipUploadsInterceptor]))
   ],
   bootstrap: [AppComponent] 
 })
