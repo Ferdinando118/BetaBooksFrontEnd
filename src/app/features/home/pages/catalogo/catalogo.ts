@@ -6,10 +6,19 @@ import { LibroService } from '../../../../core/services/libro';
 import { CarrelloService } from '../../../../core/services/carrello';
 import { AuthService } from '../../../../core/services/auth';
 import { LibroDTO } from '../../../../core/models/libro.model';
+import { BookHoverDirective } from '../../../../shared/directives/book-hover.directive';
+import { Libro } from '../../../../core/models/models';
 
 @Component({
   selector: 'app-catalogo',
-  standalone: false,
+  // Scegliamo Standalone di Aldo per modernità
+  standalone: true, 
+  imports: [
+    CommonModule, 
+    RouterModule, 
+    FormsModule, 
+    BookHoverDirective
+  ],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css'
 })
@@ -27,7 +36,10 @@ export class Catalogo implements OnInit {
   ricerca = '';
   categoriaSelezionata = '';
   ordinamento = 'titolo';
+  soloPreferiti = false;
 
+  
+ 
   libriFiltrati = computed(() => {
     let risultati = [...this.libri()];
 
@@ -56,6 +68,7 @@ if (this.ricerca.trim()) {
 
     return risultati;
   });
+
 
   ngOnInit(): void {
     this.inizializzaCatalogo();
@@ -136,4 +149,14 @@ aggiungiAlCarrello(event: Event, libro: any): void {
     console.error('Errore: Il libro non ha un formato valido.');
   }
 }
+
+  stelle(n: number): string {
+    return '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
+  }
+
+  toggleMiPiace(event: Event, libro: any){
+    event.stopPropagation();
+    this.libroService.toggleMiPiace(libro.id);
+    libro.miPiace = !libro.miPiace;
+  }
 }

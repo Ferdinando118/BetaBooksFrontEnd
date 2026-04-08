@@ -9,9 +9,9 @@ export class OrdineService {
   private http = inject(HttpClient);
 
   // GET /api/ordine/storico/{idUtente}
-  getOrdiniUtente(idUtente: number): Observable<OrdineDTO[]> {
+getOrdiniUtente(idUtente: number): Observable<OrdineDTO[]> {
     return this.http.get<Resp>(`${this.API}/storico/${idUtente}`).pipe(
-      map((res: Resp) => res.obj as OrdineDTO[])
+      map((res: Resp) => (res.obj as any[]).map(o => this.arricchisciConTracking(o)))
     );
   }
 
@@ -26,9 +26,9 @@ export class OrdineService {
   }
 
   // GET /api/ordine/getById/{idOrdine}
-  getById(idOrdine: number): Observable<OrdineDTO> {
+getById(idOrdine: number): Observable<OrdineDTO> {
     return this.http.get<Resp>(`${this.API}/getById/${idOrdine}`).pipe(
-      map((res: Resp) => res.obj as OrdineDTO) // <-- Corretto il refuso Ordin:eDTO
+      map((res: Resp) => this.arricchisciConTracking(res.obj as OrdineDTO))
     );
   }
 
@@ -43,13 +43,39 @@ export class OrdineService {
     return this.http.patch<Resp>(`${this.API}/${id}/cambiaStato`, null, { params });
   }
 
-  getOrdiniFiltrati(idUtente: number, completati: boolean, periodo: FiltroTemporale): Observable<OrdineDTO[]> {
-  const params = new HttpParams()
-    .set('completati', completati.toString())
-    .set('periodo', periodo);
+getOrdiniFiltrati(idUtente: number, completati: boolean, periodo: FiltroTemporale): Observable<OrdineDTO[]> {
+    const params = new HttpParams()
+      .set('completati', completati.toString())
+      .set('periodo', periodo);
 
-  return this.http.get<Resp>(`${this.API}/storico/${idUtente}/filtrato`, { params }).pipe(
-    map((res: Resp) => res.obj as OrdineDTO[])
-  );
+    return this.http.get<Resp>(`${this.API}/storico/${idUtente}/filtrato`, { params }).pipe(
+      map((res: Resp) => (res.obj as any[]).map(o => this.arricchisciConTracking(o)))
+    );
+  }
+
+
+// --- INTEGRAZIONE ALDO: Metodo per generare il tracking se manca dal DB ---
+// Cambia il tipo di ritorno da OrdineDTO a any
+private arricchisciConTracking(ordine: any): any { 
+  if (ordine.tracking) return ordine;
+
+  ordine.tracking = {
+    codice: `BB-${ordine.id}-2026`,
+    corriere: 'BetaExpress',
+    stato: this.mappaStatoOrdineATracking(ordine.stato),
+    ultimoAggiornamento: new Date().toISOString(),
+    eventi: []
+  };
+  
+  return ordine;
 }
+
+  private mappaStatoOrdineATracking(stato: StatoOrdine): string {
+    switch (stato) {
+      case StatoOrdine.IN_ATTESA: return 'PREPARAZIONE';
+      case StatoOrdine.SPEDITO: return 'IN_TRANSITO';
+      case StatoOrdine.CONSEGNATO: return 'CONSEGNATO';
+      default: return 'PREPARAZIONE';
+    }
+  }
 }

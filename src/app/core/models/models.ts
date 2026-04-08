@@ -111,12 +111,24 @@ export interface Ordine {
   items: OrdineItem[];
 }
 
+export interface TrackingDTO {
+  codice: string;
+  corriere: string;
+  stato: string;
+  ultimoAggiornamento: string;
+  eventi: {
+    timestamp: string;
+    stato: string;
+    descrizione: string;
+  }[];
+}
+
 export interface OrdineDTO {
     id: number;
     dataOrdine: string;
     stato: string;
     totale: number;
-    metodoPagamento: string;
+    metodoPagamento: string; tracking?: TrackingDTO;
     items: any[]; // O usa l'interfaccia specifica degli item se l'hai creata
 }
 // ── RECENSIONE & WISHLIST ─────────────────────────

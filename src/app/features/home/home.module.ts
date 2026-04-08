@@ -7,11 +7,11 @@ import { Dettaglio } from './pages/dettaglio/dettaglio';
 
 @NgModule({
   declarations: [
-    Catalogo,
     Dettaglio
   ],
   imports: [
     CommonModule,
+    Catalogo,
     FormsModule,           // Serve per [(ngModel)] nella barra di ricerca
     ReactiveFormsModule,   // Serve per le recensioni nel Dettaglio
     HomeRoutingModule

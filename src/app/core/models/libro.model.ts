@@ -30,7 +30,7 @@ export interface LibroDTO {
   titolo: string;
   descrizione: string;
   autore: AutoreDTO;
-  editore: EditoreDTO;
+  editore: EditoreDTO;miPiace?: boolean;
   categorie: CategoriaDTO[];
   formati: FormatoLibroDTO[];
 }

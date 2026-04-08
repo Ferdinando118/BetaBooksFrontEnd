@@ -35,9 +35,40 @@ export interface FormatoLibroReq {
 export class LibroService {
   private url = 'http://localhost:8080/api/libro';
 
+  private miPiaceKey = 'betabooks_mi_piace';
+  private miPiaceSet = new Set<number>();
+
   libri = signal<any[]>([]);
 
   constructor(private http: HttpClient) {}
+
+  // ─── GESTIONE PREFERITI (Metodi di Aldo adattati) ──────
+  private loadMiPiace(): void {
+    const saved = localStorage.getItem(this.miPiaceKey);
+    if (saved) {
+      const ids = JSON.parse(saved);
+      this.miPiaceSet = new Set(ids);
+    }
+  }
+
+  private saveMiPiace(): void {
+    localStorage.setItem(this.miPiaceKey, JSON.stringify(Array.from(this.miPiaceSet)));
+  }
+
+  isMiPiace(libroId: number): boolean {
+    return this.miPiaceSet.has(libroId);
+  }
+
+  toggleMiPiace(libroId: number): void {
+    if (this.miPiaceSet.has(libroId)) {
+      this.miPiaceSet.delete(libroId);
+    } else {
+      this.miPiaceSet.add(libroId);
+    }
+    this.saveMiPiace();
+    // Opzionale: aggiorna il signal dei libri per far reagire la UI
+    this.getAll().subscribe();
+  }
 
   // ─── LIBRO ───────────────────────────────────────────
 

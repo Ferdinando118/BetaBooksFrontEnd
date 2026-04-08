@@ -1,0 +1,71 @@
+<div class="profilo-wrapper">
+
+  <aside class="sidebar card">
+    <div class="avatar">
+      {{ utente?.email?.charAt(0)?.toUpperCase() }}
+    </div>
+    <p class="utente-email">{{ utente?.email }}</p>
+    <span class="badge" [class.badge-admin]="utente?.ruolo === 'ADMIN'">
+      {{ utente?.ruolo }}
+    </span>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/profile" routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: true}">
+        👤 Il mio profilo
+      </a>
+      <a routerLink="/profile/ordini" routerLinkActive="active">
+        📦 I miei ordini
+        <span class="nav-badge">{{ totaleOrdini }}</span>
+      </a>
+      <a routerLink="/" class="link-catalogo">📚 Catalogo</a>
+    </nav>
+
+    <button class="btn btn-outline btn-sm logout-btn" (click)="logout()">
+      Esci
+    </button>
+  </aside>
+
+  <main class="profilo-content">
+    <div class="card">
+      <h2 class="section-title">Il mio profilo</h2>
+      <hr class="divider">
+
+      <form [formGroup]="form" (ngSubmit)="salva()">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome</label>
+            <input type="text" formControlName="nome">
+            @if (nome.invalid && nome.touched) {
+              <span class="error-msg">Campo obbligatorio</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Cognome</label>
+            <input type="text" formControlName="cognome">
+            @if (cognome.invalid && cognome.touched) {
+              <span class="error-msg">Campo obbligatorio</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" [value]="utente?.email ?? ''" disabled>
+        </div>
+
+        <div class="form-group">
+          <label>Telefono</label>
+          <input type="tel" formControlName="telefono" placeholder="+39 333 000 0000">
+        </div>
+
+        @if (salvato) {
+          <div class="alert-success">✅ Profilo aggiornato con successo!</div>
+        }
+
+        <button type="submit" class="btn btn-primary">Salva modifiche</button>
+      </form>
+    </div>
+  </main>
+
+</div>

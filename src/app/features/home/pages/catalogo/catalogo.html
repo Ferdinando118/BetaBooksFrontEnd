@@ -38,6 +38,11 @@
     <option value="prezzo-desc">Prezzo ↓</option>
   </select>
 
+    <label class="filtro-checkbox">
+    <input type="checkbox" [(ngModel)]="soloPreferiti" (ngModelChange)="aggiornaFiltri()">
+    <span>❤️ Preferiti</span>
+  </label>
+
   <button class="btn btn-outline btn-sm" (click)="reset()">Reset</button>
 </div>
 
@@ -78,13 +83,30 @@
               <p class="book-author">di <strong>{{ libro.autore?.nome }} {{ libro.autore?.cognome }}</strong></p>
               <p class="book-publisher"><small>Editore: {{ libro.editore?.nome }}</small></p>
 
+              @if (libro.valutazioneMedia) {
+                            <div class="book-stars">
+                              <span class="stars">{{ stelle(libro.valutazioneMedia) }}</span>
+                              <span class="voto">{{ libro.valutazioneMedia }}</span>
+                            </div>
+                          }
+
+
+
               <div class="book-footer">
                 <span class="price">€ {{ libro.prezzo | number:'1.2-2' }}</span>
                 
                 <div class="actions">
+
+                <button class="btn btn-icon btn-like"
+                        [class.liked]="libro.miPiace"
+                        (click)="toggleMiPiace($event, libro)"
+                        title="Aggiungi ai preferiti">
+                  {{ libro.miPiace ? '❤️' : '🤍' }}
+                </button>
+
                   @if (auth.isAdmin()) {
                     <button class="btn btn-warning btn-sm" [routerLink]="['/admin/modifica-libro', libro.id]">
-                      Modifica
+                      Modificas
                     </button>
                   } 
                   @else if (libro.quantita > 0) {
