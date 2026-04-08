@@ -84,6 +84,56 @@
 .dettaglio-info    { display: flex; gap: 8px; font-size: 14px; margin-bottom: 16px; }
 .ordine-items      { display: flex; flex-direction: column; gap: 12px; }
 
+.tracking-card {
+  border: 1px solid var(--bb-gray-200);
+  border-radius: var(--bb-radius-sm);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.tracking-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.tracking-progress {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bb-gray-200);
+  overflow: hidden;
+  margin: 10px 0 8px;
+}
+
+.tracking-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--bb-blue), var(--bb-orange));
+  transition: width 0.3s ease;
+}
+
+.tracking-updated { font-size: 12px; margin-bottom: 12px; }
+.tracking-events  { display: flex; flex-direction: column; gap: 8px; }
+
+.tracking-event {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.event-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bb-orange);
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.event-title { font-weight: 600; font-size: 13px; color: var(--bb-blue); }
+
 .ordine-item {
   display: flex;
   gap: 14px;

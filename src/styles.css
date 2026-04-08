@@ -106,4 +106,3 @@ img { max-width: 100%; display: block; }
 .mt-24 { margin-top: 24px; }
 .price { color: var(--bb-orange-dark); font-weight: 700; font-size: 18px; }
 .divider { border: none; border-top: 1px solid var(--bb-gray-200); margin: 24px 0; }
-

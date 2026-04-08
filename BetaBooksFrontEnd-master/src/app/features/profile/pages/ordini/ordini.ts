@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OrdineService } from '../../../../core/services/ordine';
-import { Ordine } from '../../../../core/models/models';
+import { Ordine, StatoTracking, TrackingSpedizione, TipoEdizione } from '../../../../core/models/models';
 
 @Component({
   selector: 'app-ordini',
@@ -12,6 +12,26 @@ import { Ordine } from '../../../../core/models/models';
   styleUrl: './ordini.css'
 })
 export class OrdiniComponent implements OnInit {
+  readonly trackingSteps: StatoTracking[] = [
+    StatoTracking.PREPARAZIONE,
+    StatoTracking.RITIRO_CORRIERE,
+    StatoTracking.IN_TRANSITO,
+    StatoTracking.IN_CONSEGNA,
+    StatoTracking.CONSEGNATO
+  ];
+
+  edizioneLabel(edizione: TipoEdizione): string {
+    switch (edizione) {
+      case TipoEdizione.COPERTINA_RIGIDA:
+        return 'Copertina rigida';
+      case TipoEdizione.EBOOK:
+        return 'E-book';
+      case TipoEdizione.COPERTINA_FLESSIBILE:
+      default:
+        return 'Copertina flessibile';
+    }
+  }
+
   ordini: Ordine[] = [];
   ordineAperto: number | null = null;
   loading = true;
@@ -43,5 +63,22 @@ export class OrdiniComponent implements OnInit {
       'SPEDITO':    '🚚',
       'CONSEGNATO': '✅'
     } as Record<string, string>)[stato] ?? '';
+  }
+
+  trackingPercent(tracking?: TrackingSpedizione): number {
+    if (!tracking) return 0;
+    const idx = this.trackingSteps.indexOf(tracking.stato);
+    if (idx <= 0) return 10;
+    return Math.round((idx / (this.trackingSteps.length - 1)) * 100);
+  }
+
+  trackingLabel(stato: StatoTracking): string {
+    return ({
+      [StatoTracking.PREPARAZIONE]: 'Preparazione',
+      [StatoTracking.RITIRO_CORRIERE]: 'Ritiro corriere',
+      [StatoTracking.IN_TRANSITO]: 'In transito',
+      [StatoTracking.IN_CONSEGNA]: 'In consegna',
+      [StatoTracking.CONSEGNATO]: 'Consegnato'
+    })[stato];
   }
 }

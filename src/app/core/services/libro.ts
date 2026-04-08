@@ -92,27 +92,75 @@ const USE_MOCK = true;
 export class LibroService {
 
   private readonly API = 'http://localhost:8080/api/libri';
+  private miPiaceKey = 'betabooks_mi_piace';
+  private miPiaceSet = new Set<number>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.loadMiPiace();
+  }
+
+  private loadMiPiace(): void {
+    const saved = localStorage.getItem(this.miPiaceKey);
+    if (saved) {
+      const ids = JSON.parse(saved);
+      this.miPiaceSet = new Set(ids);
+    }
+  }
+
+  private saveMiPiace(): void {
+    localStorage.setItem(this.miPiaceKey, JSON.stringify(Array.from(this.miPiaceSet)));
+  }
+
+  isMiPiace(libroId: number): boolean {
+    return this.miPiaceSet.has(libroId);
+  }
+
+  toggleMiPiace(libroId: number): void {
+    if (this.miPiaceSet.has(libroId)) {
+      this.miPiaceSet.delete(libroId);
+    } else {
+      this.miPiaceSet.add(libroId);
+    }
+    this.saveMiPiace();
+  }
 
   getAll(): Observable<Libro[]> {
-    if (USE_MOCK) return of(MOCK_LIBRI);
+    if (USE_MOCK) {
+      const libriConMiPiace = MOCK_LIBRI.map(l => ({
+        ...l,
+        miPiace: this.isMiPiace(l.id)
+      }));
+      return of(libriConMiPiace);
+    }
     return this.http.get<Libro[]>(this.API);
   }
 
   getById(id: number): Observable<Libro> {
-    if (USE_MOCK) return of(MOCK_LIBRI.find(l => l.id === id)!);
+    if (USE_MOCK) {
+      const libro = MOCK_LIBRI.find(l => l.id === id);
+      if (!libro) return of(null as any);
+      return of({
+        ...libro,
+        miPiace: this.isMiPiace(libro.id)
+      });
+    }
     return this.http.get<Libro>(`${this.API}/${id}`);
   }
 
   cerca(query: string): Observable<Libro[]> {
     if (USE_MOCK) {
       const q = query.toLowerCase();
-      return of(MOCK_LIBRI.filter(l =>
-        l.titolo.toLowerCase().includes(q) ||
-        l.autore.cognome.toLowerCase().includes(q) ||
-        l.autore.nome.toLowerCase().includes(q)
-      ));
+      const libriConMiPiace = MOCK_LIBRI
+        .filter(l =>
+          l.titolo.toLowerCase().includes(q) ||
+          l.autore.cognome.toLowerCase().includes(q) ||
+          l.autore.nome.toLowerCase().includes(q)
+        )
+        .map(l => ({
+          ...l,
+          miPiace: this.isMiPiace(l.id)
+        }));
+      return of(libriConMiPiace);
     }
     return this.http.get<Libro[]>(`${this.API}/search?q=${query}`);
   }

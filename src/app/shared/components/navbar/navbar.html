@@ -8,7 +8,12 @@
     <ul class="navbar-links">
       <li><a routerLink="/" routerLinkActive="active" >Catalogo</a></li>
       @if (auth.isLoggedIn()) {
-        <li><a routerLink="/cart" routerLinkActive="active">Carrello</a></li>
+        <li><a routerLink="/cart" routerLinkActive="active" class="cart-link">
+          Carrello
+          @if (contatore > 0) {
+            <span class="cart-badge">{{ contatore }}</span>
+          }
+        </a></li>
         <li><a routerLink="/profile" routerLinkActive="active">Profilo</a></li>
       }
     </ul>
@@ -34,7 +39,12 @@
   <div class="mobile-menu" [class.open]="menuAperto">
     <a routerLink="/" (click)="menuAperto=false">Catalogo</a>
     @if (auth.isLoggedIn()) {
-      <a routerLink="/cart"    (click)="menuAperto=false">Carrello</a>
+      <a routerLink="/cart" (click)="menuAperto=false" class="cart-link">
+        Carrello
+        @if (contatore > 0) {
+          <span class="cart-badge">{{ contatore }}</span>
+        }
+      </a>
       <a routerLink="/profile" (click)="menuAperto=false">Profilo</a>
     } @else {
       <a routerLink="/auth/login"    (click)="menuAperto=false">Accedi</a>

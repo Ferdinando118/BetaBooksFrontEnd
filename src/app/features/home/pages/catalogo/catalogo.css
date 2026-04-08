@@ -104,6 +104,34 @@
   backdrop-filter: blur(10px);
 }
 
+.filtro-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgba(26, 58, 107, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bb-gray-800);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.filtro-checkbox:hover {
+  border-color: rgba(26, 58, 107, 0.3);
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 0 12px rgba(26, 58, 107, 0.2);
+}
+
+.filtro-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--bb-orange);
+}
+
 .risultati-header { margin-bottom: 16px; }
 
 .loading, .empty {
@@ -143,7 +171,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease, filter 0.3s ease;
+  transition: transform 0.3s;
 }
 
 .book-card:hover .book-cover img { transform: scale(1.04); }
@@ -161,10 +189,10 @@
 }
 
 .book-info {
-  padding: 14px 16px 16px;
+  padding: 12px 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   flex: 1;
 }
 
@@ -176,6 +204,7 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  -webkit-line-clamp: 2;
 }
 
 .book-author {
@@ -192,10 +221,51 @@
 .stars { color: var(--bb-orange); font-size: 13px; letter-spacing: 1px; }
 .voto  { font-size: 12px; color: var(--bb-gray-600); font-weight: 600; }
 
+.price {
+  min-width: 70px;
+  font-weight: 600;
+  color: var(--bb-orange);
+  font-size: 15px;
+}
+
 .book-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: auto;
   padding-top: 8px;
+  border-top: 1px solid var(--bb-gray-200);
+  gap: 8px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.book-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.btn-like {
+  background: none;
+  border: 1px solid var(--bb-gray-300);
+  padding: 6px 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  min-width: 36px;
+  height: 36px;
+}
+
+.btn-like:hover {
+  border-color: var(--bb-orange);
+  background: rgba(255, 107, 53, 0.1);
+  transform: scale(1.05);
+}
+
+.btn-like.liked {
+  border-color: var(--bb-orange);
+  background: rgba(255, 107, 53, 0.1);
 }

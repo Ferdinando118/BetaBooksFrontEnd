@@ -24,12 +24,5 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./features/profile/profile-module').then(m => m.ProfileModule)
   },
-
-  {
-  path: 'libro/:id',
-  loadChildren: () =>
-    import('./features/home/home-module').then(m => m.HomeModule)
-},
-
   { path: '**', redirectTo: '' }
 ];

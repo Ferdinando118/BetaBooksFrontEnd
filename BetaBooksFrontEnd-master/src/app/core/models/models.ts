@@ -2,6 +2,23 @@
 export enum RuoloUtente   { USER = 'USER', ADMIN = 'ADMIN' }
 export enum StatoOrdine   { IN_ATTESA = 'IN_ATTESA', SPEDITO = 'SPEDITO', CONSEGNATO = 'CONSEGNATO' }
 export enum MetodoPagamento { CARTA = 'CARTA', PAYPAL = 'PAYPAL', CONSEGNA = 'CONSEGNA', BONIFICO = 'BONIFICO' }
+export enum TipoSpedizione {
+  STANDARD = 'STANDARD',
+  ESPRESSA = 'ESPRESSA',
+  PROGRAMMATA = 'PROGRAMMATA'
+}
+export enum TipoEdizione {
+  COPERTINA_FLESSIBILE = 'COPERTINA_FLESSIBILE',
+  COPERTINA_RIGIDA = 'COPERTINA_RIGIDA',
+  EBOOK = 'EBOOK'
+}
+export enum StatoTracking {
+  PREPARAZIONE = 'PREPARAZIONE',
+  RITIRO_CORRIERE = 'RITIRO_CORRIERE',
+  IN_TRANSITO = 'IN_TRANSITO',
+  IN_CONSEGNA = 'IN_CONSEGNA',
+  CONSEGNATO = 'CONSEGNATO'
+}
 
 // ── UTENTE ────────────────────────────────────────
 export interface Utente {
@@ -75,6 +92,7 @@ export interface CarrelloItem {
   id: number;
   idUtente: number;
   libro: Libro;
+  edizione: TipoEdizione;
   quantita: number;
   prezzoPezzi: number;
 }
@@ -83,6 +101,7 @@ export interface CarrelloItem {
 export interface OrdineItem {
   id: number;
   libro: Libro;
+  edizione: TipoEdizione;
   quantita: number;
   prezzoUnitarioAcquisto: number;
 }
@@ -95,7 +114,23 @@ export interface Ordine {
   idUtente: number;
   indirizzo?: Indirizzo;
   metodoPagamento: MetodoPagamento;
+  tipoSpedizione: TipoSpedizione;
   items: OrdineItem[];
+  tracking?: TrackingSpedizione;
+}
+
+export interface EventoTracking {
+  timestamp: string;
+  stato: StatoTracking;
+  descrizione: string;
+}
+
+export interface TrackingSpedizione {
+  codice: string;
+  corriere: string;
+  stato: StatoTracking;
+  ultimoAggiornamento: string;
+  eventi: EventoTracking[];
 }
 
 // ── RECENSIONE & WISHLIST ─────────────────────────
