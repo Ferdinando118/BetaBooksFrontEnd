@@ -16,7 +16,6 @@ export class AuthService {
   private readonly API_UTENTI = 'http://localhost:8080/api/utenti';
   private readonly API_AUTH = 'http://localhost:8080/api/auth'; 
 
-  // Usiamo il SIGNAL come nell'esempio che mi hai dato!
   grant = signal({
     isLogged: false,
     isAdmin: false,
@@ -24,33 +23,7 @@ export class AuthService {
     utente: null as Utente | null
   });
 
-/*
-constructor(
-  private http: HttpClient, 
-  private router: Router,
-  @Inject(PLATFORM_ID) private platformId: Object
-) {
-  if (isPlatformBrowser(this.platformId)) {
-    const token = localStorage.getItem('bb_token');
-    const utenteStr = localStorage.getItem('bb_utente');
-    
-    // CONTROLLO DI SICUREZZA: Verifichiamo che i dati esistano e non siano "undefined"
-    if (token && utenteStr && utenteStr !== 'undefined') {
-      try {
-        const utente: Utente = JSON.parse(utenteStr);
-        this.grant.set({
-          isLogged: true,
-          isAdmin: utente.ruolo === 'ADMIN',
-          token: token,
-          utente: utente
-        });
-      } catch (e) {
-        console.error("Errore nel recupero utente dal localStorage", e);
-        this.logout(); // Puliamo tutto se il JSON è rotto
-      }
-    }
-  }
-}*/
+
 
 constructor(
   private http: HttpClient, 
@@ -59,47 +32,40 @@ constructor(
 ) {
   if (isPlatformBrowser(this.platformId)) {
     const token = localStorage.getItem('bb_token');
-    
+    /*
     if (token) {
       // Invece di fidarci solo del localStorage, chiediamo conferma al server
       this.checkMe().subscribe({
         next: (u) => console.log("Sessione ripristinata per:", u.email),
         error: () => this.logout() // Se il server dice 401, puliamo tutto
       });
+    }*/
+
+      if (token) {
+  this.checkMe().subscribe({
+    next: (u) => console.log("Sessione ripristinata:", u.email),
+    error: (err) => {
+      // Slogga solo se le credenziali sono scadute/invalide
+      // Non slogga se il backend è temporaneamente down
+      if (err.status === 401 || err.status === 403) {
+        this.logout();
+      }
     }
+  });
+}
   }
 }
 
-/*
-    login(email: string, password: string): Observable<any> {
-  return this.http.post<any>(`${this.API_AUTH}/login`, { email, password }).pipe(
-    tap(res => {
-      if (isPlatformBrowser(this.platformId)) {
-        // 'res' è già l'utente (id, email, ruolo) perché Java manda UtenteDTO
-        const utenteLoggato: Utente = res; 
-
-        // Salviamo un token finto per ora, visto che non abbiamo ancora il JWT
-        localStorage.setItem('bb_token', 'finto-token-per-ora');
-        localStorage.setItem('bb_utente', JSON.stringify(utenteLoggato));
-        
-        // Aggiorniamo il signal
-        this.grant.set({
-          isLogged: true,
-          isAdmin: utenteLoggato.ruolo === 'ADMIN',
-          token: 'finto-token-per-ora',
-          utente: utenteLoggato
-        });
-        
-        console.log("LOGIN COMPLETATO CON SUCCESSO!", utenteLoggato);
-      }
-    })
-  );
-}*/
 
 login(email: string, password: string): Observable<any> {
   // 1. Generiamo il token SUBITO
-  const basicToken = btoa(unescape(encodeURIComponent(`${email}:${password}`)));
-  
+ // const basicToken = btoa(unescape(encodeURIComponent(`${email}:${password}`)));
+ const basicToken = btoa(
+  Array.from(
+    new TextEncoder().encode(`${email}:${password}`)
+  ).map(b => String.fromCharCode(b)).join('')
+);
+  /*
   // Rimuovi eventuali vecchi dati sporchi prima di settare i nuovi
     localStorage.removeItem('bb_token');
   // 2. Lo salviamo temporaneamente per farlo usare all'interceptor 
@@ -120,6 +86,24 @@ login(email: string, password: string): Observable<any> {
           utente: utenteLoggato
         });
       }
+    })
+  );
+}*/
+
+ return this.http.get<Utente>(`${this.API_AUTH}/me`, {
+    headers: { Authorization: `Basic ${basicToken}` }
+  }).pipe(
+    tap(utente => {
+      // Salva solo DOPO che il server ha confermato le credenziali
+      localStorage.setItem('bb_token', basicToken);
+      localStorage.setItem('bb_utente', JSON.stringify(utente));
+
+      this.grant.set({
+        isLogged: true,
+        isAdmin: utente.ruolo === 'ADMIN',
+        token: basicToken,
+        utente
+      });
     })
   );
 }

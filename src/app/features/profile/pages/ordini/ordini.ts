@@ -2,6 +2,9 @@ import { Component, OnInit, inject } from '@angular/core';
 import { OrdineService } from '../../../../core/services/ordine'; 
 import { AuthService } from '../../../../core/services/auth'; 
 import { OrdineDTO, FiltroTemporale } from '../../../../core/models/models';
+import { Subject } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { ChangeDetectorRef } from '@angular/core';
 
 
 @Component({
@@ -13,6 +16,8 @@ import { OrdineDTO, FiltroTemporale } from '../../../../core/models/models';
 export class Ordini implements OnInit {
   private ordineService = inject(OrdineService);
   private auth = inject(AuthService);
+  private cdr           = inject(ChangeDetectorRef);
+
 
   ordini: OrdineDTO[] = [];
   loading = false;
@@ -20,6 +25,7 @@ export class Ordini implements OnInit {
 
   filtroCompletati: boolean = false;
   filtroPeriodo: string = 'TUTTO';
+  private filtriChange$ = new Subject<void>();
 
   opzioniPeriodo = [
     { label: 'Tutto lo storico', value: 'TUTTO' },
@@ -30,8 +36,26 @@ export class Ordini implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.caricaOrdini();
-  }
+    //this.caricaOrdini();
+
+  this.filtriChange$.pipe(
+    switchMap(() => {
+      const utente = this.auth.grant().utente;
+      if (!utente) return [];
+      this.loading = true;
+      return this.ordineService.getOrdiniFiltrati(
+        utente.id, this.filtroCompletati, this.filtroPeriodo as any
+      );
+    })
+  ).subscribe({
+    next: (ordini) => { this.ordini = ordini; this.loading = false;  this.cdr.markForCheck()},
+    error: (err) => { console.error(err); this.loading = false; this.cdr.markForCheck();}
+  });
+
+  // Prima chiamata
+  this.filtriChange$.next();
+}
+  
 
   caricaOrdini(): void {
     const utente = this.auth.grant().utente;
@@ -58,7 +82,8 @@ export class Ordini implements OnInit {
   // Metodo chiamato al cambio dei filtri nel template
   onFiltroChange(): void {
     this.ordineAperto = null; // Chiudiamo eventuali dettagli aperti
-    this.caricaOrdini();
+    //this.caricaOrdini();
+    this.filtriChange$.next(); // emette, switchMap cancella quella in volo
   }
 
   toggleDettaglio(id: number): void {

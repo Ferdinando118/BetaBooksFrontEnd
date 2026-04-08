@@ -127,9 +127,17 @@ export interface OrdineDTO {
     id: number;
     dataOrdine: string;
     stato: string;
-    totale: number;
+    totaleComplessivo: number;
     metodoPagamento: string; tracking?: TrackingDTO;
-    items: any[]; // O usa l'interfaccia specifica degli item se l'hai creata
+    items: OrdineItemDTO[]; // O usa l'interfaccia specifica degli item se l'hai creata
+}
+
+export interface OrdineItemDTO {
+  id: number;
+  titoloLibro: string;
+  copertina: string | null;
+  quantita: number;
+  prezzoUnitarioAcquisto: number;
 }
 // ── RECENSIONE & WISHLIST ─────────────────────────
 export interface Recensione {

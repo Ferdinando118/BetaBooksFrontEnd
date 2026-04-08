@@ -56,7 +56,10 @@ getOrdiniFiltrati(idUtente: number, completati: boolean, periodo: FiltroTemporal
 
 // --- INTEGRAZIONE ALDO: Metodo per generare il tracking se manca dal DB ---
 // Cambia il tipo di ritorno da OrdineDTO a any
+/*
 private arricchisciConTracking(ordine: any): any { 
+
+  console.log('tracking dal server:', ordine.tracking, '| stato:', ordine.stato);
   if (ordine.tracking) return ordine;
 
   ordine.tracking = {
@@ -77,5 +80,55 @@ private arricchisciConTracking(ordine: any): any {
       case StatoOrdine.CONSEGNATO: return 'CONSEGNATO';
       default: return 'PREPARAZIONE';
     }
+  }*/
+
+  private arricchisciConTracking(ordine: any): any {
+  // Controlla che tracking esista E abbia un codice valido
+  if (ordine.tracking?.codice) return ordine;
+
+  ordine.tracking = {
+    codice: `BB-${ordine.id}-2026`,
+    corriere: 'BetaExpress',
+    stato: this.mappaStatoOrdineATracking(ordine.stato),
+    ultimoAggiornamento: new Date().toISOString(),
+    eventi: this.generaEventi(ordine.stato) // ← vedi sotto
+  };
+  return ordine;
+}
+
+// Genera eventi fake coerenti con lo stato
+private generaEventi(stato: string): any[] {
+  const base = [{ 
+    timestamp: new Date().toISOString(), 
+    stato: 'PREPARAZIONE', 
+    descrizione: 'Ordine ricevuto e in preparazione' 
+  }];
+  if (stato === 'SPEDITO' || stato === 'CONSEGNATO') {
+    base.push({ 
+      timestamp: new Date().toISOString(), 
+      stato: 'IN_TRANSITO', 
+      descrizione: 'Pacco affidato al corriere' 
+    });
   }
+  if (stato === 'CONSEGNATO') {
+    base.push({ 
+      timestamp: new Date().toISOString(), 
+      stato: 'CONSEGNATO', 
+      descrizione: 'Pacco consegnato' 
+    });
+  }
+  return base;
+}
+
+private mappaStatoOrdineATracking(stato: string): string {
+  // Usa stringa diretta, non enum — il server manda stringhe
+  switch (stato?.toUpperCase()) {
+    case 'IN_ATTESA':  return 'PREPARAZIONE';
+    case 'SPEDITO':    return 'IN_TRANSITO';
+    case 'CONSEGNATO': return 'CONSEGNATO';
+    default:           return 'PREPARAZIONE';
+  }
+}
+
+
 }
