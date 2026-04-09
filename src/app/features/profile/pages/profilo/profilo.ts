@@ -13,6 +13,9 @@ import { Utente, ProfiloUtente, Indirizzo } from '../../../../core/models/models
   styleUrl: './profilo.css'
 })
 export class Profilo implements OnInit {
+  private readonly STORAGE_KEY = 'formIndirizzo_draft';
+  private readonly STORAGE_MODIFICA_KEY = 'indirizzoInModifica_draft';
+  
   utente: Utente | null = null;
   profiloEsistente: ProfiloUtente | null = null;
   indirizzi: Indirizzo[] = []; // Ora è un array per gestire la rubrica!
@@ -28,6 +31,10 @@ export class Profilo implements OnInit {
   mostraFormIndirizzo = false;
   loadingIndirizzo = false;
   indirizzoInModifica: Indirizzo | null = null;
+  
+  // Modale di conferma eliminazione
+  mostraModalEliminazione = false;
+  indirizzoInEliminazione: number | null = null;
 
   constructor(
     private auth: AuthService,
@@ -73,6 +80,9 @@ export class Profilo implements OnInit {
 
     // 2. Carica Lista Indirizzi
     this.caricaIndirizzi();
+    
+    // 3. Carica draft del form indirizzo da localStorage
+    this.caricaFormDraft();
   }
 
   caricaIndirizzi() {
@@ -116,11 +126,15 @@ export class Profilo implements OnInit {
       this.indirizzoInModifica = null;
       this.formIndirizzo.reset({ paese: 'Italia' });
     }
+    // Salva il draft quando apri il form
+    this.salvaFormDraft();
   }
 
   chiudiFormIndirizzo() {
     this.mostraFormIndirizzo = false;
     this.indirizzoInModifica = null;
+    // Pulisci il draft quando chiudi il form
+    this.pulisciFormDraft();
   }
 
   salvaIndirizzo() {
@@ -146,24 +160,73 @@ export class Profilo implements OnInit {
 
     this.profiloService.saveIndirizzo(iReq).subscribe(() => {
       this.loadingIndirizzo = false;
+      // Pulisci il draft dopo il salvataggio
+      this.pulisciFormDraft();
       this.chiudiFormIndirizzo();
       this.caricaIndirizzi(); // Ricarichiamo la rubrica dal database!
     });
   }
 
 eliminaIndirizzo(id: number) {
-    if (confirm("Vuoi davvero eliminare questo indirizzo?")) {
-      // Ora chiamiamo davvero il backend!
-      this.profiloService.deleteIndirizzo(id).subscribe({
+    this.indirizzoInEliminazione = id;
+    this.mostraModalEliminazione = true;
+  }
+
+  confermaEliminazione() {
+    if (this.indirizzoInEliminazione) {
+      this.profiloService.deleteIndirizzo(this.indirizzoInEliminazione).subscribe({
         next: () => {
-          // Quando Java ci risponde (con il 204 No Content), ricarichiamo la rubrica
           this.caricaIndirizzi();
+          this.chiudiModalEliminazione();
         },
         error: (err) => {
           console.error("Errore durante l'eliminazione", err);
           alert("Ops! Non è stato possibile eliminare l'indirizzo.");
+          this.chiudiModalEliminazione();
         }
       });
     }
+  }
+
+  chiudiModalEliminazione() {
+    this.mostraModalEliminazione = false;
+    this.indirizzoInEliminazione = null;
+    // Mantieni il draft del form anche quando chiudi la modale
+  }
+
+  // ─── METODI PERSISTENZA FORM (localStorage) ────────────────────────
+
+  private caricaFormDraft(): void {
+    const formDraft = localStorage.getItem(this.STORAGE_KEY);
+    const modicaDraft = localStorage.getItem(this.STORAGE_MODIFICA_KEY);
+    
+    if (formDraft) {
+      try {
+        const datiSalvati = JSON.parse(formDraft);
+        this.mostraFormIndirizzo = true;
+        this.formIndirizzo.patchValue(datiSalvati);
+        
+        if (modicaDraft) {
+          this.indirizzoInModifica = JSON.parse(modicaDraft);
+        }
+      } catch (e) {
+        console.error('Errore nel caricamento del draft', e);
+        this.pulisciFormDraft();
+      }
+    }
+  }
+
+  private salvaFormDraft(): void {
+    const formData = this.formIndirizzo.value;
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(formData));
+    
+    if (this.indirizzoInModifica) {
+      localStorage.setItem(this.STORAGE_MODIFICA_KEY, JSON.stringify(this.indirizzoInModifica));
+    }
+  }
+
+  private pulisciFormDraft(): void {
+    localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.removeItem(this.STORAGE_MODIFICA_KEY);
   }
 }
