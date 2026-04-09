@@ -23,8 +23,6 @@ export class AuthService {
     utente: null as Utente | null
   });
 
-
-
 constructor(
   private http: HttpClient, 
   private router: Router,
@@ -32,29 +30,39 @@ constructor(
 ) {
   if (isPlatformBrowser(this.platformId)) {
     const token = localStorage.getItem('bb_token');
-    /*
-    if (token) {
-      // Invece di fidarci solo del localStorage, chiediamo conferma al server
-      this.checkMe().subscribe({
-        next: (u) => console.log("Sessione ripristinata per:", u.email),
-        error: () => this.logout() // Se il server dice 401, puliamo tutto
-      });
-    }*/
+    const utenteSalvato = localStorage.getItem('bb_utente');
 
-      if (token) {
-  this.checkMe().subscribe({
-    next: (u) => console.log("Sessione ripristinata:", u.email),
-    error: (err) => {
-      // Slogga solo se le credenziali sono scadute/invalide
-      // Non slogga se il backend è temporaneamente down
-      if (err.status === 401 || err.status === 403) {
-        this.logout();
-      }
+    // 1. RIPRISTINO IMMEDIATO (Sincrono)
+    // Questo permette alla Guardia di leggere i permessi all'istante!
+    if (token && utenteSalvato) {
+      const utente = JSON.parse(utenteSalvato);
+      this.grant.set({
+        isLogged: true,
+        isAdmin: utente.ruolo === 'ADMIN',
+        token: token,
+        utente: utente
+      });
+      console.log("Sessione recuperata localmente:", utente.email);
     }
-  });
-}
+
+    // 2. VERIFICA DI SICUREZZA (Asincrono)
+    // Questo conferma che il token sia ancora valido sul server
+    if (token) {
+      this.checkMe().subscribe({
+        next: (u) => console.log("Sessione confermata dal server per:", u.email),
+        error: (err) => {
+          // Se il server dice che il token non è più valido (401 o 403), facciamo logout
+          if (err.status === 401 || err.status === 403) {
+            console.warn("Sessione scaduta o non valida, eseguo logout.");
+            this.logout();
+          }
+        }
+      });
+    }
   }
 }
+
+
 
 
 login(email: string, password: string): Observable<any> {
