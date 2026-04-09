@@ -106,7 +106,7 @@
 
                   @if (auth.isAdmin()) {
                     <button class="btn btn-warning btn-sm" [routerLink]="['/admin/modifica-libro', libro.id]">
-                      Modificas
+                      Modifica
                     </button>
                   } 
                   @else if (libro.quantita > 0) {
