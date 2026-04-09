@@ -233,11 +233,52 @@
 .stepper-item.completed .step-name { color: #4bb543; font-weight: bold; }
 
 
+.img-copertina-ordine {
+  width: 80px;        /* Larghezza fissa */
+  height: 110px;      /* Altezza fissa (proporzioni da libro) */
+  object-fit: cover;  /* Evita che l'immagine venga schiacciata o stirata */
+  border-radius: 4px; /* Un tocco di stile opzionale */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Ombreggiatura opzionale */
+}
 
+/* Contenitore delle immaginine nel riepilogo chiuso */
+.ordine-items-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Spazio tra un libro e l'altro */
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+/* La singola immagine piccola */
+.mini-preview {
+  width: 35px;
+  height: 50px;
+  object-fit: cover; /* Evita che si deformi */
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Il badge per i libri in più (es: "+2") */
+.more-items-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 50px;
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border-radius: 4px;
+  border: 1px dashed #cbd5e1;
+}
 
 @media (max-width: 768px) {
   .profilo-wrapper { grid-template-columns: 1fr; }
   .sidebar { position: static; }
   .ordine-header { flex-wrap: wrap; gap: 8px; }
 }
+
 

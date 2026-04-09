@@ -1,22 +1,31 @@
+/* 1. CONTENITORE ESTERNO: Fissaggio in alto ed Effetto Vetro */
 .navbar {
-  background: var(--bb-white);
   position: sticky;
   top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.1); /* Ombra leggermente più morbida */
-  border-bottom: 1px solid #eeeeee;     /* Definizione extra per lo sfondo bianco */
+  z-index: 1000;
+  
+  background-color: rgba(255, 255, 255, 0.85); 
+  backdrop-filter: blur(12px); 
+  -webkit-backdrop-filter: blur(12px); 
+  
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  /* Nota: rimosso display:flex da qui per evitare lo schiacciamento */
 }
 
+/* 2. CONTENITORE INTERNO: Allineamento e spazi (Logo a sx, Azioni a dx) */
 .navbar-inner {
+  display: flex;
+  justify-content: space-between; /* Imprescindibile per distanziare logo e bottoni */
+  align-items: center;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
-  height: 70px; /* Aumentato leggermente per far respirare il logo */
-  display: flex;
-  align-items: center;
-  gap: 32px;
+  height: 70px; 
 }
 
+/* --- LOGO --- */
 .navbar-logo {
   display: flex;
   align-items: center;
@@ -28,36 +37,56 @@
   height: 60px;
   width: auto;
   object-fit: contain;
+  transition: transform 0.2s ease;
 }
 
-/* Se usi ancora il testo accanto al logo */
-.logo-beta  { color: var(--bb-blue); } 
-.logo-books { color: var(--bb-orange); }
+.logo-img:hover {
+  transform: scale(1.05); /* Effetto zoom al passaggio del mouse */
+}
 
+/* --- LINK CENTRALI --- */
 .navbar-links {
   display: flex;
-  background-color: transparent; 
-  gap: 8px;
+  align-items: center;
+  gap: 20px;
   list-style: none;
-  flex: 1;
+  margin: 0;
+  padding: 0;
 }
 
 .navbar-links a {
-  color: #444444; /* Grigio scuro per i link */
+  position: relative;
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: var(--bb-radius-sm);
-  font-size: 15px;
+  color: #475569;
   font-weight: 500;
-  transition: all 0.2s ease;
+  padding: 0.5rem 0;
+  transition: color 0.3s ease;
 }
 
-.navbar-links a:hover,
+.navbar-links a:hover, 
 .navbar-links a.active {
-  color: var(--bb-blue);
-  background: rgba(var(--bb-blue-rgb), 0.08); /* Sfondo leggerissimo al passaggio */
+  color: #2563eb; 
 }
 
+/* La linea colorata sotto ai link */
+.navbar-links a::after {
+  content: '';
+  position: absolute;
+  width: 0; 
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #2563eb; 
+  transition: width 0.3s ease; 
+  border-radius: 2px;
+}
+
+.navbar-links a:hover::after, 
+.navbar-links a.active::after {
+  width: 100%;
+}
+
+/* --- AZIONI A DESTRA (Pillola utente e bottoni) --- */
 .navbar-actions {
   display: flex;
   align-items: center;
@@ -66,29 +95,34 @@
 }
 
 .navbar-user {
-  color: #666666;
-  font-size: 13px;
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 0.85rem;
+  color: #334155;
+  background-color: #f1f5f9; 
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px; 
+  margin-right: 12px;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
 }
 
-/* Bottoni nella navbar */
 .navbar-actions .btn-outline {
-  border: 1px solid var(--bb-blue);
-  color: var(--bb-blue);
+  border: 1px solid var(--bb-blue, #2563eb);
+  color: var(--bb-blue, #2563eb);
   background: transparent;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .navbar-actions .btn-outline:hover {
-  background: var(--bb-blue);
+  background: var(--bb-blue, #2563eb);
   color: white;
 }
 
-/* Hamburger Menu (per Mobile) */
+/* --- MENU MOBILE (HAMBURGER E DROPDOWN) --- */
 .hamburger {
-  display: none;
+  display: none; /* Nascosto su PC */
   flex-direction: column;
   gap: 5px;
   background: none;
@@ -101,21 +135,22 @@
   display: block;
   width: 24px;
   height: 2px;
-  background: var(--bb-blue); /* Linee blu invece che bianche */
+  background: var(--bb-blue, #2563eb); 
   border-radius: 2px;
 }
 
-/* Menu Mobile */
 .mobile-menu {
-  display: none;
+  display: none; /* Nascosto di default */
   flex-direction: column;
-  background: white; /* Mobile menu ora bianco */
+  background: white; 
   border-bottom: 1px solid #eee;
   padding: 12px 20px 20px;
   gap: 4px;
 }
 
-.mobile-menu.open { display: flex; }
+.mobile-menu.open { 
+  display: flex; 
+}
 
 .mobile-menu a {
   color: #333;
@@ -129,8 +164,11 @@
   transition: background 0.2s ease;
 }
 
-.mobile-menu a:hover { background: rgba(0, 82, 204, 0.08); }
+.mobile-menu a:hover { 
+  background: rgba(0, 82, 204, 0.08); 
+}
 
+/* Badge Carrello Mobile riparato */
 .mobile-cart-link {
   position: relative;
 }
@@ -141,9 +179,129 @@
   justify-content: center;
   min-width: 22px;
   height: 22px;
-  background: var(--bb-orange);
+  background: var(--bb-orange, #f97316);
   color: white;
-  border-radiu
-.logo-img:hover {
-  transform: scale(1.05);
-}}
+  border-radius: 11px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* --- MEDIA QUERIES (Per nascondere il centro su telefoni) --- */
+@media screen and (max-width: 768px) {
+  .navbar-links,
+  .navbar-actions {
+    display: none; /* Nasconde il menu PC sui telefoni */
+  }
+  
+  .hamburger {
+    display: flex; /* Mostra l'hamburger sui telefoni */
+  }
+}
+/* --- DROPDOWN UTENTE (NUOVO) --- */
+.user-dropdown-container {
+  position: relative; /* Fondamentale per posizionare il menu sotto */
+}
+
+/* Il bottone trigger (Avatar + Freccia) */
+.avatar-btn {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 20px;
+  transition: background 0.2s ease;
+}
+
+.avatar-btn:hover {
+  background: #f1f5f9;
+}
+
+/* Il cerchio blu con l'iniziale */
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--bb-blue, #2563eb); 
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* La piccola freccia che ruota */
+.arrow {
+  font-size: 0.7rem;
+  color: #64748b;
+  transition: transform 0.2s ease;
+}
+.arrow.open {
+  transform: rotate(180deg); /* Gira in su quando aperto */
+}
+
+/* IL MENU VERO E PROPRIO */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px); /* Lo posiziona esattamente sotto l'avatar */
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
+  z-index: 1001;
+}
+
+.dropdown-header {
+  padding: 12px 16px;
+  background-color: #f8fafc;
+}
+
+.dropdown-email {
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 500;
+  word-break: break-all; /* Evita che email lunghissime sbordino */
+}
+
+.dropdown-divider {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.dropdown-item {
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #334155;
+  font-size: 0.9rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f5f9;
+  color: var(--bb-blue, #2563eb);
+}
+
+/* Stile speciale per il tasto Esci */
+.dropdown-item.text-danger {
+  color: #ef4444; 
+}
+.dropdown-item.text-danger:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}

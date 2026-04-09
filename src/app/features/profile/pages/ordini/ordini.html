@@ -65,26 +65,27 @@
                     {{ iconaStato(ordine.stato) }} {{ ordine.stato }}
                   </span>
                   <div class="ordine-items-preview">
-                    @for (item of ordine.items; track item.id) {
-                      
-                      @if (item.copertina) {
-                        <img [src]="getImmagine(item.copertina)"
-                          [alt]="item.titoloLibro"
-                          class="mini-preview"
-                          (error)="$event.target.src='/assets/images/default-book.png'">
-                      } @else {
-                        <img src="assets/images/default-book.png"
-                        [alt]="item.titoloLibro"
-                           class="mini-preview"
-                           onerror="this.src='/assets/images/default-book.png'">
-                      }
+  @for (item of ordine.items | slice:0:3; track item.id) {
+    
+    @if (item.copertina) {
+      <img [src]="getImmagine(item.copertina)"
+           [alt]="item.titoloLibro"
+           class="mini-preview"
+           (error)="$event.target.src='/assets/images/default-book.png'">
+    } @else {
+      <img src="assets/images/default-book.png"
+           [alt]="item.titoloLibro"
+           class="mini-preview">
+    }
 
+  }
 
-                    }
-                  </div>
-                  <span class="text-muted">
-                    {{ ordine.items.length }} articol{{ ordine.items.length === 1 ? 'o' : 'i' }}
-                  </span>
+  @if (ordine.items.length > 3) {
+    <div class="more-items-badge">
+      +{{ ordine.items.length - 3 }}
+    </div>
+  }
+</div>
                 </div>
 
                 <div class="ordine-destra">
@@ -126,6 +127,7 @@
                       <div class="ordine-item">
                         <img [src]="getImmagine(item.copertina)" 
                              [alt]="item.titoloLibro"
+                             class="img-copertina-ordine"
                              onerror="this.onerror=null; this.src='/assets/images/default-book.png'">
                         <div class="item-info">
                           <p class="item-titolo">{{ item.titoloLibro }}</p>

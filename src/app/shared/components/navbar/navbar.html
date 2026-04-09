@@ -5,25 +5,49 @@
   <img src="favicon2.png" alt="BetaBooks Logo" class="logo-img">
 </a>
     <!-- Link centrali desktop -->
-    <ul class="navbar-links">
-      <li><a routerLink="/" routerLinkActive="active" >Catalogo</a></li>
-      @if (auth.isLoggedIn()) {
-        <li><a routerLink="/cart" routerLinkActive="active">Carrello</a></li>
-        <li><a routerLink="/profile" routerLinkActive="active">Profilo</a></li>
-      }
-    </ul>
-
+<ul class="navbar-links">
+  <li><a routerLink="/" routerLinkActive="active">📚 Catalogo</a></li>
+  @if (auth.isLoggedIn()) {
+    <li>
+      <a routerLink="/cart" routerLinkActive="active" class="icon-link">
+        🛒 </a>
+    </li>
+  }
+</ul>
     <!-- Azioni destra -->
-    <div class="navbar-actions">
-      @if (auth.isLoggedIn()) {
-        <span class="navbar-user">{{ auth.grant().utente?.email }}</span>
-        <button class="btn btn-outline btn-sm" (click)="logout()">Esci</button>
-      } @else {
-        <a routerLink="/auth/login"    class="btn btn-outline btn-sm">Accedi</a>
-        <a routerLink="/auth/register" class="btn btn-accent btn-sm">Registrati</a>
+<div class="navbar-actions">
+  @if (auth.isLoggedIn()) {
+    
+    <div class="user-dropdown-container">
+      
+      <button class="avatar-btn" (click)="toggleDropdown()">
+        <div class="avatar-circle">{{ getIniziale() }}</div>
+        <span class="arrow" [class.open]="dropdownAperto">▼</span>
+      </button>
+
+      @if (dropdownAperto) {
+        <div class="dropdown-menu">
+          <div class="dropdown-header">
+            <span class="dropdown-email">{{ auth.grant().utente?.email }}</span>
+          </div>
+          
+          <hr class="dropdown-divider">
+          
+          <a routerLink="/profile" class="dropdown-item" (click)="dropdownAperto=false">👤 Il mio profilo</a>
+          <a routerLink="/profile/ordini" class="dropdown-item" (click)="dropdownAperto=false">📦 I miei ordini</a>
+          
+          <hr class="dropdown-divider">
+          
+          <button class="dropdown-item text-danger" (click)="logout()">🚪 Esci</button>
+        </div>
       }
     </div>
 
+  } @else {
+    <a routerLink="/auth/login" class="btn btn-outline btn-sm">Accedi</a>
+    <a routerLink="/auth/register" class="btn btn-accent btn-sm">Registrati</a>
+  }
+</div>
     <!-- Hamburger mobile -->
     <button class="hamburger" (click)="toggleMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
