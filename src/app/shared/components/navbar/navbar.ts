@@ -5,13 +5,14 @@ import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-navbar',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
 export class Navbar {
   menuAperto = false;
-  dropdownAperto = false; // NUOVO: Stato del menu utente
+  dropdownAperto = false;
 
   auth = inject(AuthService);
   private router = inject(Router);
@@ -19,7 +20,7 @@ export class Navbar {
   constructor() {}
 
   logout(): void {
-    this.dropdownAperto = false; // Chiudi il menu quando esce
+    this.dropdownAperto = false;
     this.auth.logout();
   }
 
@@ -27,12 +28,10 @@ export class Navbar {
     this.menuAperto = !this.menuAperto;
   }
 
-  // NUOVO: Apri/Chiudi dropdown utente
   toggleDropdown(): void {
     this.dropdownAperto = !this.dropdownAperto;
   }
 
-  // NUOVO: Prende la prima lettera dell'email
   getIniziale(): string {
     const email = this.auth.grant().utente?.email;
     return email ? email.charAt(0).toUpperCase() : 'U';
