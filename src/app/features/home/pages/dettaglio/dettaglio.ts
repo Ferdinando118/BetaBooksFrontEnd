@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -14,13 +14,18 @@ import { RecensioneService } from '../../../../core/services/recensione';
   styleUrl: './dettaglio.css'
 })
 export class Dettaglio implements OnInit {
+  // --- 1. Signals di base ---
   libro = signal<any | null>(null);
   formati = signal<any[]>([]);
   recensioni = signal<any[]>([]);
   loading = signal(true);
   aggiunto = signal(false);
   recensioneInviata = signal(false);
-  erroreRecensione = signal<string | null>(null); // Per gestire il blocco "libro non consegnato"
+  erroreRecensione = signal<string | null>(null);
+
+  // --- 2. Computed Signals (Quelli che mancavano!) ---
+  formatoPrincipale = computed(() => this.formati().length > 0 ? this.formati()[0] : null);
+  disponibile = computed(() => (this.formatoPrincipale()?.quantita || 0) > 0);
 
   formRecensione: FormGroup;
 
@@ -41,22 +46,21 @@ export class Dettaglio implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    // Carica il libro
     this.libroService.getById(id).subscribe({
       next: (libro) => {
         this.libro.set(libro);
+        
+        // Salviamo nel signal i formati che arrivano DIRETTAMENTE dal libro!
+        if (libro.formati) {
+          this.formati.set(libro.formati);
+        }
+
         this.loading.set(false);
       },
       error: (err) => {
         console.error('Errore caricamento libro:', err);
         this.loading.set(false);
       }
-    });
-
-    // Carica i formati disponibili per questo libro
-    this.libroService.getFormatiByLibro(id).subscribe({
-      next: (formati) => this.formati.set(formati),
-      error: (err) => console.error('Errore caricamento formati:', err)
     });
 
     this.caricaRecensioni(id);
@@ -69,59 +73,67 @@ export class Dettaglio implements OnInit {
     });
   }
 
-  aggiungiAlCarrello(): void {
-    const libro = this.libro();
-    if (!libro) return;
-    this.carrelloService.aggiungi(libro);
-    this.aggiunto.set(true);
-    setTimeout(() => this.aggiunto.set(false), 2000);
+  getImmagine(copertina: string | undefined | null): string {
+    if (!copertina) return '/assets/images/default-book.png';
+    if (copertina.startsWith('http')) return copertina;
+    return 'http://localhost:8080/uploads/' + copertina;
   }
-/*
+
+  aggiungiAlCarrello(): void {
+    if (!this.auth.isLoggedIn()) {
+      alert('Devi effettuare il login per aggiungere al carrello.');
+      return;
+    }
+
+    // Usiamo il computed signal per maggiore sicurezza!
+    const formato = this.formatoPrincipale();
+    if (!formato) {
+      alert('Formato non disponibile per questo libro.');
+      return;
+    }
+
+    this.carrelloService.aggiungi(formato.id).subscribe({
+      next: () => {
+        this.aggiunto.set(true);
+        setTimeout(() => this.aggiunto.set(false), 2000);
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Errore: ' + (err.error?.message || 'Impossibile aggiungere il libro'));
+      }
+    });
+  }
+
   inviaRecensione(): void {
     if (this.formRecensione.invalid) return;
-    // TODO: chiamare RecensioneService quando disponibile
-    console.log('Recensione:', this.formRecensione.value);
-    this.recensioneInviata.set(true);
-  }*/
 
-inviaRecensione(): void {
-  if (this.formRecensione.invalid) return;
+    const utenteLoggato = this.auth.grant().utente;
 
-  // Recuperiamo l'utente dal signal 'grant' del service auth
-  const utenteLoggato = this.auth.grant().utente;
-
-  if (!utenteLoggato) {
-    this.erroreRecensione.set("Devi effettuare il login per lasciare una recensione.");
-    return;
-  }
-
-  const req = {
-    valutazione: this.formRecensione.value.valutazione,
-    descrizione: this.formRecensione.value.descrizione,
-    idLibro: this.libro()?.id,
-    idUtente: utenteLoggato.id 
-  };
-
-  this.recensioneService.create(req).subscribe({
-    next: (res) => {
-      this.recensioneInviata.set(true);
-      this.erroreRecensione.set(null);
-      // Ricarichiamo la lista per vedere subito la nuova recensione
-      this.caricaRecensioni(this.libro()?.id);
-    },
-    /*
-    error: (err) => {
-      // Qui gestiamo il messaggio "Non hai acquistato il libro" dal backend
-      this.erroreRecensione.set(err.error.message || 'Errore durante l\'invio');
-    }*/
-   error: (err) => {
-      console.error("Errore API:", err);
-      // Usiamo l'optional chaining (?.) e un fallback per evitare il crash
-      const msg = err?.error?.message || "Errore di connessione al server (403)";
-      this.erroreRecensione.set(msg);
+    if (!utenteLoggato) {
+      this.erroreRecensione.set("Devi effettuare il login per lasciare una recensione.");
+      return;
     }
-  });
-}
+
+    const req = {
+      valutazione: this.formRecensione.value.valutazione,
+      descrizione: this.formRecensione.value.descrizione,
+      idLibro: this.libro()?.id,
+      idUtente: utenteLoggato.id 
+    };
+
+    this.recensioneService.create(req).subscribe({
+      next: (res) => {
+        this.recensioneInviata.set(true);
+        this.erroreRecensione.set(null);
+        this.caricaRecensioni(this.libro()?.id);
+      },
+      error: (err) => {
+        console.error("Errore API:", err);
+        const msg = err?.error?.message || "Errore di connessione al server (403)";
+        this.erroreRecensione.set(msg);
+      }
+    });
+  }
   
   stelle(n: number): string {
     const arrotondato = Math.round(n);

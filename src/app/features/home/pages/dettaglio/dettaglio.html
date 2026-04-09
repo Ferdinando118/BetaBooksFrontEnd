@@ -5,12 +5,13 @@
 @if (!loading() && libro()) {
   <div class="dettaglio-wrapper">
 
-    <!-- Colonna sinistra: copertina -->
     <aside class="dettaglio-cover">
-      <img [src]="libro()!.copertina" [alt]="libro()!.titolo"
-           onerror="this.src='https://placehold.co/300x420/1a3a6b/ffffff?text=📚'">
+      
+      <img [src]="getImmagine(formatoPrincipale()?.copertina || libro()!.copertina)" 
+           [alt]="libro()!.titolo"
+           onerror="this.onerror=null; this.src='/assets/images/default-book.png'">
 
-      @if (libro()!.quantita > 0) {
+      @if (disponibile()) {
         <button class="btn btn-accent w-full"
                 (click)="aggiungiAlCarrello()"
                 [disabled]="aggiunto()">
@@ -25,7 +26,6 @@
       </a>
     </aside>
 
-    <!-- Colonna destra: info -->
     <div class="dettaglio-info">
       <div class="card">
         <h1 class="libro-titolo">{{ libro()!.titolo }}</h1>
@@ -49,7 +49,7 @@
             <span>📅 {{ libro()!.anno }}</span>
           }
           <span>🌐 {{ libro()!.lingua }}</span>
-          <span>📦 {{ libro()!.quantita > 0 ? libro()!.quantita + ' disponibili' : 'Esaurito' }}</span>
+          <span>📦 {{ disponibile() ? formatoPrincipale()!.quantita + ' disponibili' : 'Esaurito' }}</span>
         </div>
 
         @if (libro()!.categorie?.length > 0) {
@@ -60,18 +60,18 @@
           </div>
         }
 
-        <!-- Formati disponibili -->
         @if (formati().length > 0) {
           <div class="formati" style="margin-top: 12px">
             <span class="text-muted" style="font-size: 13px">Disponibile in:</span>
             @for (f of formati(); track f.id) {
-              <span class="badge-categoria">{{ f.formato }} — € {{ f.prezzo | number:'1.2-2' }}</span>
+              <span class="badge-categoria">{{ f.formato || 'Standard' }} — € {{ f.prezzo | number:'1.2-2' }}</span>
             }
           </div>
         }
 
         <div class="prezzo-box">
-          <span class="price">€ {{ libro()!.prezzo | number:'1.2-2' }}</span>
+          <span class="price">€ {{ formatoPrincipale() ? (formatoPrincipale()!.prezzo | number:'1.2-2') : 'N/D' }}</span>
+          
           @if (libro()!.valutazioneMedia) {
             <span class="stelle-media">
               ★ {{ libro()!.valutazioneMedia }} / 5
@@ -82,11 +82,10 @@
 
         @if (libro()!.descrizione) {
           <hr class="divider">
-          <span class="price">€ {{ formati()[0]?.prezzo | number:'1.2-2' }}</span>
+          <p style="line-height: 1.6; margin-top: 12px">{{ libro()!.descrizione }}</p>
         }
       </div>
 
-      <!-- Recensioni -->
       <div class="card" style="margin-top: 24px">
         <h2 class="section-title">Recensioni</h2>
         <hr class="divider">
@@ -107,7 +106,6 @@
           </div>
         }
 
-        <!-- Form nuova recensione -->
         @if (auth.isLoggedIn() && !recensioneInviata()) {
           <hr class="divider">
           <h3 style="font-size:15px; font-weight:600; color:var(--bb-blue); margin-bottom:12px">

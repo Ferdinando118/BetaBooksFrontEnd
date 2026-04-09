@@ -14,11 +14,10 @@ import { Libro } from '../../../../core/models/models';
   // Scegliamo Standalone di Aldo per modernità
   standalone: true, 
   imports: [
-    CommonModule, 
-    RouterModule, 
-    FormsModule, 
-    BookHoverDirective
-  ],
+    CommonModule,
+    RouterModule,
+    FormsModule
+],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css'
 })
