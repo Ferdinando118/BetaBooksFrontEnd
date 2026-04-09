@@ -3,6 +3,10 @@ import { authGuard } from './core/guards/auth-guard';
 import { FormLibro } from './features/admin/form-libro/form-libro';
 import { adminGuard } from './core/guards/admin-guard';
 
+import { Spedizioni } from './features/admin/spedizioni/spedizioni';
+import { Tabelle } from './features/admin/tabelle/tabelle';
+import { Audit } from './features/admin/audit/audit';
+
 export const routes: Routes = [
   {
     path: '',
@@ -19,6 +23,19 @@ export const routes: Routes = [
   component: FormLibro, 
   canActivate: [adminGuard] 
 },
+// RAGGRUPPAMENTO ROTTE ADMIN
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    children: [
+     // { path: 'nuovo-libro', component: FormLibro },
+      //{ path: 'modifica-libro/:id', component: FormLibro },
+    
+    { path: 'spedizioni', component: Spedizioni },
+    { path: 'tabelle',    component: Tabelle },
+    { path: 'audit',      component: Audit }
+    ]
+  },
 { 
   path: 'admin/modifica-libro/:id', 
   component: FormLibro, 

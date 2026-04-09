@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule} from '@angular/common';
 import { AuthService } from '../../../core/services/auth';
@@ -13,7 +13,10 @@ export class Navbar {
   menuAperto = false;
   dropdownAperto = false; // NUOVO: Stato del menu utente
 
-  constructor(public auth: AuthService, private router: Router) {}
+  auth = inject(AuthService);
+  private router = inject(Router);
+
+  constructor() {}
 
   logout(): void {
     this.dropdownAperto = false; // Chiudi il menu quando esce

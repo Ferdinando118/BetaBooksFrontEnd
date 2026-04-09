@@ -14,6 +14,8 @@
     </li>
   }
 </ul>
+
+
     <!-- Azioni destra -->
 <div class="navbar-actions">
   @if (auth.isLoggedIn()) {
@@ -21,7 +23,11 @@
     <div class="user-dropdown-container">
       
       <button class="avatar-btn" (click)="toggleDropdown()">
-        <div class="avatar-circle">{{ getIniziale() }}</div>
+        
+        <div class="avatar-circle" [style.border]="auth.isAdmin() ? '2px solid #ffc107' : 'none'">
+          {{ getIniziale() }}
+        </div>
+
         <span class="arrow" [class.open]="dropdownAperto">▼</span>
       </button>
 
@@ -29,9 +35,21 @@
         <div class="dropdown-menu">
           <div class="dropdown-header">
             <span class="dropdown-email">{{ auth.grant().utente?.email }}</span>
+         
+            @if (auth.isAdmin()) {
+              <span class="admin-badge">ADMIN</span>
+            }
           </div>
           
           <hr class="dropdown-divider">
+
+          @if (auth.isAdmin()) {
+          
+            <a routerLink="/admin/spedizioni" class="dropdown-item admin-link" (click)="dropdownAperto=false">📦 Spedizioni</a>
+            <a routerLink="/admin/tabelle" class="dropdown-item admin-link" (click)="dropdownAperto=false">📂 Anagrafiche</a>
+            <a routerLink="/admin/audit" class="dropdown-item admin-link" (click)="dropdownAperto=false">🔍 Audit Log</a>
+            <hr class="dropdown-divider">
+          }
           
           <a routerLink="/profile" class="dropdown-item" (click)="dropdownAperto=false">👤 Il mio profilo</a>
           <a routerLink="/profile/ordini" class="dropdown-item" (click)="dropdownAperto=false">📦 I miei ordini</a>
