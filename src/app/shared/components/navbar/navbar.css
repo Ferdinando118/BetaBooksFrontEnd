@@ -329,12 +329,12 @@
 }
 
 .dropdown-item.admin-link {
-  color: #7c3aed;
+  color: #f57f17;
 }
 
 .dropdown-item.admin-link:hover {
-  background: linear-gradient(90deg, rgba(124, 58, 237, 0.1) 0%, transparent 100%);
-  color: #6d28d9;
+  background: linear-gradient(90deg, rgba(245, 127, 23, 0.1) 0%, transparent 100%);
+  color: #e65100;
 }
 
 /* Stile speciale per il tasto Esci */
@@ -349,7 +349,7 @@
 
 .admin-badge {
   display: inline-block;
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #f57f17 0%, #fb8c00 100%);
   color: white;
   font-size: 0.65rem;
   font-weight: 700;
@@ -357,5 +357,5 @@
   border-radius: 12px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 12px rgba(245, 127, 23, 0.3);
 }
