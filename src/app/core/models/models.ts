@@ -83,6 +83,13 @@ export interface CarrelloDTO {
   prezzoTotaleComplessivo: number; // Il totale calcolato da Spring Boot!
 }
 
+export interface FormatoDisponibileDTO {
+  id: number;
+  tipoSupporto: string;
+  tipoCopertina: string;
+  prezzo: number;
+}
+
 export interface CarrelloItemDTO {
   id: number;
   idFormatoLibro: number;
@@ -90,6 +97,10 @@ export interface CarrelloItemDTO {
   quantita: number;
   prezzoUnitario: number;
   prezzoTotaleRiga: number; // Fornito direttamente dal backend!
+  tipoSupporto?: string;    // Aggiunto: tipo supporto (Copertina flessibile, Copertina rigida, E-book)
+  tipoCopertina?: string;   // Aggiunto: tipo copertina
+  idLibro?: number;         // Aggiunto: per recuperare i formati alternativi
+  formatiDisponibili?: FormatoDisponibileDTO[]; // Aggiunto: formati alternativi dello stesso libro
 }
 
 // ── ORDINE ────────────────────────────────────────

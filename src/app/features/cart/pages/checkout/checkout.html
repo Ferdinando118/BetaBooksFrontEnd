@@ -119,9 +119,35 @@
         <h2>Riepilogo</h2>
         <hr class="divider">
         @for (item of items; track item.id) {
-          <div class="riepilogo-row">
-            <span>{{ item.titoloLibro | slice:0:22 }}{{ item.titoloLibro.length > 22 ? '…' : '' }} x{{ item.quantita }}</span>
-            <span>€ {{ item.prezzoTotaleRiga | number:'1.2-2' }}</span>
+          <div class="riepilogo-item" style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 500;">{{ item.titoloLibro | slice:0:22 }}{{ item.titoloLibro.length > 22 ? '…' : '' }}</span>
+              <span>x{{ item.quantita }}</span>
+            </div>
+            
+            @if (item.formatiDisponibili && item.formatiDisponibili.length > 0) {
+              <div style="margin-bottom: 8px;">
+                <label style="display: block; font-size: 13px; color: #666; margin-bottom: 4px;">Versione:</label>
+                <select (change)="onFormatoChange($event, item)" 
+                        [value]="item.idFormatoLibro"
+                        style="width: 100%; padding: 6px; border: 1px solid #d0d0d0; border-radius: 4px; font-size: 13px;">
+                  @for (formato of item.formatiDisponibili; track formato.id) {
+                    <option [value]="formato.id">
+                      @if (formato.tipoSupporto === 'EBOOK') {
+                        {{ formato.tipoSupporto }} (€{{ formato.prezzo | number:'1.2-2' }})
+                      } @else {
+                        {{ formato.tipoSupporto }} - {{ formato.tipoCopertina }} (€{{ formato.prezzo | number:'1.2-2' }})
+                      }
+                    </option>
+                  }
+                </select>
+              </div>
+            }
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #666;">{{ item.quantita }} × € {{ item.prezzoUnitario | number:'1.2-2' }}</span>
+              <span style="font-weight: 600;">€ {{ item.prezzoTotaleRiga | number:'1.2-2' }}</span>
+            </div>
           </div>
         }
         <hr class="divider">

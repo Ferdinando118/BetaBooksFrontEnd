@@ -42,33 +42,75 @@
       </div>
 
       <hr>
-      <h5 class="mb-0">Dettagli Formato e Prezzo</h5>
-      <p class="text-muted small">Questi dati verranno salvati nel formato del libro.</p>
+      <div class="formati-section">
+        <h5 class="mb-3">Versioni e Prezzi 📦</h5>
+        <p class="text-muted small mb-3">Configura tutte le versioni disponibili del libro con i relativi prezzi.</p>
 
-      <div class="col-md-3">
-        <label class="form-label">Prezzo (€) *</label>
-        <input type="number" formControlName="prezzo" class="form-control" step="0.01">
-      </div>
+        @if (formati.length === 0) {
+          <div class="alert alert-warning">Nessun formato aggiunto. Aggiungine almeno uno.</div>
+        }
 
-      <div class="col-md-3">
-        <label class="form-label">Quantità a Stock *</label>
-        <input type="number" formControlName="stock" class="form-control">
-      </div>
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th [style.width]="hasFormatoCartaceo() ? '25%' : '35%'">Supporto</th>
+                @if (hasFormatoCartaceo()) {
+                  <th style="width: 25%;">Copertina</th>
+                }
+                <th [style.width]="hasFormatoCartaceo() ? '20%' : '23%'">Prezzo (€)</th>
+                <th [style.width]="hasFormatoCartaceo() ? '20%' : '22%'">Quantità</th>
+                <th [style.width]="hasFormatoCartaceo() ? '10%' : '20%'">Azioni</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (formato of formati.controls; let i = $index; track i) {
+                <tr [formGroup]="getFormatoGroup(i)">
+                  <td>
+                    <select formControlName="tipoSupporto" class="form-select form-select-sm">
+                      @for (tipo of tipiSupporto; track tipo.value) {
+                        <option [value]="tipo.value">{{ tipo.label }}</option>
+                      }
+                    </select>
+                  </td>
+                  @if (hasFormatoCartaceo() && getFormatoGroup(i).get('tipoSupporto')?.value !== 'EBOOK') {
+                    <td>
+                      <select formControlName="tipoCopertina" class="form-select form-select-sm">
+                        @for (tipo of tipiCopertina; track tipo.value) {
+                          <option [value]="tipo.value">{{ tipo.label }}</option>
+                        }
+                      </select>
+                    </td>
+                  }
+                  <td>
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text">€</span>
+                      <input type="number" formControlName="prezzo" class="form-control" step="0.01" min="0.01">
+                    </div>
+                  </td>
+                  <td>
+                    <input type="number" formControlName="quantita" class="form-control form-control-sm" min="1">
+                  </td>
+                  <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger" (click)="rimuoviFormato(i)">
+                      🗑️
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
 
-      <div class="col-md-3">
-        <label class="form-label">Supporto</label>
-        <select formControlName="tipoSupporto" class="form-select">
-          <option value="CARTACEO">Cartaceo</option>
-          <option value="EBOOK">E-book</option>
-        </select>
-      </div>
-
-      <div class="col-md-3">
-        <label class="form-label">Copertina</label>
-        <select formControlName="tipoCopertina" class="form-select">
-          <option value="FLESSIBILE">Flessibile</option>
-          <option value="RIGIDA">Rigida</option>
-        </select>
+        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" (click)="aggiungiFormatoPredefinito('CARTACEO', 'FLESSIBILE')">
+          + Copertina Flessibile
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary mb-3 ms-2" (click)="aggiungiFormatoPredefinito('CARTACEO', 'RIGIDA')">
+          + Copertina Rigida
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary mb-3 ms-2" (click)="aggiungiFormatoPredefinito('EBOOK', 'FLESSIBILE')">
+          + E-book
+        </button>
       </div>
 
       <div class="col-md-12">
@@ -80,12 +122,12 @@
       </div>
 
       <div class="col-12 form-actions mt-4">
-        <button type="submit" class="btn btn-primary" [disabled]="loading">
+        <button type="submit" class="btn btn-primary" [disabled]="loading || formati.length === 0">
           @if (loading) {
             <span class="spinner-border spinner-border-sm me-2"></span>
             Salvataggio...
           } @else {
-            <span>Salva Libro e Formato</span>
+            <span>{{ editMode ? 'Aggiorna' : 'Crea' }} Libro e Versioni</span>
           }
         </button>
         <button type="button" class="btn btn-secondary ms-2" routerLink="/catalogo" [disabled]="loading">Annulla</button>

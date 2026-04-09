@@ -5,7 +5,8 @@ import { Router } from '@angular/router';
 import { CarrelloService } from '../../../../core/services/carrello';
 import { OrdineService } from '../../../../core/services/ordine';
 import { AuthService } from '../../../../core/services/auth';
-import { ProfiloService } from '../../../../core/services/profilo'; // <-- Aggiunto per gli indirizzi
+import { ProfiloService } from '../../../../core/services/profilo';
+import { LibroService } from '../../../../core/services/libro';
 
 import { CarrelloDTO, CarrelloItemDTO, MetodoPagamento, Indirizzo, Resp } from '../../../../core/models/models';
 
@@ -21,6 +22,7 @@ export class Checkout implements OnInit {
   private ordineService = inject(OrdineService);
   private auth = inject(AuthService);
   private profiloService = inject(ProfiloService);
+  private libroService = inject(LibroService);
   private router = inject(Router);
 
   // --- STATO CARRELLO E ORDINE ---
@@ -71,6 +73,13 @@ export class Checkout implements OnInit {
       if (data && data.items && data.items.length > 0) {
         this.items = data.items;
         this.totale = data.prezzoTotaleComplessivo;
+        // Inizializza i formati disponibili
+        this.items.forEach(item => {
+          if (!item.formatiDisponibili) {
+            item.formatiDisponibili = [];
+          }
+          this.caricaFormatiPerItem(item);
+        });
       } else if (!this.ordinato) {
         this.router.navigate(['/cart']);
       }
@@ -78,6 +87,121 @@ export class Checkout implements OnInit {
 
     // 2. Carica gli Indirizzi dell'utente
     this.caricaIndirizzi();
+  }
+
+  // ─── GESTIONE FORMATI ────────────────────────────────────────────────
+
+  /**
+   * Carica i formati disponibili per un item del carrello
+   */
+  caricaFormatiPerItem(item: CarrelloItemDTO): void {
+    // Se abbiamo idLibro, usalo direttamente
+    if (item.idLibro) {
+      this.caricaFormatiByIdLibro(item);
+      return;
+    }
+
+    // Se no, cerchiamo di ottenerlo dal backend usando il formato corrente
+    if (item.idFormatoLibro) {
+      this.libroService.getFormatoById(item.idFormatoLibro).subscribe({
+        next: (formato: any) => {
+          if (formato && formato.idLibro) {
+            item.idLibro = formato.idLibro;
+            this.caricaFormatiByIdLibro(item);
+          }
+        },
+        error: (err) => console.error('Errore caricamento formato:', err)
+      });
+    }
+  }
+
+  /**
+   * Carica i formati di un libro per ID
+   */
+  private caricaFormatiByIdLibro(item: CarrelloItemDTO): void {
+    if (!item.idLibro) return;
+
+    this.libroService.getFormatiByLibro(item.idLibro).subscribe({
+      next: (formati: any[]) => {
+        if (!formati || formati.length === 0) {
+          console.warn('Nessun formato trovato per il libro:', item.idLibro);
+          item.formatiDisponibili = [];
+          return;
+        }
+
+        item.formatiDisponibili = formati.map((f: any) => ({
+          id: f.id,
+          tipoSupporto: f.tipoSupporto || 'Sconosciuto',
+          tipoCopertina: f.tipoCopertina || 'Sconosciuto',
+          prezzo: f.prezzo || 0
+        }));
+        
+        // Aggiorna il tipo di supporto e copertina dell'item corrente
+        const formatoCorrente = formati.find((f: any) => f.id === item.idFormatoLibro);
+        if (formatoCorrente) {
+          item.tipoSupporto = formatoCorrente.tipoSupporto;
+          item.tipoCopertina = formatoCorrente.tipoCopertina;
+          item.prezzoUnitario = formatoCorrente.prezzo;
+        }
+
+        console.log('Formati caricati per', item.titoloLibro, ':', item.formatiDisponibili);
+      },
+      error: (err) => {
+        console.error('Errore caricamento formati per libro', item.idLibro, ':', err);
+        item.formatiDisponibili = [];
+      }
+    });
+  }
+
+  /**
+   * Gestore per il cambio di formato dal select
+   */
+  onFormatoChange(event: Event, item: CarrelloItemDTO): void {
+    const target = event.target as HTMLSelectElement;
+    if (!target || !target.value) return;
+    
+    const nuovoIdFormato = parseInt(target.value, 10);
+    this.cambiaFormato(item, nuovoIdFormato);
+  }
+
+  /**
+   * Cambia il formato di un item del carrello
+   * @param item - L'item da modificare
+   * @param nuovoIdFormato - L'ID del nuovo formato
+   */
+  cambiaFormato(item: CarrelloItemDTO, nuovoIdFormato: number): void {
+    if (isNaN(nuovoIdFormato) || nuovoIdFormato === item.idFormatoLibro) {
+      return; // Nessun cambio o valore non valido
+    }
+
+    const nuovoFormato = item.formatiDisponibili?.find(f => f.id === nuovoIdFormato);
+    if (!nuovoFormato) {
+      console.error('Formato non trovato:', nuovoIdFormato);
+      return;
+    }
+
+    // Rimuovi l'item corrente e aggiungi uno nuovo con il nuovo formato
+    this.carrelloService.rimuovi(item.id).subscribe({
+      next: () => {
+        // Aggiungi il nuovo formato
+        this.carrelloService.aggiungi(nuovoIdFormato, item.quantita).subscribe({
+          next: () => {
+            console.log('Formato cambiato con successo');
+            this.carrelloService.loadCarrello();
+          },
+          error: (err) => {
+            console.error('Errore durante l\'aggiunta:', err);
+            alert('Errore durante l\'aggiunta: ' + (err.error?.message || 'Errore sconosciuto'));
+            this.carrelloService.loadCarrello(); // Ricarica per sincronizzare lo stato
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Errore durante la rimozione:', err);
+        alert('Errore durante la rimozione: ' + (err.error?.message || 'Errore sconosciuto'));
+        this.carrelloService.loadCarrello(); // Ricarica per sincronizzare lo stato
+      }
+    });
   }
 
   // ─── GESTIONE INDIRIZZI ──────────────────────────────────────────────
