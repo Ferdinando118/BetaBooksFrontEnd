@@ -31,4 +31,4 @@ export class RecensioneService {
 
 }
 
-export { Recensione };
+export type { Recensione };
