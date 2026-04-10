@@ -3,6 +3,17 @@
     <h2>📦 Gestione Ordini e Logistica</h2>
   </div>
 
+  <div class="search-container">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="applicaFiltro()" 
+        placeholder="🔍 Cerca per ID, pagamento o stato..."
+        class="search-input">
+      <span class="badge-count">{{ ordiniFiltrati.length }} Ordini trovati</span>
+    </div>
+  </div>
+
   <div class="table-responsive">
     <table class="admin-table">
       <thead>
@@ -15,7 +26,7 @@
           <th class="text-center">Stato</th> </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let o of ordini">
+        <tr *ngFor="let o of ordiniFiltrati">
           <td><strong>#{{ o.id }}</strong></td>
           
           <td>{{ o.dataOrdine | date:'dd/MM/yyyy HH:mm' }}</td>

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule} from '@angular/common';
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
@@ -13,6 +13,7 @@ import { AuthService } from '../../../core/services/auth';
 export class Navbar {
   menuAperto = false;
   dropdownAperto = false;
+  loading = false;
 
   auth = inject(AuthService);
   private router = inject(Router);
@@ -22,6 +23,7 @@ export class Navbar {
   logout(): void {
     this.dropdownAperto = false;
     this.auth.logout();
+    this.router.navigate(['/auth/login']);
   }
 
   toggleMenu(): void {
@@ -32,6 +34,28 @@ export class Navbar {
     this.dropdownAperto = !this.dropdownAperto;
   }
 
+  /**
+   * Gestisce l'invio della mail di convalida
+   */
+  mandaVerifica(): void {
+    const email = this.auth.grant().utente?.email;
+    if (typeof email === 'string') {
+      this.loading = true;
+      this.auth.verificaMail(email).subscribe({
+        next: () => { 
+          // loading rimane true per mostrare il feedback "Mail inviata" nel template
+        },
+        error: (err) => { 
+          console.error("Errore invio verifica:", err);
+          this.loading = false; 
+        }
+      });
+    }
+  }
+
+  /**
+   * Ritorna l'iniziale dell'email per l'avatar
+   */
   getIniziale(): string {
     const email = this.auth.grant().utente?.email;
     return email ? email.charAt(0).toUpperCase() : 'U';

@@ -6,7 +6,11 @@
     <a routerLink="/profile/ordini" class="btn btn-outline" routerLinkActive="active">
       📦 I miei Ordini
     </a>
+    <button class="btn btn-outline" (click)="apriDialogPassword()">
+      🔒 Cambia Password
+    </button>
   </div>
+
   <div class="card mb-4">
     <h2 class="section-title">Informazioni Personali</h2>
     <form [formGroup]="formProfilo" (ngSubmit)="salvaProfilo()">
@@ -144,7 +148,45 @@
     }
   </div>
 
-  <!-- Modale di Conferma Eliminazione -->
+  @if (mostraDialogPassword) {
+    <div class="modal-overlay" (click)="chiudiDialogPassword()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="form-title-bar">
+          <h3 class="modal-title">Cambia Password</h3>
+          <button class="btn-icon" (click)="chiudiDialogPassword()">✕</button>
+        </div>
+        
+        <div class="modal-message text-start">
+          @if (successoPassword) {
+            <p class="text-success fw-bold">✅ Password aggiornata! Verrai disconnesso...</p>
+          }
+          
+          <div class="form-group mb-3">
+            <label>Password attuale</label>
+            <input type="password" class="form-control" [(ngModel)]="formPassword.vecchiaPassword" placeholder="••••••••" />
+          </div>
+          <div class="form-group mb-3">
+            <label>Nuova password</label>
+            <input type="password" class="form-control" [(ngModel)]="formPassword.nuovaPassword" placeholder="••••••••" />
+          </div>
+          <div class="form-group mb-3">
+            <label>Conferma nuova password</label>
+            <input type="password" class="form-control" [(ngModel)]="formPassword.confermaPassword" placeholder="••••••••" />
+          </div>
+          
+          @if (errorePassword) {
+            <p class="text-danger small">⚠️ {{ errorePassword }}</p>
+          }
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="chiudiDialogPassword()">Annulla</button>
+          <button class="btn btn-primary" (click)="salvaPassword()">Salva</button>
+        </div>
+      </div>
+    </div>
+  }
+
   @if (mostraModalEliminazione) {
     <div class="modal-overlay" (click)="chiudiModalEliminazione()">
       <div class="modal-content" (click)="$event.stopPropagation()">

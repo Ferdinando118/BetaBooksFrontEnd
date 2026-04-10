@@ -21,7 +21,6 @@
   overflow: hidden;
 }
 
-/* Sottile banda decorativa dorata in cima alla card */
 .form-card::before {
   content: '';
   position: absolute;
@@ -199,7 +198,6 @@ textarea.form-control {
   font-weight: 400;
 }
 
-/* Stato vuoto */
 .empty-state {
   display: flex;
   align-items: center;
@@ -256,7 +254,6 @@ textarea.form-control {
   vertical-align: middle;
 }
 
-/* Input piccoli dentro tabella */
 .form-select-sm,
 .form-control-sm {
   padding: 7px 10px !important;
@@ -279,7 +276,6 @@ textarea.form-control {
   background: #fff;
 }
 
-/* Prezzo */
 .price-input-wrap {
   display: flex;
   align-items: center;
@@ -313,7 +309,6 @@ textarea.form-control {
   width: 100%;
 }
 
-/* Tasto rimuovi */
 .btn-remove {
   width: 30px;
   height: 30px;
@@ -452,7 +447,6 @@ textarea.form-control {
   box-shadow: none;
 }
 
-/* Spinner */
 .spinner {
   width: 14px;
   height: 14px;
@@ -480,4 +474,50 @@ textarea.form-control {
   .form-card { padding: 20px 16px; }
   .formati-section { padding: 16px; }
   .btn-add-formato { flex: 1 1 100%; }
+}
+
+/* --- GRIGLIA CATEGORIE A PILLOLA --- */
+.categorie-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.categoria-pill {
+  position: relative;
+}
+
+.categoria-pill input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.categoria-pill label {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.categoria-pill label:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.categoria-pill input[type="checkbox"]:checked + label {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  font-weight: 600;
 }

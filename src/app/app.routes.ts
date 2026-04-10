@@ -7,6 +7,10 @@ import { Spedizioni } from './features/admin/spedizioni/spedizioni';
 import { Tabelle } from './features/admin/tabelle/tabelle';
 import { Audit } from './features/admin/audit/audit';
 
+import { Spedizioni } from './features/admin/spedizioni/spedizioni';
+import { Tabelle } from './features/admin/tabelle/tabelle';
+import { Audit } from './features/admin/audit/audit';
+
 export const routes: Routes = [
   {
     path: '',
