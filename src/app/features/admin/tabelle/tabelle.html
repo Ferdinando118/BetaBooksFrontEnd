@@ -1,123 +1,143 @@
-<div class="admin-dashboard">
-  <!-- Header -->
-  <div class="dashboard-header">
-    <div class="header-content">
-      <h1 class="dashboard-title">📊 Pannello Amministrativo</h1>
-      <p class="dashboard-subtitle">Gestisci libri, ordini e sistema</p>
+<div class="admin-panel">
+  <div class="header">
+    <h2>📂 Gestione Anagrafiche</h2>
+  </div>
+
+  <div class="main-layout">
+    
+    <div class="tab-selector">
+      <button (click)="selezionaTab('autori')" [class.active]="tabAttiva === 'autori'">
+        <span>✍️ Autori</span>
+      </button>
+      <button (click)="selezionaTab('editori')" [class.active]="tabAttiva === 'editori'">
+        <span>🏢 Editori</span>
+      </button>
+      <button (click)="selezionaTab('categorie')" [class.active]="tabAttiva === 'categorie'">
+        <span>🏷️ Categorie</span>
+      </button>
     </div>
-    <div class="header-date">
-      {{ currentDate | date:'dd MMMM yyyy':'':'it' }}
+
+    <div class="content-area">
+      <div *ngIf="tabAttiva">
+        <div class="actions-bar">
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            (input)="applicaFiltro()" 
+            [placeholder]="'🔍 Cerca ' + tabAttiva + '...'"
+            class="search-input">
+          
+          <button class="btn-add" (click)="apriModaleNuovo()">
+            <span>+</span> Aggiungi {{ tabAttiva === 'autori' ? 'Autore' : tabAttiva === 'editori' ? 'Editore' : 'Categoria' }}
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 80px;">ID</th>
+                <th *ngIf="tabAttiva === 'autori'">Nome e Cognome</th>
+                <th *ngIf="tabAttiva === 'autori'">Nazionalità</th> <th *ngIf="tabAttiva === 'editori'">Denominazione</th>
+                <th *ngIf="tabAttiva === 'categorie'">Categoria</th>
+                <th class="text-center" style="width: 100px;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of datiFiltrati">
+                <td class="id-cell">#{{ item.id }}</td>
+                
+                <td *ngIf="tabAttiva === 'autori'">
+                  <span class="main-text">{{ item.nome }} {{ item.cognome }}</span>
+                </td>
+                <td *ngIf="tabAttiva === 'autori'">
+                   <span class="badge-geo">{{ item.nazionalita || 'N/D' }}</span>
+                </td>
+                
+                <td *ngIf="tabAttiva === 'editori'">
+                  <span class="main-text">{{ item.nome }}</span>
+                </td>
+                
+                <td *ngIf="tabAttiva === 'categorie'">
+                  <span class="main-text">{{ item.nome }}</span>
+                </td>
+
+                <td class="text-center">
+                  <button class="btn-action-edit" (click)="modifica(item)" type="button" title="Modifica">
+                    <span>✏️</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div class="empty-state" *ngIf="datiFiltrati.length === 0">
+            Nessun dato trovato per "{{ searchTerm }}".
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div> 
+</div>
+
+<div class="custom-modal-overlay" *ngIf="showModal">
+  <div class="custom-modal">
+    <div class="modal-header">
+  <h3>
+    {{ isModifica ? '📝 Modifica' : '✨ Nuovo' }} 
+    {{ tabAttiva === 'autori' ? 'Autore' : tabAttiva === 'editori' ? 'Editore' : 'Categoria' }}
+  </h3>
+</div>
+
+    <div class="modal-body">
+  
+  <div *ngIf="tabAttiva === 'autori'" class="form-container">
+    <div class="form-group">
+      <label>Nome</label>
+      <input type="text" [(ngModel)]="formData.nome" placeholder="Es. Mario" class="form-input">
+    </div>
+    
+    <div class="form-group">
+      <label>Cognome</label>
+      <input type="text" [(ngModel)]="formData.cognome" placeholder="Es. Rossi" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label>Nazionalità</label>
+      <input type="text" [(ngModel)]="formData.nazionalita" placeholder="Es. Italiana" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label>Biografia</label>
+      <textarea [(ngModel)]="formData.biografia" placeholder="Racconta qualcosa sull'autore..." class="form-input"></textarea>
     </div>
   </div>
 
-  <!-- Statistiche -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon">📚</div>
-      <div class="stat-content">
-        <div class="stat-label">Libri Totali</div>
-        <div class="stat-value">{{ totalLibri }}</div>
-      </div>
+  <div *ngIf="tabAttiva === 'editori'" class="form-container">
+    <div class="form-group">
+      <label>Denominazione</label>
+      <input type="text" [(ngModel)]="formData.nome" placeholder="Nome della casa editrice" class="form-input">
     </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">📦</div>
-      <div class="stat-content">
-        <div class="stat-label">Ordini Pendenti</div>
-        <div class="stat-value">{{ ordiniPendenti }}</div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">👥</div>
-      <div class="stat-content">
-        <div class="stat-label">Utenti Registrati</div>
-        <div class="stat-value">{{ totalUtenti }}</div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">💰</div>
-      <div class="stat-content">
-        <div class="stat-label">Ricavi Mensili</div>
-        <div class="stat-value">€ {{ ricaviMensili | number:'1.2-2' }}</div>
-      </div>
+    <div class="form-group">
+      <label>Descrizione</label>
+      <textarea [(ngModel)]="formData.descrizione" placeholder="Descrivi l'editore..." class="form-input"></textarea>
     </div>
   </div>
 
-  <!-- Menu Azioni Principali -->
-  <div class="actions-section">
-    <h2 class="section-title">Azioni Rapide</h2>
-    <div class="actions-grid">
-      <a routerLink="/admin/nuovo-libro" class="action-card">
-        <div class="action-icon">📖</div>
-        <div class="action-text">
-          <h3>Nuovo Libro</h3>
-          <p>Aggiungi un nuovo libro al catalogo</p>
-        </div>
-      </a>
-
-      <a routerLink="/admin/ordini" class="action-card">
-        <div class="action-icon">📋</div>
-        <div class="action-text">
-          <h3>Gestisci Ordini</h3>
-          <p>Visualizza e gestisci gli ordini</p>
-        </div>
-      </a>
-
-      <a routerLink="/admin/users" class="action-card">
-        <div class="action-icon">👤</div>
-        <div class="action-text">
-          <h3>Utenti</h3>
-          <p>Gestisci i profili utente</p>
-        </div>
-      </a>
-
-      <a routerLink="/admin/audit" class="action-card">
-        <div class="action-icon">📝</div>
-        <div class="action-text">
-          <h3>Audit Log</h3>
-          <p>Visualizza i log delle attività</p>
-        </div>
-      </a>
-
-      <a routerLink="/admin/spedizioni" class="action-card">
-        <div class="action-icon">🚚</div>
-        <div class="action-text">
-          <h3>Spedizioni</h3>
-          <p>Gestisci le spedizioni</p>
-        </div>
-      </a>
-
-      <a routerLink="/catalogo" class="action-card">
-        <div class="action-icon">🏪</div>
-        <div class="action-text">
-          <h3>Catalogo</h3>
-          <p>Torna al catalogo pubblico</p>
-        </div>
-      </a>
+  <div *ngIf="tabAttiva === 'categorie'" class="form-container">
+    <div class="form-group">
+      <label>Nome</label>
+      <input type="text" [(ngModel)]="formData.nome" placeholder="Es. Romanzo, Saggio..." class="form-input">
+    </div>
+    <div class="form-group">
+      <label>Descrizione</label>
+      <textarea [(ngModel)]="formData.descrizione" placeholder="Cosa include questa categoria?" class="form-input"></textarea>
     </div>
   </div>
-
-  <!-- Ultimi Ordini -->
-  <div class="recent-section">
-    <h2 class="section-title">Ultimi Ordini</h2>
-    <div class="recent-orders">
-      <div class="order-chip">
-        <span class="order-id">#1024</span>
-        <span class="order-user">Mario Rossi</span>
-        <span class="order-status pending">In Preparazione</span>
-      </div>
-      <div class="order-chip">
-        <span class="order-id">#1023</span>
-        <span class="order-user">Lucia Bianchi</span>
-        <span class="order-status shipped">Spedito</span>
-      </div>
-      <div class="order-chip">
-        <span class="order-id">#1022</span>
-        <span class="order-user">Giovanni Verdi</span>
-        <span class="order-status delivered">Consegnato</span>
-      </div>
+</div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Annulla</button>
+      <button class="btn-confirm" (click)="salva()">{{ isModifica ? 'Aggiorna' : 'Salva' }}</button>
     </div>
-  </div>
+  
 </div>

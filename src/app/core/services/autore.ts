@@ -18,4 +18,8 @@ export class AutoreService {
   create(data: any): Observable<any> {
     return this.http.post(`${this.url}/create`, data);
   }
+
+  update(data: any): Observable<any> {
+    return this.http.put(`${this.url}/update`, data);
+  }
 }
