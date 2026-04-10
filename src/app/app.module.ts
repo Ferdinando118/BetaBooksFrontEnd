@@ -16,12 +16,12 @@ import { skipUploadsInterceptor} from './core/interceptors/skip.interceptor';
 @NgModule({
   declarations: [
     AppComponent,
+    Navbar,  
     Footer
   ],
   imports: [
     BrowserModule, 
-    RouterModule.forRoot(routes),
-    Navbar
+    RouterModule.forRoot(routes) 
   ],
   providers: [
     // Qui lasciamo solo l'interceptor per il token!

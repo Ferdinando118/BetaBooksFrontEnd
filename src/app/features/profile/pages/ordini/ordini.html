@@ -1,146 +1,151 @@
-<main class="profilo-content">
-
-  <div class="profilo-nav-tabs">
-    <a routerLink="/profile" class="btn btn-outline" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-      👤 I miei Dati e Indirizzi
-    </a>
-    <a routerLink="/profile/ordini" class="btn btn-primary" routerLinkActive="active">
-      📦 I miei Ordini
-      @if (ordini.length > 0) {
+<div class="profilo-wrapper">
+  <aside class="sidebar card">
+    <div class="avatar-small">📦</div>
+    <nav class="sidebar-nav">
+      <a routerLink="/profile" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        👤 Il mio profilo
+      </a>
+      <a routerLink="/profile/ordini" routerLinkActive="active">
+        📦 I miei ordini
         <span class="nav-badge">{{ ordini.length }}</span>
-      }
-    </a>
-  </div>
+      </a>
+      <a routerLink="/" class="link-catalogo">📚 Catalogo</a>
+    </nav>
+  </aside>
 
-  <div class="card">
-    <div class="header-ordini">
-      <h2 class="section-title">I miei ordini</h2>
-      <div class="filtri-container">
-        <div class="filtro-group">
-          <label>Stato:</label>
-          <select [(ngModel)]="filtroCompletati" (change)="onFiltroChange()">
-            <option [ngValue]="false">In corso</option>
-            <option [ngValue]="true">Consegnati</option>
-          </select>
-        </div>
-        <div class="filtro-group">
-          <label>Periodo:</label>
-          <select [(ngModel)]="filtroPeriodo" (change)="onFiltroChange()">
-            @for (opt of opzioniPeriodo; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
-            }
-          </select>
+  <main class="profilo-content">
+    <div class="card">
+      <div class="header-ordini">
+        <h2 class="section-title">I miei ordini</h2>
+        <div class="filtri-container">
+          <div class="filtro-group">
+            <label>Stato:</label>
+            <select [(ngModel)]="filtroCompletati" (change)="onFiltroChange()">
+              <option [ngValue]="false">In corso</option>
+              <option [ngValue]="true">Consegnati</option>
+            </select>
+          </div>
+          <div class="filtro-group">
+            <label>Periodo:</label>
+            <select [(ngModel)]="filtroPeriodo" (change)="onFiltroChange()">
+              @for (opt of opzioniPeriodo; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
         </div>
       </div>
+
+      <hr class="divider">
+
+      @if (loading) {
+        <p class="text-muted text-center">Caricamento ordini...</p>
+      }
+
+      @if (!loading && ordini.length === 0) {
+        <div class="empty">
+          <p>Non hai ancora effettuato ordini.</p>
+          <a routerLink="/" class="btn btn-accent mt-16">Vai al catalogo</a>
+        </div>
+      }
+
+      @if (!loading && ordini.length > 0) {
+        <div class="ordini-list">
+          @for (ordine of ordini; track ordine.id) {
+            <div class="ordine-card">
+              <div class="ordine-header" (click)="toggleDettaglio(ordine.id)">
+                
+                <div class="ordine-meta">
+                  <span class="ordine-id">#{{ ordine.id }}</span>
+                  <span class="ordine-data">{{ ordine.dataOrdine | date:'dd/MM/yyyy' }}</span>
+                </div>
+
+                <div class="ordine-centro">
+                  <span [class]="badgeClasse(ordine.stato)">
+                    {{ iconaStato(ordine.stato) }} {{ ordine.stato }}
+                  </span>
+                  <div class="ordine-items-preview">
+                    @for (item of ordine.items; track item.id) {
+                      
+                      @if (item.copertina) {
+                        <img [src]="getImmagine(item.copertina)"
+                          [alt]="item.titoloLibro"
+                          class="mini-preview"
+                          (error)="$event.target.src='/assets/images/default-book.png'">
+                      } @else {
+                        <img src="assets/images/default-book.png"
+                        [alt]="item.titoloLibro"
+                           class="mini-preview"
+                           onerror="this.src='/assets/images/default-book.png'">
+                      }
+
+
+                    }
+                  </div>
+                  <span class="text-muted">
+                    {{ ordine.items.length }} articol{{ ordine.items.length === 1 ? 'o' : 'i' }}
+                  </span>
+                </div>
+
+                <div class="ordine-destra">
+                  <span class="price">€ {{ ordine.totaleComplessivo | number:'1.2-2' }}</span>
+                  <span class="toggle-icon">{{ ordineAperto === ordine.id ? '▲' : '▼' }}</span>
+                </div>
+
+              </div> @if (ordineAperto === ordine.id) {
+                <div class="ordine-dettaglio">
+
+                 <div class="tracking-container">
+  <p class="text-muted mb-2">Stato Spedizione: <strong>{{ordine.tracking?.codice}}</strong></p>
+  
+  <div class="stepper-wrapper">
+    <div class="stepper-item" [class.completed]="ordine.tracking?.stato === 'PREPARAZIONE' || ordine.tracking?.stato === 'IN_TRANSITO' || ordine.tracking?.stato === 'CONSEGNATO'">
+      <div class="step-counter">1</div>
+      <div class="step-name">Preparazione</div>
     </div>
 
-    <hr class="divider">
+    <div class="stepper-item" [class.completed]="ordine.tracking?.stato === 'IN_TRANSITO' || ordine.tracking?.stato === 'CONSEGNATO'">
+      <div class="step-counter">2</div>
+      <div class="step-name">Spedito</div>
+    </div>
 
-    @if (loading) {
-      <p class="text-muted text-center">Caricamento ordini...</p>
-    }
+    <div class="stepper-item" [class.completed]="ordine.tracking?.stato === 'CONSEGNATO'">
+      <div class="step-counter">3</div>
+      <div class="step-name">Consegnato</div>
+    </div>
+  </div>
+</div>
 
-    @if (!loading && ordini.length === 0) {
-      <div class="empty">
-        <p>Non hai ancora effettuato ordini.</p>
-        <a routerLink="/" class="btn btn-primary mt-16">Vai al catalogo</a>
-      </div>
-    }
-
-    @if (!loading && ordini.length > 0) {
-      <div class="ordini-list">
-        @for (ordine of ordini; track ordine.id) {
-          <div class="ordine-card">
-            <div class="ordine-header" (click)="toggleDettaglio(ordine.id)">
-
-              <div class="ordine-meta">
-                <span class="ordine-id">#{{ ordine.id }}</span>
-                <span class="ordine-data">{{ ordine.dataOrdine | date:'dd/MM/yyyy' }}</span>
-              </div>
-
-              <div class="ordine-centro">
-                <span [class]="badgeClasse(ordine.stato)">
-                  {{ iconaStato(ordine.stato) }} {{ ordine.stato }}
-                </span>
-                <div class="ordine-items-preview">
-                  @for (item of ordine.items | slice:0:3; track item.id) {
-                    @if (item.copertina) {
-                      <img [src]="getImmagine(item.copertina)"
-                           [alt]="item.titoloLibro"
-                           class="mini-preview"
-                           (error)="$event.target.src='/assets/images/default-book.png'">
-                    } @else {
-                      <img src="assets/images/default-book.png"
-                           [alt]="item.titoloLibro"
-                           class="mini-preview">
+                  <div class="dettaglio-info">
+                    <span class="text-muted">Pagamento:</span>
+                    <strong>{{ ordine.metodoPagamento }}</strong>
+                  </div>
+                  
+                  <div class="ordine-items">
+                    @for (item of ordine.items; track item.id) {
+                      <div class="ordine-item">
+                        <img [src]="getImmagine(item.copertina)" 
+                             [alt]="item.titoloLibro"
+                             onerror="this.onerror=null; this.src='/assets/images/default-book.png'">
+                        <div class="item-info">
+                          <p class="item-titolo">{{ item.titoloLibro }}</p>
+                          <p class="text-muted">Qtà: {{ item.quantita }}</p>
+                        </div>
+                        <span class="item-prezzo">€ {{ item.prezzoUnitarioAcquisto | number:'1.2-2' }}</span>
+                      </div>
                     }
-                  }
-                  @if (ordine.items.length > 3) {
-                    <div class="more-items-badge">+{{ ordine.items.length - 3 }}</div>
-                  }
-                </div>
-              </div>
+                  </div>
 
-              <div class="ordine-destra">
-                <span class="price">€ {{ ordine.totaleComplessivo | number:'1.2-2' }}</span>
-                <span class="toggle-icon">{{ ordineAperto === ordine.id ? '▲' : '▼' }}</span>
-              </div>
-
-            </div>
-
-            @if (ordineAperto === ordine.id) {
-              <div class="ordine-dettaglio">
-
-                <div class="tracking-container">
-                  <p class="text-muted mb-2">Stato Spedizione: <strong>{{ ordine.tracking?.codice }}</strong></p>
-                  <div class="stepper-wrapper">
-                    <div class="stepper-item" [class.completed]="ordine.tracking?.stato === 'PREPARAZIONE' || ordine.tracking?.stato === 'IN_TRANSITO' || ordine.tracking?.stato === 'CONSEGNATO'">
-                      <div class="step-counter">1</div>
-                      <div class="step-name">Preparazione</div>
-                    </div>
-                    <div class="stepper-item" [class.completed]="ordine.tracking?.stato === 'IN_TRANSITO' || ordine.tracking?.stato === 'CONSEGNATO'">
-                      <div class="step-counter">2</div>
-                      <div class="step-name">Spedito</div>
-                    </div>
-                    <div class="stepper-item" [class.completed]="ordine.tracking?.stato === 'CONSEGNATO'">
-                      <div class="step-counter">3</div>
-                      <div class="step-name">Consegnato</div>
-                    </div>
+                  <div class="ordine-totale">
+                    <span>Totale ordine</span>
+                    <span class="price">€ {{ ordine.totaleComplessivo | number:'1.2-2' }}</span>
                   </div>
                 </div>
-
-                <div class="dettaglio-info">
-                  <span class="text-muted">Pagamento:</span>
-                  <strong>{{ ordine.metodoPagamento }}</strong>
-                </div>
-
-                <div class="ordine-items">
-                  @for (item of ordine.items; track item.id) {
-                    <div class="ordine-item">
-                      <img [src]="getImmagine(item.copertina)"
-                           [alt]="item.titoloLibro"
-                           class="img-copertina-ordine"
-                           onerror="this.onerror=null; this.src='/assets/images/default-book.png'">
-                      <div class="item-info">
-                        <p class="item-titolo">{{ item.titoloLibro }}</p>
-                        <p class="text-muted">Qtà: {{ item.quantita }}</p>
-                      </div>
-                      <span class="item-prezzo">€ {{ item.prezzoUnitarioAcquisto | number:'1.2-2' }}</span>
-                    </div>
-                  }
-                </div>
-
-                <div class="ordine-totale">
-                  <span>Totale ordine</span>
-                  <span class="price">€ {{ ordine.totaleComplessivo | number:'1.2-2' }}</span>
-                </div>
-
-              </div>
-            }
-          </div>
-        }
-      </div>
-    }
-  </div>
-
-</main>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </main>
+</div>

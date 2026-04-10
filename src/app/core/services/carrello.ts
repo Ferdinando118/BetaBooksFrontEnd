@@ -57,11 +57,11 @@ export class CarrelloService {
   /**
    * Aggiunge un prodotto al carrello (o aumenta la quantità se già presente)
    */
-  aggiungi(idFormatoLibro: number, quantita: number = 1): Observable<any> {
+  aggiungi(idFormatoLibro: number): Observable<any> {
     const req = { 
       idUtente: this.userId, 
       idFormatoLibro: idFormatoLibro,
-      quantita: quantita // Quantità personalizzabile
+      quantita: 1 // Risolve l'errore Integer.intValue() null in Java
     };
 
     return this.http.post(`${this.API}/aggiungiProdotto`, req).pipe(

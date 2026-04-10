@@ -1,9 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { Utente } from '../models/models';
+import { PasswordRecoveryReq, PasswordReq, Resp, Utente } from '../models/models';
 
 interface AuthResponse {
   token: string;
@@ -23,6 +23,8 @@ export class AuthService {
     utente: null as Utente | null
   });
 
+
+
 constructor(
   private http: HttpClient, 
   private router: Router,
@@ -30,39 +32,29 @@ constructor(
 ) {
   if (isPlatformBrowser(this.platformId)) {
     const token = localStorage.getItem('bb_token');
-    const utenteSalvato = localStorage.getItem('bb_utente');
-
-    // 1. RIPRISTINO IMMEDIATO (Sincrono)
-    // Questo permette alla Guardia di leggere i permessi all'istante!
-    if (token && utenteSalvato) {
-      const utente = JSON.parse(utenteSalvato);
-      this.grant.set({
-        isLogged: true,
-        isAdmin: utente.ruolo === 'ADMIN',
-        token: token,
-        utente: utente
-      });
-      console.log("Sessione recuperata localmente:", utente.email);
-    }
-
-    // 2. VERIFICA DI SICUREZZA (Asincrono)
-    // Questo conferma che il token sia ancora valido sul server
+    /*
     if (token) {
+      // Invece di fidarci solo del localStorage, chiediamo conferma al server
       this.checkMe().subscribe({
-        next: (u) => console.log("Sessione confermata dal server per:", u.email),
-        error: (err) => {
-          // Se il server dice che il token non è più valido (401 o 403), facciamo logout
-          if (err.status === 401 || err.status === 403) {
-            console.warn("Sessione scaduta o non valida, eseguo logout.");
-            this.logout();
-          }
-        }
+        next: (u) => console.log("Sessione ripristinata per:", u.email),
+        error: () => this.logout() // Se il server dice 401, puliamo tutto
       });
+    }*/
+
+      if (token) {
+  this.checkMe().subscribe({
+    next: (u) => console.log("Sessione ripristinata:", u.email),
+    error: (err) => {
+      // Slogga solo se le credenziali sono scadute/invalide
+      // Non slogga se il backend è temporaneamente down
+      if (err.status === 401 || err.status === 403) {
+        this.logout();
+      }
     }
+  });
+}
   }
 }
-
-
 
 
 login(email: string, password: string): Observable<any> {
@@ -152,8 +144,33 @@ checkMe(): Observable<Utente> {
   );
 }
 
+verificaMail(email: string): Observable<Resp> {
+  const params = new HttpParams().set('email', email);
+  return this.http.get<Resp>(`${this.API_UTENTI}/sendValidation`, { params });
+}
+
+attivaValidazione(email: string): Observable<Resp> {
+  const params = new HttpParams().set('email', email);
+  return this.http.get<Resp>(`${this.API_UTENTI}/emailValidate`, { params });
+}
+
+cambiaPassword(pwdReq: PasswordReq): Observable<Resp> {
+  return this.http.post<Resp>(`${this.API_UTENTI}/cambiaPassword`, pwdReq);
+}
+
+emailCambioPassword(email: string): Observable<any> {
+  return this.http.get(`${this.API_UTENTI}/request-password-recovery?email=${email}`);
+}
+
+confirmPasswordRecovery(data: PasswordRecoveryReq): Observable<any> {
+  return this.http.post(`${this.API_UTENTI}/confirm-password-recovery`, data);
+}
+
+
+
   // Comodi metodi per leggere velocemente lo stato
   getToken(): string | null { return this.grant().token; }
   isLoggedIn(): boolean { return this.grant().isLogged; }
   isAdmin(): boolean { return this.grant().isAdmin; }
+  isValidato() {return this.grant().utente?.validato}
 }

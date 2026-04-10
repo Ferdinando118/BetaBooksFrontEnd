@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
-import { tap, Observable } from 'rxjs';
-import { LibroDTO } from '../models/libro.model';
+import { tap } from 'rxjs';
+import { LibroDTO} from '../models/libro.model';
 
 export interface LibroReq {
   id?: number;
@@ -10,6 +10,7 @@ export interface LibroReq {
   idAutore: number;
   idEditore: number;
   idCategorie?: number[];
+  // Aggiungi questi campi per matchare la classe Java LibroReq
   tipoSupporto: string;
   tipoCopertina: string;
   isbn?: string;
@@ -19,12 +20,12 @@ export interface LibroReq {
 
 export interface FormatoLibroReq {
   id?: number;
-  idLibro: number;
-  tipoSupporto: string;
-  tipoCopertina: string;
-  isbn?: string;
+  idLibro: number;            // Corretto da id_libro
+  tipoSupporto: string;       // Sostituisce 'formato'
+  tipoCopertina: string;      // Aggiunto per matchare il backend
+  isbn?: string;              // Aggiunto per matchare il backend
   prezzo: number;
-  quantita: number;
+  quantita: number;           // Sostituisce 'stock'
   attivo?: boolean;
 }
 
@@ -39,11 +40,9 @@ export class LibroService {
 
   libri = signal<any[]>([]);
 
-  constructor(private http: HttpClient) {
-    this.loadMiPiace(); // Inizializza i Mi Piace all'avvio del servizio
-  }
+  constructor(private http: HttpClient) {}
 
-  // ─── GESTIONE PREFERITI ────────────────────────────────
+  // ─── GESTIONE PREFERITI (Metodi di Aldo adattati) ──────
   private loadMiPiace(): void {
     const saved = localStorage.getItem(this.miPiaceKey);
     if (saved) {
@@ -67,9 +66,12 @@ export class LibroService {
       this.miPiaceSet.add(libroId);
     }
     this.saveMiPiace();
+    // Opzionale: aggiorna il signal dei libri per far reagire la UI
+    this.getAll().subscribe();
   }
 
   // ─── LIBRO ───────────────────────────────────────────
+
   getAll() {
     return this.http.get<any[]>(`${this.url}/getAll`).pipe(
       tap(data => this.libri.set(data))
@@ -93,16 +95,11 @@ export class LibroService {
     );
   }
 
-  delete(id: number): Observable<any> {
-    return this.http.delete(`${this.url}/delete/${id}`).pipe(
-      tap(() => this.getAll().subscribe())
-    );
-  }
-
   // ─── FORMATO ─────────────────────────────────────────
-  createFormato(idLibro: number, body: any) {
-    return this.http.post<any>(`${this.url}/formato/create/${idLibro}`, body);
-  }
+
+createFormato(idLibro: number, body: any) {
+  return this.http.post<any>(`${this.url}/formato/create/${idLibro}`, body);
+}
   
   updateFormato(body: FormatoLibroReq) {
     return this.http.put<any>(`${this.url}/formato/update`, body);
@@ -128,9 +125,11 @@ export class LibroService {
   }
 
   // ─── COPERTINA (multipart) ────────────────────────────
-  uploadCopertina(idFormato: number, file: File) {
-    const formData = new FormData();
-    formData.append('file', file); // Deve coincidere con @RequestPart("file") in Java
-    return this.http.post<any>(`${this.url}/formato/copertina/${idFormato}`, formData);
-  }
+
+// libro.service.ts
+uploadCopertina(idFormato: number, file: File) {
+  const formData = new FormData();
+  formData.append('file', file); // Il nome 'file' deve coincidere con @RequestPart("file") in Java
+  return this.http.post<any>(`${this.url}/formato/copertina/${idFormato}`, formData);
+}
 }

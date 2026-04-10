@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ProfiloUtente, Indirizzo } from '../models/models';
 
@@ -49,4 +49,6 @@ export class ProfiloService {
       responseType: 'text' 
     });
   }
+
+  
 }

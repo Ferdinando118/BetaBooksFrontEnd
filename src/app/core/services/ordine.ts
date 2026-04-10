@@ -131,14 +131,4 @@ private mappaStatoOrdineATracking(stato: string): string {
 }
 
 
-getTuttiGliOrdini(): Observable<OrdineDTO[]> {
-  return this.http.get<any>(`${this.API}/getAll`).pipe(
-    map(res => {
-    
-      const lista = Array.isArray(res) ? res : res.obj;
-      return lista ? lista.map((o: any) => this.arricchisciConTracking(o)) : [];
-    })
-  );
-}
-
 }

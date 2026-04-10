@@ -1,0 +1,13 @@
+<div style="text-align:center; margin-top: 80px;">
+  @if (stato === 'caricamento') {
+    <p>⏳ Validazione in corso...</p>
+  }
+  @if (stato === 'successo') {
+    <h2>✅ Account verificato!</h2>
+    <p>Verrai reindirizzato al login tra 3 secondi...</p>
+  }
+  @if (stato === 'errore') {
+    <h2>❌ Link non valido o scaduto</h2>
+    <a routerLink="/auth/login">Vai al login</a>
+  }
+</div>

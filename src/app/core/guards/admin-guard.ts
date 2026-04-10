@@ -6,17 +6,13 @@ export const adminGuard: CanActivateFn = (route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  const isLogged = auth.isLoggedIn();
-  const isAdmin = auth.isAdmin();
-
-  console.log('Controllo AdminGuard - Logged:', isLogged, 'Admin:', isAdmin);
-
-  if (isLogged && isAdmin) {
+  // Verifichiamo se l'utente è ADMIN usando il metodo che hai già nel service
+  if (auth.isLoggedIn() && auth.isAdmin()) {
     return true;
   }
 
-  // Se arriviamo qui, l'accesso è negato
-  console.warn('Accesso negato: reindirizzamento in corso...');
-  router.navigate(['/']); 
+  // Se non è admin, lo riportiamo al catalogo o alla login
+  console.warn('Accesso negato: l\'utente non è un amministratore.');
+  router.navigate(['/catalogo']); 
   return false;
 };

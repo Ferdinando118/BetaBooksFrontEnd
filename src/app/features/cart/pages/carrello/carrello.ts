@@ -14,14 +14,11 @@ export class Carrello implements OnInit {
   constructor(public carrelloService: CarrelloService) {}
 
   ngOnInit(): void {
-    
-        this.carrelloService.carrello$.subscribe((data) => {
-      this.carrello = data;
-    });
-    
     this.carrelloService.loadCarrello();
 
-
+    this.carrelloService.carrello$.subscribe((data) => {
+      this.carrello = data;
+    });
   }
 
   aumenta(idItem: number): void {

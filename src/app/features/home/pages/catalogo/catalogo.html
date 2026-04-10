@@ -38,7 +38,7 @@
     <option value="prezzo-desc">Prezzo ↓</option>
   </select>
 
-  <label class="filtro-checkbox">
+    <label class="filtro-checkbox">
     <input type="checkbox" [(ngModel)]="soloPreferiti" (ngModelChange)="aggiornaFiltri()">
     <span>❤️ Preferiti</span>
   </label>
@@ -68,16 +68,15 @@
       @for (libro of libriFiltrati(); track libro.id) {
         <div class="book-card card">
           <div class="card-content">
-            
-            <div class="book-cover" [routerLink]="['/libro', libro.id]" style="cursor: pointer;">
+            <div class="book-cover" [routerLink]="auth.isAdmin() ? null : ['/libro', libro.id]" style="cursor: pointer;">
               <img [src]="libro.copertina" (error)="libro.copertina = '/assets/images/default-book.png'" alt="Copertina Libro">
-              @if (!libro.disponibile) {
+              @if (libro.quantita === 0) {
                 <span class="badge-esaurito">Esaurito</span>
               }
             </div>
 
             <div class="book-info">
-              <h3 class="book-title" [routerLink]="['/libro', libro.id]" style="cursor: pointer;">
+              <h3 class="book-title" [routerLink]="auth.isAdmin() ? null : ['/libro', libro.id]" style="cursor: pointer;">
                 {{ libro.titolo }}
               </h3>
               
@@ -85,46 +84,39 @@
               <p class="book-publisher"><small>Editore: {{ libro.editore?.nome }}</small></p>
 
               @if (libro.valutazioneMedia) {
-                <div class="book-stars">
-                  <span class="stars">{{ stelle(libro.valutazioneMedia) }}</span>
-                  <span class="voto">{{ libro.valutazioneMedia }}</span>
-                </div>
-              }
+                            <div class="book-stars">
+                              <span class="stars">{{ stelle(libro.valutazioneMedia) }}</span>
+                              <span class="voto">{{ libro.valutazioneMedia }}</span>
+                            </div>
+                          }
+
+
 
               <div class="book-footer">
                 <span class="price">€ {{ libro.prezzo | number:'1.2-2' }}</span>
                 
                 <div class="actions">
-                  <button class="btn btn-icon btn-like"
-                          [class.liked]="libro.miPiace"
-                          (click)="toggleMiPiace($event, libro)"
-                          title="Aggiungi ai preferiti">
-                    {{ libro.miPiace ? '❤️' : '🤍' }}
-                  </button>
+
+                <button class="btn btn-icon btn-like"
+                        [class.liked]="libro.miPiace"
+                        (click)="toggleMiPiace($event, libro)"
+                        title="Aggiungi ai preferiti">
+                  {{ libro.miPiace ? '❤️' : '🤍' }}
+                </button>
 
                   @if (auth.isAdmin()) {
                     <button class="btn btn-warning btn-sm" [routerLink]="['/admin/modifica-libro', libro.id]">
-                      Modifica
-                    </button>
-                    <button class="btn btn-danger btn-sm" (click)="eliminaLibro($event, libro.id)">
-                      Elimina
+                      Modificas
                     </button>
                   } 
-
-                  @if (libro.formati && libro.formati.length > 1) {
-                    <button class="btn btn-accent btn-sm" [routerLink]="['/libro', libro.id]">
-                      Scegli opzione
-                    </button>
-                  } @else if (libro.disponibile) {
+                  @else if (libro.quantita > 0) {
                     <button class="btn btn-accent btn-sm" (click)="aggiungiAlCarrello($event, libro)">
                       + Carrello
                     </button>
                   }
-
                 </div>
               </div>
             </div>
-            
           </div>
         </div>
       }

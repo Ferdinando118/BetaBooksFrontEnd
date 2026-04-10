@@ -14,9 +14,10 @@ import { Libro } from '../../../../core/models/models';
   // Scegliamo Standalone di Aldo per modernità
   standalone: true, 
   imports: [
-    CommonModule,
-    RouterModule,
-    FormsModule
+    CommonModule, 
+    RouterModule, 
+    FormsModule, 
+    BookHoverDirective
   ],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css'
@@ -37,18 +38,21 @@ export class Catalogo implements OnInit {
   ordinamento = 'titolo';
   soloPreferiti = false;
 
+  
+ 
   libriFiltrati = computed(() => {
     let risultati = [...this.libri()];
 
-    if (this.ricerca.trim()) {
-      const query = this.ricerca.toLowerCase();
-      risultati = risultati.filter(l =>
-        l.titolo?.toLowerCase().includes(query) ||
-        l.autore?.nome?.toLowerCase().includes(query) ||
-        l.autore?.cognome?.toLowerCase().includes(query) ||
-        l.editore?.nome?.toLowerCase().includes(query)
-      );
-    }
+// catalogo.ts - dentro libriFiltrati
+if (this.ricerca.trim()) {
+  const query = this.ricerca.toLowerCase();
+  risultati = risultati.filter(l =>
+    l.titolo?.toLowerCase().includes(query) ||
+    l.autore?.nome?.toLowerCase().includes(query) ||
+    l.autore?.cognome?.toLowerCase().includes(query) ||
+    l.editore?.nome?.toLowerCase().includes(query) // Aggiungi questo per l'editore!
+  );
+}
 
     if (this.categoriaSelezionata) {
       risultati = risultati.filter(l =>
@@ -65,6 +69,7 @@ export class Catalogo implements OnInit {
     return risultati;
   });
 
+
   ngOnInit(): void {
     this.inizializzaCatalogo();
   }
@@ -78,21 +83,16 @@ export class Catalogo implements OnInit {
           
           // Costruzione URL immagine
           const urlServer = 'http://localhost:8080/uploads/'; 
+          // Se f.copertina è già un URL (http...) lo usiamo, altrimenti aggiungiamo il prefisso
           const copertinaUrl = f?.copertina 
             ? (f.copertina.startsWith('http') ? f.copertina : urlServer + f.copertina) 
-            : '/assets/images/default-book.png';
-
-          // NOVITÀ: Calcoliamo se il formato principale è disponibile! (Se EBOOK è sempre true)
-          const isEbook = f?.tipoSupporto === 'EBOOK';
-          const disponibile = isEbook || (f?.quantita ? f.quantita > 0 : false);
+            : '/assets/images/default-book.png'; // Un'immagine di default se non c'è la copertina
 
           return {
             ...libro,
-            formati: libro.formati || [],
             idFormato: f?.id,
             prezzo: f?.prezzo || 0,
             quantita: f?.quantita || 0,
-            disponibile: disponibile, // Passiamo questo booleano all'HTML
             copertina: copertinaUrl
           };
         });
@@ -124,62 +124,45 @@ export class Catalogo implements OnInit {
     this.aggiornaFiltri();
   }
 
-  aggiungiAlCarrello(event: Event, libro: any): void {
-    event.stopPropagation();
-
-    // 1. Controllo Login
-    if (!this.auth.isLoggedIn()) {
-      alert('Devi essere loggato per aggiungere prodotti al carrello!');
-      return;
-    }
-
-    // 2. Controllo Validazione Email (Nuova logica mantenuta)
-    if (!this.auth.isValidato()) {
-      alert('Devi aver validato la mail per aggiungere prodotti al carrello!');
-      return;
-    }
-
-    // 3. Aggiunta effettiva
-    if (libro.idFormato) {
-      this.carrelloService.aggiungi(libro.idFormato).subscribe({
-        next: (res) => {
-          console.log('Prodotto aggiunto!', res);
-          alert('Libro aggiunto al carrello!');
-        },
-        error: (err) => {
-          console.error('Errore durante l\'aggiunta:', err);
-          alert('Errore: ' + (err.error?.message || 'Impossibile aggiungere il libro'));
-        }
-      });
-    } else {
-      console.error('Errore: Il libro non ha un formato valido.');
-    }
+aggiungiAlCarrello(event: Event, libro: any): void {
+  event.stopPropagation(); // Evita di aprire la scheda libro se hai un link sul contenitore
+  
+  if (!this.auth.isLoggedIn()) {
+    alert('Devi essere loggato per aggiungere prodotti al carrello!');
+    // Opzionale: this.router.navigate(['/auth/login']);
+    return;
   }
+
+  if (this.auth.isValidato() != true) {
+    alert('Devi aver validato la mail per aggiungere prodotti al carrello!');
+    // Opzionale: this.router.navigate(['/auth/login']);
+    return;
+  }
+
+  if (libro.idFormato) {
+    this.carrelloService.aggiungi(libro.idFormato).subscribe({
+      next: (res) => {
+        // Opzionale: un feedback visivo (es. un toast o un alert)
+        console.log('Prodotto aggiunto!', res);
+        alert('Libro aggiunto al carrello!');
+      },
+      error: (err) => {
+        console.error('Errore durante l\'aggiunta:', err);
+        alert('Errore: ' + (err.error?.message || 'Impossibile aggiungere il libro'));
+      }
+    });
+  } else {
+    console.error('Errore: Il libro non ha un formato valido.');
+  }
+}
 
   stelle(n: number): string {
-    const voto = Math.round(n || 0);
-    return '★'.repeat(voto) + '☆'.repeat(5 - voto);
+    return '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
   }
 
-  toggleMiPiace(event: Event, libro: any) {
+  toggleMiPiace(event: Event, libro: any){
     event.stopPropagation();
     this.libroService.toggleMiPiace(libro.id);
     libro.miPiace = !libro.miPiace;
   }
-
-  eliminaLibro(event: Event, id: number): void {
-    event.stopPropagation();
-
-    if (confirm('Sei sicuro di voler eliminare questo libro dal catalogo?')) {
-      this.libroService.delete(id).subscribe({
-        next: () => {
-          alert('Libro eliminato con successo!');
-          this.inizializzaCatalogo(); // Ricarica la lista dopo l'eliminazione
-        },
-        error: (err: any) => {
-          console.error('Errore durante l\'eliminazione:', err);
-          alert('Errore: impossibile eliminare il libro.');
-        }
-      });
-    }
-  }
+}

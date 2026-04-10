@@ -1,71 +1,73 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
 import { ProfiloService } from '../../../../core/services/profilo';
 import { Utente, ProfiloUtente, Indirizzo } from '../../../../core/models/models';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-profilo',
   standalone: false,
   templateUrl: './profilo.html',
-  styleUrl: './profilo.css'
+  styleUrl: './profilo.css',
 })
 export class Profilo implements OnInit {
-  private readonly STORAGE_KEY = 'formIndirizzo_draft';
-  private readonly STORAGE_MODIFICA_KEY = 'indirizzoInModifica_draft';
-  
   utente: Utente | null = null;
   profiloEsistente: ProfiloUtente | null = null;
-  indirizzi: Indirizzo[] = [];
+  indirizzi: Indirizzo[] = []; // Ora è un array per gestire la rubrica!
 
+  // Due form separati!
   formProfilo: FormGroup;
   formIndirizzo: FormGroup;
 
+  // Stati
   loadingProfilo = false;
   salvatoProfilo = false;
-  
+
   mostraFormIndirizzo = false;
   loadingIndirizzo = false;
   indirizzoInModifica: Indirizzo | null = null;
-  
-  // Modale di conferma eliminazione
-  mostraModalEliminazione = false;
-  indirizzoInEliminazione: number | null = null;
 
-  // Gestione Password
+  //proprietà per il cambio pwd
   mostraDialogPassword = false;
   errorePassword = '';
   successoPassword = false;
+
   formPassword = {
     vecchiaPassword: '',
     nuovaPassword: '',
     confermaPassword: '',
   };
 
+  // --------------------- COSTRUTTORE ---------------------
   constructor(
     private auth: AuthService,
     private fb: FormBuilder,
     private profiloService: ProfiloService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
+    // FORM 1: ANAGRAFICA
     this.formProfilo = this.fb.group({
       nome: ['', Validators.required],
       cognome: ['', Validators.required],
-      telefono: ['']
+      telefono: [''],
     });
 
+    // FORM 2: INDIRIZZO (corretto "citta" in "comune"!)
     this.formIndirizzo = this.fb.group({
       via: ['', Validators.required],
       civico: ['', Validators.required],
-      comune: ['', Validators.required], 
+      comune: ['', Validators.required],
       cap: ['', [Validators.required, Validators.pattern(/^[0-9]{5}$/)]],
       provincia: ['', [Validators.required, Validators.maxLength(2)]],
       paese: ['Italia', Validators.required],
-      noteConsegna: ['']
+      noteConsegna: [''],
     });
   }
+
+  // -------------------------------------------------------
 
   ngOnInit(): void {
     this.utente = this.auth.grant().utente;
@@ -81,23 +83,16 @@ export class Profilo implements OnInit {
     this.profiloService.findByUtente(idUtente).subscribe((p) => {
       if (p) {
         this.profiloEsistente = p;
-        this.formProfilo.patchValue({ 
-          nome: p.nome, 
-          cognome: p.cognome, 
-          telefono: p.telefono 
-        });
+        this.formProfilo.patchValue({ nome: p.nome, cognome: p.cognome, telefono: p.telefono });
       }
     });
 
-    // 2. Carica Indirizzi
+    // 2. Carica Lista Indirizzi
     this.caricaIndirizzi();
-    
-    // 3. Carica draft del form indirizzo da localStorage
-    this.caricaFormDraft();
   }
 
   caricaIndirizzi() {
-    this.profiloService.findIndirizziByUser(this.utente!.id).subscribe(list => {
+    this.profiloService.findIndirizziByUser(this.utente!.id).subscribe((list) => {
       this.indirizzi = list || [];
     });
   }
@@ -114,13 +109,13 @@ export class Profilo implements OnInit {
       nome: val.nome,
       cognome: val.cognome,
       telefono: val.telefono,
-      idUtente: this.utente!.id
+      idUtente: this.utente!.id,
     } as ProfiloUtente;
 
     this.profiloService.saveProfilo(pReq).subscribe(() => {
       this.loadingProfilo = false;
       this.salvatoProfilo = true;
-      setTimeout(() => this.salvatoProfilo = false, 3000);
+      setTimeout(() => (this.salvatoProfilo = false), 3000);
     });
   }
 
@@ -129,19 +124,19 @@ export class Profilo implements OnInit {
   apriFormIndirizzo(indirizzo?: Indirizzo) {
     this.mostraFormIndirizzo = true;
     if (indirizzo) {
+      // Modalità Modifica
       this.indirizzoInModifica = indirizzo;
       this.formIndirizzo.patchValue(indirizzo);
     } else {
+      // Modalità Nuovo
       this.indirizzoInModifica = null;
       this.formIndirizzo.reset({ paese: 'Italia' });
     }
-    this.salvaFormDraft();
   }
 
   chiudiFormIndirizzo() {
     this.mostraFormIndirizzo = false;
     this.indirizzoInModifica = null;
-    this.pulisciFormDraft();
   }
 
   salvaIndirizzo() {
@@ -149,6 +144,7 @@ export class Profilo implements OnInit {
     this.loadingIndirizzo = true;
     const val = this.formIndirizzo.value;
 
+    // Se è il primo indirizzo che aggiunge, lo rendiamo Predefinito
     const isDefault = this.indirizzi.length === 0 || (this.indirizzoInModifica?.isDefault ?? false);
 
     const iReq = {
@@ -161,44 +157,33 @@ export class Profilo implements OnInit {
       paese: val.paese,
       noteConsegna: val.noteConsegna,
       idUtente: this.utente!.id,
-      isDefault: isDefault
+      isDefault: isDefault,
     } as Indirizzo;
 
     this.profiloService.saveIndirizzo(iReq).subscribe(() => {
       this.loadingIndirizzo = false;
-      this.pulisciFormDraft();
       this.chiudiFormIndirizzo();
-      this.caricaIndirizzi();
+      this.caricaIndirizzi(); // Ricarichiamo la rubrica dal database!
     });
   }
 
   eliminaIndirizzo(id: number) {
-    this.indirizzoInEliminazione = id;
-    this.mostraModalEliminazione = true;
-  }
-
-  confermaEliminazione() {
-    if (this.indirizzoInEliminazione) {
-      this.profiloService.deleteIndirizzo(this.indirizzoInEliminazione).subscribe({
+    if (confirm('Vuoi davvero eliminare questo indirizzo?')) {
+      // Ora chiamiamo davvero il backend!
+      this.profiloService.deleteIndirizzo(id).subscribe({
         next: () => {
+          // Quando Java ci risponde (con il 204 No Content), ricarichiamo la rubrica
           this.caricaIndirizzi();
-          this.chiudiModalEliminazione();
         },
         error: (err) => {
           console.error("Errore durante l'eliminazione", err);
           alert("Ops! Non è stato possibile eliminare l'indirizzo.");
-          this.chiudiModalEliminazione();
-        }
+        },
       });
     }
   }
 
-  chiudiModalEliminazione() {
-    this.mostraModalEliminazione = false;
-    this.indirizzoInEliminazione = null;
-  }
-
-  // ─── GESTIONE CAMBIO PWD ───────────────────────────────────────────
+  // GESTIONE CAMBIO PWD
 
   apriDialogPassword(): void {
     this.mostraDialogPassword = true;
@@ -214,7 +199,11 @@ export class Profilo implements OnInit {
   salvaPassword(): void {
     this.errorePassword = '';
 
-    if (!this.formPassword.vecchiaPassword || !this.formPassword.nuovaPassword) {
+    if (
+      !this.formPassword.vecchiaPassword ||
+      !this.formPassword.nuovaPassword ||
+      !this.formPassword.confermaPassword
+    ) {
       this.errorePassword = 'Compila tutti i campi.';
       return;
     }
@@ -236,7 +225,8 @@ export class Profilo implements OnInit {
       .subscribe({
         next: () => {
           this.successoPassword = true;
-          this.cdr.detectChanges();
+          this.cdr.detectChanges(); // forza il render
+
           setTimeout(() => {
             this.auth.logout();
           }, 2000);
@@ -245,41 +235,5 @@ export class Profilo implements OnInit {
           this.errorePassword = err.error?.message ?? 'Errore durante il cambio password.';
         },
       });
-  }
-
-  // ─── METODI PERSISTENZA FORM (localStorage) ────────────────────────
-
-  private caricaFormDraft(): void {
-    const formDraft = localStorage.getItem(this.STORAGE_KEY);
-    const modicaDraft = localStorage.getItem(this.STORAGE_MODIFICA_KEY);
-    
-    if (formDraft) {
-      try {
-        const datiSalvati = JSON.parse(formDraft);
-        this.mostraFormIndirizzo = true;
-        this.formIndirizzo.patchValue(datiSalvati);
-        
-        if (modicaDraft) {
-          this.indirizzoInModifica = JSON.parse(modicaDraft);
-        }
-      } catch (e) {
-        console.error('Errore nel caricamento del draft', e);
-        this.pulisciFormDraft();
-      }
-    }
-  }
-
-  private salvaFormDraft(): void {
-    const formData = this.formIndirizzo.value;
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(formData));
-    
-    if (this.indirizzoInModifica) {
-      localStorage.setItem(this.STORAGE_MODIFICA_KEY, JSON.stringify(this.indirizzoInModifica));
-    }
-  }
-
-  private pulisciFormDraft(): void {
-    localStorage.removeItem(this.STORAGE_KEY);
-    localStorage.removeItem(this.STORAGE_MODIFICA_KEY);
   }
 }
