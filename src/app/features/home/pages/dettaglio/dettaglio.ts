@@ -17,15 +17,22 @@ export class Dettaglio implements OnInit {
   // --- 1. Signals di base ---
   libro = signal<any | null>(null);
   formati = signal<any[]>([]);
+  formatoSelezionato = signal<any | null>(null); // NUOVO: Tiene traccia della scelta dell'utente
+  
   recensioni = signal<any[]>([]);
   loading = signal(true);
   aggiunto = signal(false);
   recensioneInviata = signal(false);
   erroreRecensione = signal<string | null>(null);
 
-  // --- 2. Computed Signals (Quelli che mancavano!) ---
-  formatoPrincipale = computed(() => this.formati().length > 0 ? this.formati()[0] : null);
-  disponibile = computed(() => (this.formatoPrincipale()?.quantita || 0) > 0);
+  // --- 2. Computed Signals ---
+  // Ora controlla se IL FORMATO SELEZIONATO ha quantità > 0
+  disponibile = computed(() => {
+    const formato = this.formatoSelezionato();
+    if (!formato) return false;
+    
+    return formato.tipoSupporto === 'EBOOK' || formato.quantita > 0;
+  });
 
   formRecensione: FormGroup;
 
@@ -50,9 +57,10 @@ export class Dettaglio implements OnInit {
       next: (libro) => {
         this.libro.set(libro);
         
-        // Salviamo nel signal i formati che arrivano DIRETTAMENTE dal libro!
-        if (libro.formati) {
+        // Salviamo i formati e pre-selezioniamo il primo
+        if (libro.formati && libro.formati.length > 0) {
           this.formati.set(libro.formati);
+          this.formatoSelezionato.set(libro.formati[0]); // Imposta il default
         }
 
         this.loading.set(false);
@@ -73,6 +81,13 @@ export class Dettaglio implements OnInit {
     });
   }
 
+  // NUOVO METODO: Crea l'etichetta testuale per i bottoni dei formati
+  getLabelFormato(f: any): string {
+    if (!f) return '';
+    if (f.tipoSupporto === 'EBOOK') return 'E-book Digitale';
+    return `Cartaceo (${f.tipoCopertina === 'RIGIDA' ? 'Copertina Rigida' : 'Copertina Flessibile'})`;
+  }
+
   getImmagine(copertina: string | undefined | null): string {
     if (!copertina) return '/assets/images/default-book.png';
     if (copertina.startsWith('http')) return copertina;
@@ -85,10 +100,10 @@ export class Dettaglio implements OnInit {
       return;
     }
 
-    // Usiamo il computed signal per maggiore sicurezza!
-    const formato = this.formatoPrincipale();
+    // Usiamo il signal del formato selezionato invece di quello principale
+    const formato = this.formatoSelezionato();
     if (!formato) {
-      alert('Formato non disponibile per questo libro.');
+      alert('Nessun formato selezionato per questo libro.');
       return;
     }
 

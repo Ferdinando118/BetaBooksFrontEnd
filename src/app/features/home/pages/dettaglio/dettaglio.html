@@ -7,7 +7,7 @@
 
     <aside class="dettaglio-cover">
       
-      <img [src]="getImmagine(formatoPrincipale()?.copertina || libro()!.copertina)" 
+      <img [src]="getImmagine(formatoSelezionato()?.copertina || libro()!.copertina)" 
            [alt]="libro()!.titolo"
            onerror="this.onerror=null; this.src='/assets/images/default-book.png'">
 
@@ -49,7 +49,14 @@
             <span>📅 {{ libro()!.anno }}</span>
           }
           <span>🌐 {{ libro()!.lingua }}</span>
-          <span>📦 {{ disponibile() ? formatoPrincipale()!.quantita + ' disponibili' : 'Esaurito' }}</span>
+          
+          <span>
+            @if (formatoSelezionato()?.tipoSupporto === 'EBOOK') {
+              📥 Download Immediato
+            } @else {
+              📦 {{ disponibile() ? formatoSelezionato()!.quantita + ' disponibili' : 'Esaurito' }}
+            }
+          </span>
         </div>
 
         @if (libro()!.categorie?.length > 0) {
@@ -61,16 +68,33 @@
         }
 
         @if (formati().length > 0) {
-          <div class="formati" style="margin-top: 12px">
-            <span class="text-muted" style="font-size: 13px">Disponibile in:</span>
-            @for (f of formati(); track f.id) {
-              <span class="badge-categoria">{{ f.formato || 'Standard' }} — € {{ f.prezzo | number:'1.2-2' }}</span>
-            }
+          <div class="formati-selector" style="margin-top: 20px;">
+            <p class="text-muted" style="font-size: 13px; margin-bottom: 8px;">Scegli il formato desiderato:</p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              
+              @for (f of formati(); track f.id) {
+                <div class="formato-box"
+                     style="border: 2px solid; padding: 10px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+                     [style.borderColor]="formatoSelezionato()?.id === f.id ? '#0d6efd' : '#e2e8f0'"
+                     [style.backgroundColor]="formatoSelezionato()?.id === f.id ? '#f0f7ff' : '#fff'"
+                     (click)="formatoSelezionato.set(f)">
+                  
+                  <div style="font-weight: 600; font-size: 14px; color: #1e293b;">
+                    {{ getLabelFormato(f) }}
+                  </div>
+                  <div style="color: #0d6efd; font-size: 15px; font-weight: bold; margin-top: 4px;">
+                    € {{ f.prezzo | number:'1.2-2' }}
+                  </div>
+
+                </div>
+              }
+
+            </div>
           </div>
         }
 
-        <div class="prezzo-box">
-          <span class="price">€ {{ formatoPrincipale() ? (formatoPrincipale()!.prezzo | number:'1.2-2') : 'N/D' }}</span>
+        <div class="prezzo-box" style="margin-top: 20px;">
+          <span class="price">€ {{ formatoSelezionato() ? (formatoSelezionato()!.prezzo | number:'1.2-2') : 'N/D' }}</span>
           
           @if (libro()!.valutazioneMedia) {
             <span class="stelle-media">

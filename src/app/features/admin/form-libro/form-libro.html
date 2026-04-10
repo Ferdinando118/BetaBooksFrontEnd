@@ -167,13 +167,55 @@
         </div>
       </div>
 
-      <div class="mt-4">
+<div class="mt-4">
         <label class="form-label">Immagine di Copertina</label>
+        
+        @if (immagineAttuale()) {
+          <div class="mb-3 p-3 border rounded d-flex flex-column align-items-center" style="background: #fff; max-width: 250px;">
+            <p class="text-muted small mb-2 w-100 m-0">Copertina Attuale:</p>
+            <img [src]="immagineAttuale()" alt="Copertina" style="max-height: 180px; max-width: 100%; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+          </div>
+        }
+
         <div class="p-3 border rounded" style="background: #f8fafc;">
           <input type="file" (change)="onFileSelected($event)" class="form-control bg-white" accept="image/*">
+          @if (editMode) {
+            <small class="text-muted mt-2 d-block">
+              ℹ️ Lascia vuoto se vuoi mantenere l'immagine attuale.
+            </small>
+          }
         </div>
       </div>
 
+      <div style="background: #fee2e2; border: 2px solid #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <h4 style="color: #b91c1c;">🕵️ Debug Form (Cerca la scritta INVALID)</h4>
+        
+        <div style="display: flex; gap: 40px; font-family: monospace; font-size: 14px;">
+          <div>
+            <strong>CAMPI PRINCIPALI:</strong><br>
+            Titolo: <b>{{ form.get('titolo')?.status }}</b><br>
+            Descrizione: <b>{{ form.get('descrizione')?.status }}</b><br>
+            Autore: <b>{{ form.get('idAutore')?.status }}</b><br>
+            Editore: <b>{{ form.get('idEditore')?.status }}</b><br>
+            Categorie: <b>{{ form.get('idCategorie')?.status }}</b><br>
+          </div>
+          
+          <div>
+            <strong>FORMATI ({{ formati.length }}):</strong><br>
+            @for (f of formati.controls; let i = $index; track i) {
+              <div style="margin-bottom: 10px; border-bottom: 1px solid #fca5a5; padding-bottom: 5px;">
+                Riga {{ i + 1 }} - Globale: <b>{{ f.status }}</b><br>
+                - Supporto: <b>{{ f.get('tipoSupporto')?.status }}</b><br>
+                - Copertina: <b>{{ f.get('tipoCopertina')?.status }}</b><br>
+                - ISBN: <b>{{ f.get('isbn')?.status }}</b> <span style="color:red">{{ f.get('isbn')?.errors | json }}</span><br>
+                - Prezzo: <b>{{ f.get('prezzo')?.status }}</b> <span style="color:red">{{ f.get('prezzo')?.errors | json }}</span><br>
+                - Quantità: <b>{{ f.get('quantita')?.status }}</b> <span style="color:red">{{ f.get('quantita')?.errors | json }}</span><br>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+      ``
       <div class="form-actions mt-5">
         <button type="button" class="btn btn-secondary" routerLink="/catalogo" [disabled]="loading">Annulla</button>
         <button type="submit" class="btn btn-primary" [disabled]="loading || formati.length === 0">
