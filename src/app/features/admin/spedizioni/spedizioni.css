@@ -1,9 +1,8 @@
-/* Assicurati che la tabella occupi tutto lo spazio */
 .admin-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
-    table-layout: fixed; /* Opzionale: rende le colonne di larghezza fissa */
+    table-layout: fixed; /* rende le colonne di larghezza fissa */
 }
 
 /* Allineamento celle e intestazioni */
@@ -71,10 +70,10 @@
 .custom-modal {
   background: white;
   width: 95%; /* Leggermente più largo per i dispositivi piccoli */
-  max-width: 420px; /* Aumentato un po' per far stare le scritte */
+  max-width: 420px; 
   border-radius: 16px;
   box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-  overflow: visible; /* CAMBIATO: permette al testo di fluire meglio */
+  overflow: visible; 
   animation: modalSlideIn 0.3s ease-out;
   border: 1px solid rgba(0,0,0,0.1);
 }
@@ -171,6 +170,39 @@
 @keyframes modalSlideIn {
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+
+/* Barra di ricerca */
+.search-container {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #e0f0f8;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.search-input:focus {
+    border-color: #0099ff;
+    box-shadow: 0 4px 10px rgba(0,153,255,0.15);
+}
+
+.badge-count {
+    background: #0099ff;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
 }
 
 /* Colori stati */
