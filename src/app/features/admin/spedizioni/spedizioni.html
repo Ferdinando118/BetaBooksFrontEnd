@@ -1,0 +1,56 @@
+<div class="admin-panel">
+  <div class="header">
+    <h2>📦 Gestione Ordini e Logistica</h2>
+  </div>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Data Ordine</th>
+          <th>Totale</th>
+          <th>Metodo Pagamento</th>
+          <th>Tracking</th>
+          <th class="text-center">Stato</th> </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let o of ordini">
+          <td><strong>#{{ o.id }}</strong></td>
+          
+          <td>{{ o.dataOrdine | date:'dd/MM/yyyy HH:mm' }}</td>
+          
+          <td>{{ o.totaleComplessivo | currency:'EUR' }}</td>
+          
+          <td>{{ o.metodoPagamento }}</td>
+
+          <td>
+            <div *ngIf="o.tracking">
+              <small class="corriere">{{ o.tracking.corriere }}</small><br>
+              <code class="codice">{{ o.tracking.codice }}</code>
+            </div>
+          </td>
+
+          <td class="text-center">
+            <select 
+  [ngModel]="o.stato" 
+  (ngModelChange)="openConfirmModal(o, $event)"
+  [ngClass]="'status-select ' + o.stato">
+  <option *ngFor="let s of stati" [value]="s">{{ s }}</option>
+</select>
+
+<div class="custom-modal-overlay" *ngIf="showModal">
+  <div class="custom-modal">
+    <div class="modal-header">
+      <h3>⚠️ Conferma Modifica</h3>
+    </div>
+    <div class="modal-body">
+      <p>Sei sicuro di voler modificare lo stato dell'ordine? <strong>#{{ordineSelezionato?.id}}</strong>?</p>
+      <p>Nuovo stato: <strong>{{nuovoStatoSelezionato}}</strong></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Annulla</button>
+      <button class="btn-confirm" (click)="confirmChange()">Conferma</button>
+    </div>
+  </div>
+</div>

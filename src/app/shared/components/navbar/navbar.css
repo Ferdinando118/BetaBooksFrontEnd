@@ -246,62 +246,116 @@
 /* IL MENU VERO E PROPRIO */
 .dropdown-menu {
   position: absolute;
-  top: calc(100% + 10px); /* Lo posiziona esattamente sotto l'avatar */
+  top: calc(100% + 12px);
   right: 0;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
-  min-width: 220px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 10px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8ecf1;
+  min-width: 240px;
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
+  overflow: hidden;
   z-index: 1001;
+  animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 18px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-top: 1px solid #e8ecf1;
+  border-left: 1px solid #e8ecf1;
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-header {
-  padding: 12px 16px;
-  background-color: #f8fafc;
+  padding: 16px 16px 12px 16px;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .dropdown-email {
-  font-size: 0.85rem;
-  color: #475569;
-  font-weight: 500;
-  word-break: break-all; /* Evita che email lunghissime sbordino */
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+  word-break: break-all;
+  letter-spacing: 0.3px;
 }
 
 .dropdown-divider {
-  margin: 0;
+  margin: 8px 0;
   border: 0;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #eef2f5;
 }
 
 .dropdown-item {
-  padding: 12px 16px;
+  padding: 10px 16px;
   text-decoration: none;
-  color: #334155;
+  color: #475569;
   font-size: 0.9rem;
   background: transparent;
   border: none;
   text-align: left;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
 .dropdown-item:hover {
-  background-color: #f1f5f9;
+  background-color: #f0f4f8;
   color: var(--bb-blue, #2563eb);
+  padding-left: 20px;
+}
+
+.dropdown-item.admin-link {
+  color: #f57f17;
+}
+
+.dropdown-item.admin-link:hover {
+  background: linear-gradient(90deg, rgba(245, 127, 23, 0.1) 0%, transparent 100%);
+  color: #e65100;
 }
 
 /* Stile speciale per il tasto Esci */
 .dropdown-item.text-danger {
-  color: #ef4444; 
+  color: #ef4444;
+  font-weight: 500;
 }
 .dropdown-item.text-danger:hover {
-  background-color: #fef2f2;
+  background-color: rgba(239, 68, 68, 0.08);
   color: #dc2626;
+}
+
+.admin-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #f57f17 0%, #fb8c00 100%);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(245, 127, 23, 0.3);
 }
