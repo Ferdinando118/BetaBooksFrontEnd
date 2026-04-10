@@ -1,8 +1,7 @@
 // navbar.ts
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/auth';
-// ❌ Rimuovi: import { email } from '@angular/forms/signals';
+import { AuthService } from '../../../core/services/auth';;
 
 @Component({
   selector: 'app-navbar',
@@ -20,11 +19,11 @@ export class Navbar {
   toggleMenu(): void { this.menuAperto = !this.menuAperto; }
 
   mandaVerifica(): void {
-    const email = this.auth.grant().utente?.email; // ✅ variabile locale
+    const email = this.auth.grant().utente?.email; 
     if (typeof email === 'string') {
       this.loading = true;
-      this.auth.verificaMail(email).subscribe({  // ✅ sottoscrivi l'Observable
-        next: () => { /* loading rimane true = mostra "Mail inviata a..." */ },
+      this.auth.verificaMail(email).subscribe({  
+        next: () => {},
         error: () => { this.loading = false; }
       });
     }
