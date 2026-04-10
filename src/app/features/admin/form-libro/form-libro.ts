@@ -28,6 +28,7 @@ export class FormLibro implements OnInit {
   idLibro?: number;
   loading = false;
   selectedFile: File | null = null;
+  immagineAttuale = signal<string | null>(null);
 
   autori = signal<any[]>([]);
   editori = signal<any[]>([]);
@@ -73,15 +74,16 @@ export class FormLibro implements OnInit {
     return this.form.get('formati') as FormArray;
   }
 
-  creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSIBILE', prezzo = 1.0, quantita = 1, isbn = '', attivo = true): FormGroup {
+creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSIBILE', prezzo = 1.0, quantita = 1, isbn = '', attivo = true, copertina = ''): FormGroup {
     return this.fb.group({
       id: [id],
       tipoSupporto: [tipoSupporto, Validators.required],
-      tipoCopertina: [tipoCopertina, Validators.required],
-      isbn: [isbn, [Validators.required, Validators.pattern('^[0-9]{13}$')]],
-      prezzo: [prezzo, [Validators.required, Validators.min(0.01)]],
-      quantita: [quantita, [Validators.required, Validators.min(1)]],
-      attivo: [attivo]
+      tipoCopertina: [tipoCopertina],
+      isbn: [isbn],
+      prezzo: [prezzo, [Validators.required, Validators.min(0)]],
+      quantita: [quantita, [Validators.min(0)]],
+      attivo: [attivo],
+      copertina: [copertina] // Campo nascosto per non perdere il dato
     });
   }
 
@@ -121,16 +123,25 @@ export class FormLibro implements OnInit {
         });
 
         if (res.formati && res.formati.length > 0) {
+          // --- NOVITÀ: Salviamo la vecchia immagine per mostrarla! ---
+          const primaCopertina = res.formati.find((f: any) => f.copertina)?.copertina;
+          if (primaCopertina) {
+            const urlServer = 'http://localhost:8080/uploads/';
+            this.immagineAttuale.set(primaCopertina.startsWith('http') ? primaCopertina : urlServer + primaCopertina);
+          }
+          // -----------------------------------------------------------
+
           this.formatiEsistenti.set(res.formati);
           res.formati.forEach((f: any) => {
             this.formati.push(this.creaFormatiGroup(
               f.id,
-              f.tipoSupporto,
-              f.tipoCopertina,
-              f.prezzo,
-              f.quantita,
+              f.tipoSupporto || 'CARTACEO',
+              f.tipoCopertina || 'FLESSIBILE',
+              f.prezzo || 1.0,
+              f.quantita || 0,
               f.isbn || '',
-              f.attivo !== undefined ? f.attivo : true
+              f.attivo !== undefined ? f.attivo : true,
+              f.copertina // Passiamo la vecchia copertina al Form Group
             ));
           });
         }
@@ -218,15 +229,16 @@ export class FormLibro implements OnInit {
     }
 
     formatiDaSalvare.forEach((formato, index) => {
-      const formatoData: FormatoLibroReq = {
+      const formatoData: any = { // Usiamo any per poter agganciare la copertina
         id: formato.id,
         idLibro: this.idLibro!,
         tipoSupporto: formato.tipoSupporto,
-        tipoCopertina: formato.tipoCopertina,
-        isbn: formato.isbn, 
-        prezzo: formato.prezzo,
-        quantita: formato.quantita,
-        attivo: formato.attivo 
+        tipoCopertina: formato.tipoSupporto === 'EBOOK' ? null : (formato.tipoCopertina || 'FLESSIBILE'),
+        isbn: formato.isbn && formato.isbn.trim() !== '' ? formato.isbn : null,
+        prezzo: formato.prezzo || 0,
+        quantita: formato.quantita || 0,
+        attivo: formato.attivo,
+        copertina: formato.copertina // Rimandiamo la copertina vecchia al DB, così non la cancella!
       };
 
       const operazione = formato.id 
@@ -276,9 +288,14 @@ export class FormLibro implements OnInit {
     this.router.navigate(['/catalogo']);
   }
 
-  private gestisciErrore(err: any) {
+ private gestisciErrore(err: any) {
     this.loading = false;
-    console.error("Dettaglio Errore:", err);
-    alert("Attenzione: " + (err.error?.message || "Errore imprevisto."));
+    console.group("🔴 DETTAGLIO ERRORE SERVER (HTTP " + err.status + ")");
+    console.error("Oggetto Errore Completo:", err);
+    console.error("Messaggio dal Backend:", err.error?.message || "Nessun messaggio");
+    console.error("Dettagli validazione (se presenti):", err.error?.errors || err.error?.details);
+    console.groupEnd();
+    
+    alert("Attenzione: " + (err.error?.message || "Errore imprevisto dal server."));
   }
 }
