@@ -5,17 +5,18 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
 import { ProfiloService } from '../../../../core/services/profilo';
 import { Utente, ProfiloUtente, Indirizzo } from '../../../../core/models/models';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-profilo',
   standalone: false,
   templateUrl: './profilo.html',
-  styleUrl: './profilo.css'
+  styleUrl: './profilo.css',
 })
 export class Profilo implements OnInit {
   private readonly STORAGE_KEY = 'formIndirizzo_draft';
   private readonly STORAGE_MODIFICA_KEY = 'indirizzoInModifica_draft';
-  
+
   utente: Utente | null = null;
   profiloEsistente: ProfiloUtente | null = null;
   indirizzi: Indirizzo[] = []; // Ora è un array per gestire la rubrica!
@@ -27,36 +28,48 @@ export class Profilo implements OnInit {
   // Stati
   loadingProfilo = false;
   salvatoProfilo = false;
-  
+
   mostraFormIndirizzo = false;
   loadingIndirizzo = false;
   indirizzoInModifica: Indirizzo | null = null;
-  
+
   // Modale di conferma eliminazione
   mostraModalEliminazione = false;
   indirizzoInEliminazione: number | null = null;
 
+  //proprietà per il cambio pwd
+  mostraDialogPassword = false;
+  errorePassword = '';
+  successoPassword = false;
+
+  formPassword = {
+    vecchiaPassword: '',
+    nuovaPassword: '',
+    confermaPassword: '',
+  };
+
   constructor(
     private auth: AuthService,
     private fb: FormBuilder,
-    private profiloService: ProfiloService
+    private profiloService: ProfiloService,
+    private cdr: ChangeDetectorRef,
   ) {
     // FORM 1: ANAGRAFICA
     this.formProfilo = this.fb.group({
       nome: ['', Validators.required],
       cognome: ['', Validators.required],
-      telefono: ['']
+      telefono: [''],
     });
 
     // FORM 2: INDIRIZZO (corretto "citta" in "comune"!)
     this.formIndirizzo = this.fb.group({
       via: ['', Validators.required],
       civico: ['', Validators.required],
-      comune: ['', Validators.required], 
+      comune: ['', Validators.required],
       cap: ['', [Validators.required, Validators.pattern(/^[0-9]{5}$/)]],
       provincia: ['', [Validators.required, Validators.maxLength(2)]],
       paese: ['Italia', Validators.required],
-      noteConsegna: ['']
+      noteConsegna: [''],
     });
   }
 
@@ -71,7 +84,7 @@ export class Profilo implements OnInit {
     const idUtente = this.utente!.id;
 
     // 1. Carica Anagrafica
-    this.profiloService.findByUtente(idUtente).subscribe(p => {
+    this.profiloService.findByUtente(idUtente).subscribe((p) => {
       if (p) {
         this.profiloEsistente = p;
         this.formProfilo.patchValue({ nome: p.nome, cognome: p.cognome, telefono: p.telefono });
@@ -80,13 +93,13 @@ export class Profilo implements OnInit {
 
     // 2. Carica Lista Indirizzi
     this.caricaIndirizzi();
-    
+
     // 3. Carica draft del form indirizzo da localStorage
     this.caricaFormDraft();
   }
 
   caricaIndirizzi() {
-    this.profiloService.findIndirizziByUser(this.utente!.id).subscribe(list => {
+    this.profiloService.findIndirizziByUser(this.utente!.id).subscribe((list) => {
       this.indirizzi = list || [];
     });
   }
@@ -103,13 +116,13 @@ export class Profilo implements OnInit {
       nome: val.nome,
       cognome: val.cognome,
       telefono: val.telefono,
-      idUtente: this.utente!.id
+      idUtente: this.utente!.id,
     } as ProfiloUtente;
 
     this.profiloService.saveProfilo(pReq).subscribe(() => {
       this.loadingProfilo = false;
       this.salvatoProfilo = true;
-      setTimeout(() => this.salvatoProfilo = false, 3000);
+      setTimeout(() => (this.salvatoProfilo = false), 3000);
     });
   }
 
@@ -155,7 +168,7 @@ export class Profilo implements OnInit {
       paese: val.paese,
       noteConsegna: val.noteConsegna,
       idUtente: this.utente!.id,
-      isDefault: isDefault
+      isDefault: isDefault,
     } as Indirizzo;
 
     this.profiloService.saveIndirizzo(iReq).subscribe(() => {
@@ -167,7 +180,7 @@ export class Profilo implements OnInit {
     });
   }
 
-eliminaIndirizzo(id: number) {
+  eliminaIndirizzo(id: number) {
     this.indirizzoInEliminazione = id;
     this.mostraModalEliminazione = true;
   }
@@ -183,7 +196,7 @@ eliminaIndirizzo(id: number) {
           console.error("Errore durante l'eliminazione", err);
           alert("Ops! Non è stato possibile eliminare l'indirizzo.");
           this.chiudiModalEliminazione();
-        }
+        },
       });
     }
   }
@@ -199,13 +212,13 @@ eliminaIndirizzo(id: number) {
   private caricaFormDraft(): void {
     const formDraft = localStorage.getItem(this.STORAGE_KEY);
     const modicaDraft = localStorage.getItem(this.STORAGE_MODIFICA_KEY);
-    
+
     if (formDraft) {
       try {
         const datiSalvati = JSON.parse(formDraft);
         this.mostraFormIndirizzo = true;
         this.formIndirizzo.patchValue(datiSalvati);
-        
+
         if (modicaDraft) {
           this.indirizzoInModifica = JSON.parse(modicaDraft);
         }
@@ -219,7 +232,7 @@ eliminaIndirizzo(id: number) {
   private salvaFormDraft(): void {
     const formData = this.formIndirizzo.value;
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(formData));
-    
+
     if (this.indirizzoInModifica) {
       localStorage.setItem(this.STORAGE_MODIFICA_KEY, JSON.stringify(this.indirizzoInModifica));
     }
@@ -228,5 +241,60 @@ eliminaIndirizzo(id: number) {
   private pulisciFormDraft(): void {
     localStorage.removeItem(this.STORAGE_KEY);
     localStorage.removeItem(this.STORAGE_MODIFICA_KEY);
+  }
+
+  // GESTIONE CAMBIO PWD
+
+  apriDialogPassword(): void {
+     console.log('APRI DIALOG CHIAMATO');
+    this.mostraDialogPassword = true;
+    this.errorePassword = '';
+    this.successoPassword = false;
+    this.formPassword = { vecchiaPassword: '', nuovaPassword: '', confermaPassword: '' };
+  }
+
+  chiudiDialogPassword(): void {
+    this.mostraDialogPassword = false;
+  }
+
+  salvaPassword(): void {
+    this.errorePassword = '';
+
+    if (
+      !this.formPassword.vecchiaPassword ||
+      !this.formPassword.nuovaPassword ||
+      !this.formPassword.confermaPassword
+    ) {
+      this.errorePassword = 'Compila tutti i campi.';
+      return;
+    }
+
+    if (this.formPassword.nuovaPassword !== this.formPassword.confermaPassword) {
+      this.errorePassword = 'Le password non coincidono.';
+      return;
+    }
+
+    const email = this.auth.grant().utente?.email;
+    if (!email) return;
+
+    this.auth
+      .cambiaPassword({
+        email,
+        oldPwd: this.formPassword.vecchiaPassword,
+        newPwd: this.formPassword.nuovaPassword,
+      })
+      .subscribe({
+        next: () => {
+          this.successoPassword = true;
+          this.cdr.detectChanges(); // forza il render
+
+          setTimeout(() => {
+            this.auth.logout();
+          }, 2000);
+        },
+        error: (err) => {
+          this.errorePassword = err.error?.message ?? 'Errore durante il cambio password.';
+        },
+      });
   }
 }

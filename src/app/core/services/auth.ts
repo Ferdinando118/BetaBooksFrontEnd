@@ -1,9 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { Utente } from '../models/models';
+import { PasswordRecoveryReq, PasswordReq, Resp, Utente } from '../models/models';
 
 interface AuthResponse {
   token: string;
@@ -152,8 +152,33 @@ checkMe(): Observable<Utente> {
   );
 }
 
+verificaMail(email: string): Observable<Resp> {
+  const params = new HttpParams().set('email', email);
+  return this.http.get<Resp>(`${this.API_UTENTI}/sendValidation`, { params });
+}
+
+attivaValidazione(email: string): Observable<Resp> {
+  const params = new HttpParams().set('email', email);
+  return this.http.get<Resp>(`${this.API_UTENTI}/emailValidate`, { params });
+}
+
+cambiaPassword(pwdReq: PasswordReq): Observable<Resp> {
+  return this.http.post<Resp>(`${this.API_UTENTI}/cambiaPassword`, pwdReq);
+}
+
+emailCambioPassword(email: string): Observable<any> {
+  return this.http.get(`${this.API_UTENTI}/request-password-recovery?email=${email}`);
+}
+
+confirmPasswordRecovery(data: PasswordRecoveryReq): Observable<any> {
+  return this.http.post(`${this.API_UTENTI}/confirm-password-recovery`, data);
+}
+
+
+
   // Comodi metodi per leggere velocemente lo stato
   getToken(): string | null { return this.grant().token; }
   isLoggedIn(): boolean { return this.grant().isLogged; }
   isAdmin(): boolean { return this.grant().isAdmin; }
+  isValidato() {return this.grant().utente?.validato}
 }

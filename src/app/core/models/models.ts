@@ -14,6 +14,7 @@ export interface Utente {
   id: number;
   email: string;
   ruolo: RuoloUtente;
+  validato: boolean;
 }
 
 export interface ProfiloUtente {
@@ -180,4 +181,16 @@ export interface AuditLogDTO {
   valoriNuovi: any;     
   utenteDb: string;
   dataModifica: string;   // LocalDateTime in Java spesso arriva come stringa ISO (es. "2026-04-10T...")
+}
+
+export interface PasswordReq{
+  email:string;
+  oldPwd:string;
+  newPwd:string;
+}
+
+
+export interface PasswordRecoveryReq {
+  token: string;
+  nuovaPassword: string;
 }

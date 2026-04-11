@@ -132,6 +132,12 @@ export class Catalogo implements OnInit {
       return;
     }
 
+    if (this.auth.isValidato() != true) {
+    alert('Devi aver validato la mail per aggiungere prodotti al carrello!');
+    // Opzionale: this.router.navigate(['/auth/login']);
+    return;
+  }
+
     if (libro.idFormato) {
       this.carrelloService.aggiungi(libro.idFormato).subscribe({
         next: (res) => {

@@ -100,6 +100,11 @@ export class Dettaglio implements OnInit {
       return;
     }
 
+    if(!this.auth.isValidato()){
+      alert('Devi effettuare il login per aggiungere al carrello.');
+      return;
+    }
+
     // Usiamo il signal del formato selezionato invece di quello principale
     const formato = this.formatoSelezionato();
     if (!formato) {

@@ -12,6 +12,7 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { Navbar } from './shared/components/navbar/navbar';
 import { Footer } from './shared/components/footer/footer';
 import { skipUploadsInterceptor} from './core/interceptors/skip.interceptor';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [

@@ -144,3 +144,19 @@ small { font-weight: bold; display: block; margin-bottom: 3px; }
     font-weight: bold;
     white-space: nowrap;
 }
+
+.btn-password {
+  margin-left: auto;
+  background-color: #e94560;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-password:hover {
+  background-color: #c73652;
+}
