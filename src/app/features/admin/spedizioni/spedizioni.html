@@ -44,24 +44,13 @@
 
           <td class="text-center">
             <select 
-  [ngModel]="o.stato" 
-  (ngModelChange)="openConfirmModal(o, $event)"
-  [ngClass]="'status-select ' + o.stato">
-  <option *ngFor="let s of stati" [value]="s">{{ s }}</option>
-</select>
+              [ngModel]="o.stato" 
+              (ngModelChange)="gestisciCambioStato(o, $event)"
+              [ngClass]="'status-select ' + o.stato">
+              <option *ngFor="let s of stati" [value]="s">{{ s }}</option>
+            </select>
+          </td>
+    </tr>
+  </tbody>
+</table>
 
-<div class="custom-modal-overlay" *ngIf="showModal">
-  <div class="custom-modal">
-    <div class="modal-header">
-      <h3>⚠️ Conferma Modifica</h3>
-    </div>
-    <div class="modal-body">
-      <p>Sei sicuro di voler modificare lo stato dell'ordine? <strong>#{{ordineSelezionato?.id}}</strong>?</p>
-      <p>Nuovo stato: <strong>{{nuovoStatoSelezionato}}</strong></p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeModal()">Annulla</button>
-      <button class="btn-confirm" (click)="confirmChange()">Conferma</button>
-    </div>
-  </div>
-</div>

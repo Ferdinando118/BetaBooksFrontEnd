@@ -22,10 +22,6 @@ export class Spedizioni implements OnInit {
   // array di stringhe che corrispondono all' Enum StatoOrdine del backend
   stati = Object.values(StatoOrdine); 
 
-  showModal = false;
-  ordineSelezionato: any = null;
-  nuovoStatoSelezionato: StatoOrdine | any = '';
-
 ngOnInit() {
   console.log("Componente Spedizioni inizializzato");
 
@@ -50,6 +46,25 @@ caricaOrdini() {
       },
       error: (err) => console.error("Errore HTTP:", err)
     });
+  }
+
+  gestisciCambioStato(ordine: OrdineDTO, nuovoStato: StatoOrdine) {
+    if (confirm(`Sei sicuro di voler cambiare lo stato dell'ordine #${ordine.id} in "${nuovoStato}"?`)) {
+      this.ordineService.aggiornaStato(ordine.id, nuovoStato).subscribe({
+        next: (res: any) => {
+          alert("Operazione completata con successo!");
+          this.caricaOrdini();
+        },
+        error: (err: any) => {
+          console.error("Errore:", err);
+          alert("Errore nel salvataggio: " + (err.error?.message || "Riprova più tardi"));
+          this.caricaOrdini(); // Ricarica per resettare la select
+        }
+      });
+    } else {
+      // Se annulla, ricarichiamo per riportare la select al valore originale
+      this.caricaOrdini();
+    }
   }
 
   applicaFiltro() {
@@ -79,42 +94,5 @@ caricaOrdini() {
       }
     });
   }
-
-  openConfirmModal(ordine: any, nuovoStato: any) {
-    console.log("Apertura modale per ordine:", ordine.id, "Nuovo stato:", nuovoStato);
-    
-    this.ordineSelezionato = ordine;
-    this.nuovoStatoSelezionato = nuovoStato;
-    this.showModal = true;
-  }
-
-  confirmChange() {
-    if (this.ordineSelezionato && this.nuovoStatoSelezionato) {
-      this.ordineService.aggiornaStato(
-        this.ordineSelezionato.id, 
-        this.nuovoStatoSelezionato as StatoOrdine
-      ).subscribe({
-        next: (res) => {
-          console.log("Aggiornamento riuscito");
-          this.showModal = false; 
-          this.caricaOrdini();
-        },
-        error: (err) => {
-          console.error("Errore server:", err);
-          alert("Errore durante l'aggiornamento");
-          this.closeModal();
-        }
-      });
-    }
-  }
-
-  closeModal() {
-    this.showModal = false;
-    this.ordineSelezionato = null;
-    this.nuovoStatoSelezionato = '';
-    
-    this.caricaOrdini(); 
-  }
-
   
 }
