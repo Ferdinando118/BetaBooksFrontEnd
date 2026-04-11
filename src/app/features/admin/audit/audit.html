@@ -1,1 +1,73 @@
-<p>audit works!</p>
+<div class="header">
+  <h2>📜 Registro Audit di Sistema</h2>
+</div>
+
+<div class="search-container">
+  <input 
+    type="text" 
+    [(ngModel)]="searchTerm" 
+    (input)="applicaFiltro()" 
+    placeholder="🔍 Cerca per tabella, operazione o dettagli..."
+    class="search-input">
+
+  <select [(ngModel)]="selectedOperazione" (change)="applicaFiltro()" class="filter-select">
+    <option value="">Tutte le operazioni</option>
+    <option value="INSERT">INSERT</option>
+    <option value="UPDATE">UPDATE</option>
+    <option value="DELETE">DELETE</option>
+  </select>
+
+  <span class="badge-count">{{ logsFiltrati.length }} Log trovati</span>
+</div>
+
+
+<table>
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Tabella</th>
+      <th>Operazione</th>
+      <th>Dettagli Modifica</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let log of logsFiltrati">
+      <td>{{ log.dataModifica | date:'dd/MM/yy HH:mm' }}</td>
+      <td><strong>{{ log.nomeTabella }}</strong></td>
+      <td>{{ log.tipoOperazione }}</td>
+        <td>
+            <div class="json-container" 
+                [class.is-update]="log.tipoOperazione === 'UPDATE'"
+                [class.is-insert]="log.tipoOperazione !== 'UPDATE'">
+
+                <ng-container *ngIf="log.tipoOperazione === 'UPDATE'">
+                <div class="diff-section prev-section">
+                    <small>PRIMA:</small>
+                    <div *ngFor="let item of getKeysAndValues(log.valoriPrecedenti)" 
+                        class="diff-row prev">
+                    {{ item.key | titlecase }}: {{ item.value ?? '/' }}
+                    </div>
+                </div>
+                <div class="diff-section next-section">
+                    <small>DOPO:</small>
+                    <div *ngFor="let item of getKeysAndValues(log.valoriNuovi)" 
+                        class="diff-row next">
+                    {{ item.key | titlecase }}: {{ item.value ?? '/' }}
+                    </div>
+                </div>
+                </ng-container>
+
+                <ng-container *ngIf="log.tipoOperazione !== 'UPDATE'">
+                <div class="insert-grid">
+                    <div *ngFor="let item of getKeysAndValues(log.valoriNuovi || log.valoriPrecedenti)" class="diff-row">
+                    <strong>{{ item.key | titlecase }}:</strong> 
+                    {{ item.value ?? '/' }}
+                    </div>
+                </div>
+                </ng-container>
+
+            </div>
+            </td>
+    </tr>
+  </tbody>
+</table>

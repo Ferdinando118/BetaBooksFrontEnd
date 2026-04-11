@@ -359,3 +359,26 @@
   text-transform: uppercase;
   box-shadow: 0 4px 12px rgba(245, 127, 23, 0.3);
 }
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #475569;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: #2563eb;
+}
+
+.icon-link {
+  font-size: 1.4rem;
+  text-decoration: none;
+  padding: 0 5px;
+}

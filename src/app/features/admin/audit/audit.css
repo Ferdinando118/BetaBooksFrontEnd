@@ -1,0 +1,146 @@
+/* Rimuovi la griglia dal contenitore base */
+.json-container {
+  background: #fdfdfd;
+  border-left: 3px solid #007bff;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+/* Griglia SOLO per UPDATE */
+.json-container.is-update {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+/* Per INSERT/DELETE: griglia a 2 colonne per i campi */
+.json-container.is-insert .insert-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 20px;
+}
+
+.diff-row {
+  margin-bottom: 4px;
+}
+
+.json-row {
+  margin-bottom: 4px;
+  border-bottom: 1px solid #eee;
+}
+
+.json-row strong {
+  color: #333;
+  text-transform: capitalize;
+}
+
+.key {
+  font-weight: bold;
+  color: #555;
+  text-align: right;
+  padding-right: 10px;
+}
+
+/* Definisci le larghezze delle colonne principali */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 15px; /* Spazio interno per non avere tutto appiccicato */
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Larghezze fisse per evitare che il JSON sposti tutto */
+td:nth-child(1) { width: 150px; } /* Data */
+td:nth-child(2) { width: 150px; } /* Tabella */
+td:nth-child(3) { width: 100px; } /* Operazione */
+
+/* Centra solo l'intestazione della colonna Dettagli */
+th:nth-child(4) {
+  text-align: center;
+}
+
+
+.diff-section { margin-bottom: 0px; border-bottom: none; padding-bottom: 10px; }
+.prev { color: #d9534f } /* Rosso per i vecchi valori */
+.next { color: #5cb85c } /* Verde per i nuovi valori */
+small { font-weight: bold; display: block; margin-bottom: 3px; }
+
+.prev-section { grid-column: 1; }
+.next-section { grid-column: 2; }
+
+
+
+.search-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-container input { flex: 2; }
+.search-container select { flex: 1; padding: 10px; }
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+/* Container della barra di ricerca */
+.search-container {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Input di ricerca stilizzato */
+.search-input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #e0f0f8;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.search-input:focus {
+    border-color: #007bff; /* Blu coerente con il tuo stile */
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.15);
+}
+
+/* Select per l'operazione (aggiunta) */
+.filter-select {
+    padding: 12px 15px;
+    border: 2px solid #e0f0f8;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #555;
+    background: white;
+    cursor: pointer;
+}
+
+/* Badge numero risultati */
+.badge-count {
+    background: #007bff;
+    color: white;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    white-space: nowrap;
+}

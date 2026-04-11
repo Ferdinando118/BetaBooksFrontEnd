@@ -170,3 +170,14 @@ export interface Resp {
     message: string;
     obj?: any; // Il campo dove Java mette i dati (es. l'ordine o la lista)
 }
+
+export interface AuditLogDTO {
+  id: number;
+  nomeTabella: string;
+  tipoOperazione: string; 
+  idModificato: number;
+  valoriPrecedenti: any;  
+  valoriNuovi: any;     
+  utenteDb: string;
+  dataModifica: string;   // LocalDateTime in Java spesso arriva come stringa ISO (es. "2026-04-10T...")
+}

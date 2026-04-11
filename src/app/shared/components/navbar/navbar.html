@@ -1,85 +1,65 @@
 <nav class="navbar">
   <div class="navbar-inner">
 
-<a routerLink="/" class="navbar-logo">
-  <img src="favicon2.png" alt="BetaBooks Logo" class="logo-img">
-</a>
-    <!-- Link centrali desktop -->
-<ul class="navbar-links">
-  <li><a routerLink="/" routerLinkActive="active">📚 Catalogo</a></li>
-  @if (auth.isLoggedIn()) {
-    <li>
-      <a routerLink="/cart" routerLinkActive="active" class="icon-link">
-        🛒 </a>
-    </li>
-  }
-</ul>
+    <div class="navbar-left">
+      <a routerLink="/" class="navbar-logo">
+        <img src="favicon2.png" alt="BetaBooks Logo" class="logo-img">
+      </a>
+      <a routerLink="/" routerLinkActive="active" class="nav-link">📚 Catalogo</a>
+    </div>
 
+    <div class="navbar-center"></div>
 
-    <!-- Azioni destra -->
-<div class="navbar-actions">
-  @if (auth.isLoggedIn()) {
-    
-    <div class="user-dropdown-container">
-      
-      <button class="avatar-btn" (click)="toggleDropdown()">
+    <div class="navbar-actions">
+      @if (auth.isLoggedIn()) {
+        <a routerLink="/cart" routerLinkActive="active" class="icon-link">🛒</a>
         
-        <div class="avatar-circle" [style.border]="auth.isAdmin() ? '2px solid #ffc107' : 'none'">
-          {{ getIniziale() }}
-        </div>
+        <div class="user-dropdown-container">
+          <button class="avatar-btn" (click)="toggleDropdown()">
+            <div class="avatar-circle" [style.border]="auth.isAdmin() ? '2px solid #ffc107' : 'none'">
+              {{ getIniziale() }}
+            </div>
+            <span class="arrow" [class.open]="dropdownAperto">▼</span>
+          </button>
 
-        <span class="arrow" [class.open]="dropdownAperto">▼</span>
-      </button>
-
-      @if (dropdownAperto) {
-        <div class="dropdown-menu">
-          <div class="dropdown-header">
-            <span class="dropdown-email">{{ auth.grant().utente?.email }}</span>
-         
-            @if (auth.isAdmin()) {
-              <span class="admin-badge">ADMIN</span>
-            }
-          </div>
-          
-          <hr class="dropdown-divider">
-
-          @if (auth.isAdmin()) {
-          
-            <a routerLink="/admin/spedizioni" class="dropdown-item admin-link" (click)="dropdownAperto=false">📦 Spedizioni</a>
-            <a routerLink="/admin/tabelle" class="dropdown-item admin-link" (click)="dropdownAperto=false">📂 Anagrafiche</a>
-            <a routerLink="/admin/audit" class="dropdown-item admin-link" (click)="dropdownAperto=false">🔍 Audit Log</a>
-            <hr class="dropdown-divider">
+          @if (dropdownAperto) {
+            <div class="dropdown-menu">
+              <div class="dropdown-header">
+                <span class="dropdown-email">{{ auth.grant().utente?.email }}</span>
+                @if (auth.isAdmin()) { <span class="admin-badge">ADMIN</span> }
+              </div>
+              <hr class="dropdown-divider">
+              @if (auth.isAdmin()) {
+                <a routerLink="/admin/spedizioni" class="dropdown-item admin-link" (click)="dropdownAperto=false">📦 Spedizioni</a>
+                <a routerLink="/admin/tabelle" class="dropdown-item admin-link" (click)="dropdownAperto=false">📂 Anagrafiche</a>
+                <a routerLink="/admin/audit" class="dropdown-item admin-link" (click)="dropdownAperto=false">🔍 Audit Log</a>
+                <hr class="dropdown-divider">
+              }
+              <a routerLink="/profile" class="dropdown-item" (click)="dropdownAperto=false">👤 Il mio profilo</a>
+              <a routerLink="/profile/ordini" class="dropdown-item" (click)="dropdownAperto=false">📦 I miei ordini</a>
+              <hr class="dropdown-divider">
+              <button class="dropdown-item text-danger" (click)="logout()">🚪 Esci</button>
+            </div>
           }
-          
-          <a routerLink="/profile" class="dropdown-item" (click)="dropdownAperto=false">👤 Il mio profilo</a>
-          <a routerLink="/profile/ordini" class="dropdown-item" (click)="dropdownAperto=false">📦 I miei ordini</a>
-          
-          <hr class="dropdown-divider">
-          
-          <button class="dropdown-item text-danger" (click)="logout()">🚪 Esci</button>
         </div>
+      } @else {
+        <a routerLink="/auth/login" class="btn btn-outline btn-sm">Accedi</a>
+        <a routerLink="/auth/register" class="btn btn-accent btn-sm">Registrati</a>
       }
     </div>
 
-  } @else {
-    <a routerLink="/auth/login" class="btn btn-outline btn-sm">Accedi</a>
-    <a routerLink="/auth/register" class="btn btn-accent btn-sm">Registrati</a>
-  }
-</div>
-    <!-- Hamburger mobile -->
     <button class="hamburger" (click)="toggleMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </div>
 
-  <!-- Menu mobile -->
   <div class="mobile-menu" [class.open]="menuAperto">
-    <a routerLink="/" (click)="menuAperto=false">Catalogo</a>
+    <a routerLink="/" (click)="menuAperto=false">📚 Catalogo</a>
     @if (auth.isLoggedIn()) {
-      <a routerLink="/cart"    (click)="menuAperto=false">Carrello</a>
-      <a routerLink="/profile" (click)="menuAperto=false">Profilo</a>
+      <a routerLink="/cart" (click)="menuAperto=false">🛒 Carrello</a>
+      <a routerLink="/profile" (click)="menuAperto=false">👤 Profilo</a>
     } @else {
-      <a routerLink="/auth/login"    (click)="menuAperto=false">Accedi</a>
+      <a routerLink="/auth/login" (click)="menuAperto=false">Accedi</a>
       <a routerLink="/auth/register" (click)="menuAperto=false">Registrati</a>
     }
   </div>
