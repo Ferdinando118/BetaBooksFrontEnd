@@ -77,93 +77,47 @@ export class Catalogo implements OnInit {
   ngOnInit(): void {
     this.inizializzaCatalogo();
   }
-/*
-  private inizializzaCatalogo(): void {
+
+    private inizializzaCatalogo(): void {
     this.loading.set(true);
     const userId = this.auth.getUserId();
 
+    // 1. Carichiamo i libri
     this.libroService.getAll().subscribe({
       next: (data: LibroDTO[]) => {
-        const mappati = data.map(libro => {
-          const f = libro.formati?.[0];
-          
-          // Costruzione URL immagine
-          const urlServer = 'http://localhost:8080/uploads/'; 
-          const copertinaUrl = f?.copertina 
-            ? (f.copertina.startsWith('http') ? f.copertina : urlServer + f.copertina) 
-            : '/assets/images/default-book.png';
-
-          // NOVITÀ: Calcoliamo se il formato principale è disponibile! (Se EBOOK è sempre true)
-          const isEbook = f?.tipoSupporto === 'EBOOK';
-          const disponibile = isEbook || (f?.quantita ? f.quantita > 0 : false);
-
-          return {
-            ...libro,
-            formati: libro.formati || [],
-            idFormato: f?.id,
-            prezzo: f?.prezzo || 0,
-            quantita: f?.quantita || 0,
-            disponibile: disponibile, // Passiamo questo booleano all'HTML
-            copertina: copertinaUrl,
-            miPiace: this.libroService.isMiPiace(libro.id)
-          };
-        });
-
-        this.libri.set(mappati);
         
-        // Estrazione categorie
-        const nomiCat = data.flatMap(l => l.categorie?.map(c => c.nome) ?? []);
-        this.categorie.set([...new Set<string>(nomiCat)]);
-        
-        this.loading.set(false);
+        // 2. Se l'utente è loggato, recuperiamo la sua wishlist dal database
+        if (userId) {
+          this.wishlistService.getWishlist(userId).subscribe({
+            next: (wishlistItems) => {
+              // Estraiamo solo gli ID dei formati presenti in wishlist
+              // Nota: verifica se nel tuo DTO l'id è dentro 'formatoLibro.id' o 'idFormato'
+              const formatoIdsInWishlist = wishlistItems.map(item => item.libro?.id);
+
+              console.log("Dati Wishlist ricevuti:", wishlistItems);
+              const libroIdsInWishlist = wishlistItems.map(item => item.libro?.id);
+              console.log("ID estratti:", libroIdsInWishlist);
+
+              // Mappiamo i libri incrociando i dati con la wishlist del DB
+              this.completaMappatura(data, formatoIdsInWishlist);
+            },
+            error: (err) => {
+              console.error('Errore nel caricamento wishlist:', err);
+              // In caso di errore wishlist, mostriamo i libri senza preferiti
+              this.completaMappatura(data, []);
+            }
+          });
+        } else {
+          // Se non è loggato, mappatura standard senza preferiti
+          this.completaMappatura(data, []);
+        }
       },
       error: (err) => {
         console.error('Errore API Catalogo:', err);
         this.loading.set(false);
       }
     });
-  }*/
-
-    private inizializzaCatalogo(): void {
-  this.loading.set(true);
-  const userId = this.auth.getUserId();
-
-  // 1. Carichiamo i libri
-  this.libroService.getAll().subscribe({
-    next: (data: LibroDTO[]) => {
-      
-      // 2. Se l'utente è loggato, recuperiamo la sua wishlist dal database
-      if (userId) {
-        this.wishlistService.getWishlist(userId).subscribe({
-          next: (wishlistItems) => {
-            // Estraiamo solo gli ID dei formati presenti in wishlist
-            // Nota: verifica se nel tuo DTO l'id è dentro 'formatoLibro.id' o 'idFormato'
-            const formatoIdsInWishlist = wishlistItems.map(item => item.libro?.id);
-
-            console.log("Dati Wishlist ricevuti:", wishlistItems);
-            const libroIdsInWishlist = wishlistItems.map(item => item.libro?.id);
-            console.log("ID estratti:", libroIdsInWishlist);
-
-            // Mappiamo i libri incrociando i dati con la wishlist del DB
-            this.completaMappatura(data, formatoIdsInWishlist);
-          },
-          error: (err) => {
-            console.error('Errore nel caricamento wishlist:', err);
-            // In caso di errore wishlist, mostriamo i libri senza preferiti
-            this.completaMappatura(data, []);
-          }
-        });
-      } else {
-        // Se non è loggato, mappatura standard senza preferiti
-        this.completaMappatura(data, []);
-      }
-    },
-    error: (err) => {
-      console.error('Errore API Catalogo:', err);
-      this.loading.set(false);
-    }
-  });
-}
+  }
 
 
 private completaMappatura(data: LibroDTO[], libroIdsInWishlist: number[]): void {

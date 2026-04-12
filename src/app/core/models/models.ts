@@ -95,13 +95,17 @@ export interface CarrelloItemDTO {
   id: number;
   idFormatoLibro: number;
   titoloLibro: string;
+  autoreNome: string;     
+  autoreCognome: string; 
+  nomeEditore: string;   
+  copertina: string;   
   quantita: number;
   prezzoUnitario: number;
-  prezzoTotaleRiga: number; // Fornito direttamente dal backend!
-  tipoSupporto?: string;    // Aggiunto: tipo supporto (Copertina flessibile, Copertina rigida, E-book)
-  tipoCopertina?: string;   // Aggiunto: tipo copertina
-  idLibro?: number;         // Aggiunto: per recuperare i formati alternativi
-  formatiDisponibili?: FormatoDisponibileDTO[]; // Aggiunto: formati alternativi dello stesso libro
+  prezzoTotaleRiga: number; 
+  tipoSupporto?: string;    //  (Copertina flessibile, Copertina rigida, E-book)
+  tipoCopertina?: string;  
+  idLibro?: number;       
+  formatiDisponibili?: FormatoDisponibileDTO[]; // formati alternativi dello stesso libro
 }
 
 // ── ORDINE ────────────────────────────────────────
