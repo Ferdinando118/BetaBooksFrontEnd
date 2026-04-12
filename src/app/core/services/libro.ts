@@ -60,13 +60,15 @@ export class LibroService {
     return this.miPiaceSet.has(libroId);
   }
 
-  toggleMiPiace(libroId: number): void {
+
+  toggleMiPiace(libroId: number): boolean {
     if (this.miPiaceSet.has(libroId)) {
       this.miPiaceSet.delete(libroId);
     } else {
       this.miPiaceSet.add(libroId);
     }
     this.saveMiPiace();
+    return this.miPiaceSet.has(libroId); 
   }
 
   // ─── LIBRO ───────────────────────────────────────────

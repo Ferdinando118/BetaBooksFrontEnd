@@ -8,6 +8,7 @@ import { AuthService } from '../../../../core/services/auth';
 import { LibroDTO } from '../../../../core/models/libro.model';
 import { BookHoverDirective } from '../../../../shared/directives/book-hover.directive';
 import { Libro } from '../../../../core/models/models';
+import { WishlistService } from '../../../../core/services/wishlist';
 
 @Component({
   selector: 'app-catalogo',
@@ -25,6 +26,7 @@ export class Catalogo implements OnInit {
   public readonly auth = inject(AuthService);
   private readonly libroService = inject(LibroService);
   private readonly carrelloService = inject(CarrelloService);
+  private readonly wishlistService = inject(WishlistService);
 
   // --- Signals per lo Stato ---
   libri = signal<any[]>([]);
@@ -68,9 +70,11 @@ export class Catalogo implements OnInit {
   ngOnInit(): void {
     this.inizializzaCatalogo();
   }
-
+/*
   private inizializzaCatalogo(): void {
     this.loading.set(true);
+    const userId = this.auth.getUserId();
+
     this.libroService.getAll().subscribe({
       next: (data: LibroDTO[]) => {
         const mappati = data.map(libro => {
@@ -93,7 +97,8 @@ export class Catalogo implements OnInit {
             prezzo: f?.prezzo || 0,
             quantita: f?.quantita || 0,
             disponibile: disponibile, // Passiamo questo booleano all'HTML
-            copertina: copertinaUrl
+            copertina: copertinaUrl,
+            miPiace: this.libroService.isMiPiace(libro.id)
           };
         });
 
@@ -110,7 +115,83 @@ export class Catalogo implements OnInit {
         this.loading.set(false);
       }
     });
-  }
+  }*/
+
+    private inizializzaCatalogo(): void {
+  this.loading.set(true);
+  const userId = this.auth.getUserId();
+
+  // 1. Carichiamo i libri
+  this.libroService.getAll().subscribe({
+    next: (data: LibroDTO[]) => {
+      
+      // 2. Se l'utente è loggato, recuperiamo la sua wishlist dal database
+      if (userId) {
+        this.wishlistService.getWishlist(userId).subscribe({
+          next: (wishlistItems) => {
+            // Estraiamo solo gli ID dei formati presenti in wishlist
+            // Nota: verifica se nel tuo DTO l'id è dentro 'formatoLibro.id' o 'idFormato'
+            const formatoIdsInWishlist = wishlistItems.map(item => item.libro?.id);
+
+            console.log("Dati Wishlist ricevuti:", wishlistItems);
+            const libroIdsInWishlist = wishlistItems.map(item => item.libro?.id);
+            console.log("ID estratti:", libroIdsInWishlist);
+
+            // Mappiamo i libri incrociando i dati con la wishlist del DB
+            this.completaMappatura(data, formatoIdsInWishlist);
+          },
+          error: (err) => {
+            console.error('Errore nel caricamento wishlist:', err);
+            // In caso di errore wishlist, mostriamo i libri senza preferiti
+            this.completaMappatura(data, []);
+          }
+        });
+      } else {
+        // Se non è loggato, mappatura standard senza preferiti
+        this.completaMappatura(data, []);
+      }
+    },
+    error: (err) => {
+      console.error('Errore API Catalogo:', err);
+      this.loading.set(false);
+    }
+  });
+}
+
+
+private completaMappatura(data: LibroDTO[], libroIdsInWishlist: number[]): void {
+  const urlServer = 'http://localhost:8080/uploads/';
+
+  const mappati = data.map(libro => {
+    const f = libro.formati?.[0];
+    const copertinaUrl = f?.copertina 
+      ? (f.copertina.startsWith('http') ? f.copertina : urlServer + f.copertina) 
+      : '/assets/images/default-book.png';
+
+    const isEbook = f?.tipoSupporto === 'EBOOK';
+    const disponibile = isEbook || (f?.quantita ? f.quantita > 0 : false);
+
+    return {
+      ...libro,
+      formati: libro.formati || [],
+      idFormato: f?.id,
+      prezzo: f?.prezzo || 0,
+      quantita: f?.quantita || 0,
+      disponibile: disponibile,
+      copertina: copertinaUrl,
+      // NOVITÀ: miPiace è true se l'id del formato è nell'elenco della wishlist del DB
+      miPiace: f ? libroIdsInWishlist.includes(libro.id) : false
+    };
+  });
+
+  this.libri.set(mappati);
+
+  // Estrazione categorie (rimane uguale)
+  const nomiCat = data.flatMap(l => l.categorie?.map(c => c.nome) ?? []);
+  this.categorie.set([...new Set<string>(nomiCat)]);
+  
+  this.loading.set(false);
+}
 
   // --- Metodi Utility ---
   aggiornaFiltri(): void {
@@ -152,11 +233,31 @@ export class Catalogo implements OnInit {
     return '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
   }
 
-  toggleMiPiace(event: Event, libro: any){
-    event.stopPropagation();
-    this.libroService.toggleMiPiace(libro.id);
-    libro.miPiace = !libro.miPiace;
+
+toggleMiPiace(event: Event, libro: any) {
+  event.stopPropagation();
+  const userId = this.auth.getUserId();
+  
+  if (!userId) {
+    alert('Devi essere loggato!');
+    return;
   }
+
+  this.wishlistService.toggle(userId, libro.idFormato, libro.miPiace).subscribe({
+    next: () => {
+      libro.miPiace = !libro.miPiace;
+
+      // forza l'aggiornamento del signal
+      // Poiché il signal è un array, devi creare una copia per triggerare la UI
+      this.libri.set([...this.libri()]);
+    },
+    error: (err) => {
+      console.error('Errore durante la modifica wishlist:', err);
+      // Qui vedremo nel log della console il messaggio di errore del backend
+      alert('Errore di comunicazione con il server');
+    }
+  });
+}
   
   eliminaLibro(event: Event, id: number): void {
     event.stopPropagation(); 

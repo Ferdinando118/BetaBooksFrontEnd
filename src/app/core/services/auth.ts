@@ -156,4 +156,9 @@ checkMe(): Observable<Utente> {
   getToken(): string | null { return this.grant().token; }
   isLoggedIn(): boolean { return this.grant().isLogged; }
   isAdmin(): boolean { return this.grant().isAdmin; }
+
+  getUserId(): number | null {
+    const utente = this.grant().utente;
+    return utente ? utente.id : null;
+  }
 }
