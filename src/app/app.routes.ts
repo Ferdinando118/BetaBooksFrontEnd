@@ -10,6 +10,7 @@ import { Audit } from './features/admin/audit/audit';
 import { EmailValidation } from './features/auth/pages/email-validation/email-validation';
 import { RecuperoPassword } from './features/recupero-password/recupero-password';
 import { NuovaPassword } from './features/nuova-password/nuova-password';
+import { Wishlist } from './features/wishlist/wishlist';
 
 
 export const routes: Routes = [
@@ -48,6 +49,11 @@ export const routes: Routes = [
     path: 'cart',
     canActivate: [authGuard],
     loadChildren: () => import('./features/cart/cart.module').then((m) => m.CartModule),
+  },
+  {
+    path: 'wishlist',
+    canActivate: [authGuard], 
+    component: Wishlist,
   },
   {
     path: 'profile',

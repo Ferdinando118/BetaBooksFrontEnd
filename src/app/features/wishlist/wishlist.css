@@ -1,0 +1,15 @@
+@import '../cart/pages/carrello/carrello.css';
+
+/* Sovrascrivi il layout del carrello per la wishlist */
+.carrello-layout {
+  display: block; /* O cambia in grid con una sola colonna */
+  max-width: 800px; /* Limita la larghezza massima per non farla troppo larga */
+  margin: 0 auto;  /* Centra il tutto */
+}
+
+/* Assicurati che gli item prendano tutto lo spazio disponibile */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

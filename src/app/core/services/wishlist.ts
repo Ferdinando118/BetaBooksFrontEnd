@@ -25,4 +25,12 @@ export class WishlistService {
     const params = new HttpParams().set('userId', userId).set('formatId', formatId);
     return this.http.get<boolean>(`${this.url}/controlla`, { params });
   }
+
+  getWishlistByUser(userId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}/utente/${userId}`);
+  }
+
+  spostaNelCarrello(idWishlist: number): Observable<any> {
+    return this.http.post(`${this.url}/${idWishlist}/sposta-carrello`, {});
+  }
 }

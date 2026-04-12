@@ -52,12 +52,19 @@ export class Catalogo implements OnInit {
       );
     }
 
+    //filtro categoria
     if (this.categoriaSelezionata) {
       risultati = risultati.filter(l =>
         l.categorie?.some((c: any) => c.nome === this.categoriaSelezionata)
       );
     }
 
+    //filtro preferiti
+    if (this.soloPreferiti) {
+      risultati = risultati.filter(l => l.miPiace === true);
+    }
+
+    //ordinamento
     switch (this.ordinamento) {
       case 'prezzo-asc':  risultati.sort((a, b) => (a.prezzo || 0) - (b.prezzo || 0)); break;
       case 'prezzo-desc': risultati.sort((a, b) => (b.prezzo || 0) - (a.prezzo || 0)); break;
@@ -202,7 +209,9 @@ private completaMappatura(data: LibroDTO[], libroIdsInWishlist: number[]): void 
     this.ricerca = '';
     this.categoriaSelezionata = '';
     this.ordinamento = 'titolo';
+    this.soloPreferiti = false;
     this.aggiornaFiltri();
+  
   }
 
   aggiungiAlCarrello(event: Event, libro: any): void {

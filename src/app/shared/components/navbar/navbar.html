@@ -11,6 +11,7 @@
 
     <div class="navbar-actions">
       @if (auth.isLoggedIn()) {
+        <a routerLink="/wishlist" routerLinkActive="active" class="icon-link" title="I miei desideri">❤️</a>
         <a routerLink="/cart" routerLinkActive="active" class="icon-link">🛒</a>
 
         <div class="user-dropdown-container">
@@ -63,6 +64,7 @@
   <div class="mobile-menu" [class.open]="menuAperto">
     <a routerLink="/" (click)="menuAperto = false">📚 Catalogo</a>
     @if (auth.isLoggedIn()) {
+      <a routerLink="/wishlist" (click)="menuAperto = false">❤️ Wishlist</a>
       <a routerLink="/cart" (click)="menuAperto = false">🛒 Carrello</a>
       <a routerLink="/profile" (click)="menuAperto = false">👤 Profilo</a>
     } @else {
