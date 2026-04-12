@@ -7,51 +7,64 @@ import { Spedizioni } from './features/admin/spedizioni/spedizioni';
 import { Tabelle } from './features/admin/tabelle/tabelle';
 import { Audit } from './features/admin/audit/audit';
 
+import { EmailValidation } from './features/auth/pages/email-validation/email-validation';
+import { RecuperoPassword } from './features/recupero-password/recupero-password';
+import { NuovaPassword } from './features/nuova-password/nuova-password';
+
+
 export const routes: Routes = [
   {
     path: '',
-    loadChildren: () =>
-      import('./features/home/home.module').then(m => m.HomeModule)
+    loadChildren: () => import('./features/home/home.module').then((m) => m.HomeModule),
   },
   {
     path: 'auth',
-    loadChildren: () =>
-      import('./features/auth/auth.module').then(m => m.AuthModule)
+    loadChildren: () => import('./features/auth/auth.module').then((m) => m.AuthModule),
   },
-  { 
-  path: 'admin/nuovo-libro', 
-  component: FormLibro, 
-  canActivate: [adminGuard] 
-},
-// RAGGRUPPAMENTO ROTTE ADMIN
+  {
+    path: 'admin/nuovo-libro',
+    component: FormLibro,
+    canActivate: [adminGuard],
+  },
+  // RAGGRUPPAMENTO ROTTE ADMIN
   {
     path: 'admin',
     canActivate: [adminGuard],
     children: [
-     // { path: 'nuovo-libro', component: FormLibro },
+      // { path: 'nuovo-libro', component: FormLibro },
       //{ path: 'modifica-libro/:id', component: FormLibro },
-    
-    { path: 'spedizioni', component: Spedizioni },
-    { path: 'tabelle',    component: Tabelle },
-    { path: 'audit',      component: Audit }
-    ]
+
+      { path: 'spedizioni', component: Spedizioni },
+      { path: 'tabelle', component: Tabelle },
+      { path: 'audit', component: Audit },
+    ],
   },
-{ 
-  path: 'admin/modifica-libro/:id', 
-  component: FormLibro, 
-  canActivate: [adminGuard] 
-},
+  {
+    path: 'admin/modifica-libro/:id',
+    component: FormLibro,
+    canActivate: [adminGuard],
+  },
   {
     path: 'cart',
     canActivate: [authGuard],
-    loadChildren: () =>
-      import('./features/cart/cart.module').then(m => m.CartModule)
+    loadChildren: () => import('./features/cart/cart.module').then((m) => m.CartModule),
   },
   {
     path: 'profile',
     canActivate: [authGuard],
-    loadChildren: () =>
-      import('./features/profile/profile.module').then(m => m.ProfileModule)
+    loadChildren: () => import('./features/profile/profile.module').then((m) => m.ProfileModule),
   },
-  { path: '**', redirectTo: '' }
+    {
+    path: 'emailValidation/:email',
+    component: EmailValidation,
+  },
+  {
+    path: 'recupero-password',
+    component: RecuperoPassword,
+  },
+  {
+    path: 'nuova-password',
+    component: NuovaPassword,
+  },
+  { path: '**', redirectTo: '' },
 ];

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule} from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
@@ -8,11 +8,12 @@ import { AuthService } from '../../../core/services/auth';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css'
+  styleUrl: './navbar.css',
 })
 export class Navbar {
   menuAperto = false;
   dropdownAperto = false;
+  loading = false;
 
   auth = inject(AuthService);
   private router = inject(Router);
@@ -35,5 +36,18 @@ export class Navbar {
   getIniziale(): string {
     const email = this.auth.grant().utente?.email;
     return email ? email.charAt(0).toUpperCase() : 'U';
+  }
+
+  mandaVerifica(): void {
+    const email = this.auth.grant().utente?.email;
+    if (typeof email === 'string') {
+      this.loading = true;
+      this.auth.verificaMail(email).subscribe({
+        next: () => {},
+        error: () => {
+          this.loading = false;
+        },
+      });
+    }
   }
 }

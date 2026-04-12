@@ -1,12 +1,19 @@
 <main class="profilo-content">
   <div class="profilo-nav-tabs">
-    <a routerLink="/profile" class="btn btn-primary" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+    <a
+      routerLink="/profile"
+      class="btn btn-primary"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
       👤 I miei Dati e Indirizzi
     </a>
     <a routerLink="/profile/ordini" class="btn btn-outline" routerLinkActive="active">
       📦 I miei Ordini
     </a>
+     <button class="btn btn-password" (click)="apriDialogPassword()">🔒 Cambia Password</button>
   </div>
+   
   <div class="card mb-4">
     <h2 class="section-title">Informazioni Personali</h2>
     <form [formGroup]="formProfilo" (ngSubmit)="salvaProfilo()">
@@ -31,8 +38,11 @@
           {{ loadingProfilo ? 'Salvataggio...' : 'Aggiorna Profilo' }}
         </button>
         @if (salvatoProfilo) {
-          <span class="text-success ms-3 fw-bold animate__animated animate__fadeIn">✅ Profilo salvato!</span>
+          <span class="text-success ms-3 fw-bold animate__animated animate__fadeIn"
+            >✅ Profilo salvato!</span
+          >
         }
+       
       </div>
     </form>
   </div>
@@ -57,26 +67,41 @@
         <div class="row g-3">
           @for (ind of indirizzi; track ind.id) {
             <div class="col-md-6">
-              <div class="border p-3 rounded position-relative h-100" [class.border-primary]="ind.isDefault">
-                
+              <div
+                class="border p-3 rounded position-relative h-100"
+                [class.border-primary]="ind.isDefault"
+              >
                 @if (ind.isDefault) {
-                  <span class="badge bg-primary position-absolute top-0 end-0 m-2">Predefinito</span>
+                  <span class="badge bg-primary position-absolute top-0 end-0 m-2"
+                    >Predefinito</span
+                  >
                 }
-                
-                <strong>{{ formProfilo.value.nome }} {{ formProfilo.value.cognome }}</strong><br>
-                {{ ind.via }}, {{ ind.civico }}<br>
-                {{ ind.cap }} {{ ind.comune }} ({{ ind.provincia }})<br>
-                {{ ind.paese }}<br>
-                
+
+                <strong>{{ formProfilo.value.nome }} {{ formProfilo.value.cognome }}</strong
+                ><br />
+                {{ ind.via }}, {{ ind.civico }}<br />
+                {{ ind.cap }} {{ ind.comune }} ({{ ind.provincia }})<br />
+                {{ ind.paese }}<br />
+
                 @if (ind.noteConsegna) {
-                  <small class="text-muted d-block mt-2"><strong>Note:</strong> {{ ind.noteConsegna }}</small>
+                  <small class="text-muted d-block mt-2"
+                    ><strong>Note:</strong> {{ ind.noteConsegna }}</small
+                  >
                 }
-                
+
                 <div class="mt-3">
-                  <button class="btn-icon edit-btn" (click)="apriFormIndirizzo(ind)" title="Modifica Indirizzo">
+                  <button
+                    class="btn-icon edit-btn"
+                    (click)="apriFormIndirizzo(ind)"
+                    title="Modifica Indirizzo"
+                  >
                     <span class="icon">✏️</span>
                   </button>
-                  <button class="btn-icon delete-btn" (click)="eliminaIndirizzo(ind.id!)" title="Elimina Indirizzo">
+                  <button
+                    class="btn-icon delete-btn"
+                    (click)="eliminaIndirizzo(ind.id!)"
+                    title="Elimina Indirizzo"
+                  >
                     <span class="icon">🗑️</span>
                   </button>
                 </div>
@@ -94,7 +119,6 @@
           <span class="draft-badge">💾 Bozza Salvata</span>
         </div>
         <form [formGroup]="formIndirizzo" (ngSubmit)="salvaIndirizzo()">
-          
           <div class="form-row">
             <div class="form-group flex-3">
               <label>Via/Piazza *</label>
@@ -117,7 +141,13 @@
             </div>
             <div class="form-group flex-1">
               <label>Prov. *</label>
-              <input type="text" formControlName="provincia" class="form-control" maxlength="2" placeholder="Es. MI" />
+              <input
+                type="text"
+                formControlName="provincia"
+                class="form-control"
+                maxlength="2"
+                placeholder="Es. MI"
+              />
             </div>
           </div>
 
@@ -130,14 +160,21 @@
 
           <div class="form-group mt-2">
             <label>Istruzione di consegna</label>
-            <textarea formControlName="noteConsegna" class="form-control" rows="2" placeholder="Es. Citofonare Rossi, lasciare al portiere..."></textarea>
+            <textarea
+              formControlName="noteConsegna"
+              class="form-control"
+              rows="2"
+              placeholder="Es. Citofonare Rossi, lasciare al portiere..."
+            ></textarea>
           </div>
 
           <div class="mt-3">
             <button type="submit" class="btn btn-primary me-2" [disabled]="loadingIndirizzo">
               {{ loadingIndirizzo ? 'Salvataggio...' : 'Salva Indirizzo' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="chiudiFormIndirizzo()">Annulla</button>
+            <button type="button" class="btn btn-secondary" (click)="chiudiFormIndirizzo()">
+              Annulla
+            </button>
           </div>
         </form>
       </div>
@@ -150,17 +187,58 @@
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-icon">🗑️</div>
         <h3 class="modal-title">Eliminare Indirizzo?</h3>
-        <p class="modal-message">Sei sicuro di voler eliminare questo indirizzo? L'azione non può essere annullata.</p>
+        <p class="modal-message">
+          Sei sicuro di voler eliminare questo indirizzo? L'azione non può essere annullata.
+        </p>
         <div class="modal-actions">
-          <button class="btn btn-secondary" (click)="chiudiModalEliminazione()">
-            Annulla
-          </button>
-          <button class="btn btn-danger" (click)="confermaEliminazione()">
-            Elimina
-          </button>
+          <button class="btn btn-secondary" (click)="chiudiModalEliminazione()">Annulla</button>
+          <button class="btn btn-danger" (click)="confermaEliminazione()">Elimina</button>
         </div>
       </div>
     </div>
   }
 
+@if (mostraDialogPassword) {
+  <div class="overlay" (click)="chiudiDialogPassword()">
+    <div class="dialog" (click)="$event.stopPropagation()">
+
+      <div class="dialog-header">
+        <h2>Cambia Password</h2>
+        <button class="close-btn" (click)="chiudiDialogPassword()">✕</button>
+      </div>
+
+      <div class="dialog-body">
+
+        
+
+        @if (successoPassword) {
+          <p class="successo">✅ Password aggiornata! Verrai disconnesso...</p>
+        }
+
+        <div class="field">
+          <label>Password attuale</label>
+          <input type="password" [(ngModel)]="formPassword.vecchiaPassword" placeholder="••••••••" />
+        </div>
+        <div class="field">
+          <label>Nuova password</label>
+          <input type="password" [(ngModel)]="formPassword.nuovaPassword" placeholder="••••••••" />
+        </div>
+        <div class="field">
+          <label>Conferma nuova password</label>
+          <input type="password" [(ngModel)]="formPassword.confermaPassword" placeholder="••••••••" />
+        </div>
+
+        @if (errorePassword) {
+          <p class="errore">⚠️ {{ errorePassword }}</p>
+        }
+
+        <div class="dialog-footer">
+          <button class="btn-annulla" (click)="chiudiDialogPassword()">Annulla</button>
+          <button class="btn-salva" (click)="salvaPassword()">Salva</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+}
 </main>

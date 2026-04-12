@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-audit',
-  imports: [CommonModule, DatePipe, JsonPipe, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './audit.html',
   styleUrl: './audit.css',
 })
