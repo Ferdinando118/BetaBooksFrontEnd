@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { PasswordRecoveryReq, PasswordReq, Resp, Utente } from '../models/models';
+import { PasswordRecoveryReq, PasswordReq, Resp, Utente, Registrazione } from '../models/models';
 
 interface AuthResponse {
   token: string;
@@ -114,10 +114,13 @@ login(email: string, password: string): Observable<any> {
       });
     })
   );
-}
+}/*
   register(data: { email: string; password: string }): Observable<Utente> {
     return this.http.post<Utente>(`${this.API_UTENTI}/register`, data);
-  }
+  }*/
+ register(data: Registrazione): Observable<Utente> {
+  return this.http.post<Utente>(`${this.API_UTENTI}/register`, data);
+}
 
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
