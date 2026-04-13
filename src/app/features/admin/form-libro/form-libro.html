@@ -1,34 +1,47 @@
 <div class="admin-container">
   <div class="form-card">
-    
     <div class="form-header">
       <h2>{{ editMode ? '📝 Modifica Libro' : '📚 Nuovo Libro' }}</h2>
-      <p class="text-muted" style="margin-top: 5px; font-size: 0.9rem;">
+      <p class="text-muted" style="margin-top: 5px; font-size: 0.9rem">
         Inserisci i dettagli principali del libro e configura le varianti disponibili.
       </p>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="salva()">
-      
       <div class="row g-3 mb-4">
-        
         <div class="col-12">
-          <label class="form-label">Titolo del libro <span class="text-danger d-inline">*</span></label>
-          <input type="text" formControlName="titolo" class="form-control" placeholder="Es. Il Signore degli Anelli"
-                 [class.is-invalid]="form.get('titolo')?.invalid && form.get('titolo')?.touched">
+          <label class="form-label"
+            >Titolo del libro <span class="text-danger d-inline">*</span></label
+          >
+          <input
+            type="text"
+            formControlName="titolo"
+            class="form-control"
+            placeholder="Es. Il Signore degli Anelli"
+            [class.is-invalid]="form.get('titolo')?.invalid && form.get('titolo')?.touched"
+          />
         </div>
 
         <div class="col-12">
-          <label class="form-label">Trama / Descrizione <span class="text-danger d-inline">*</span></label>
-          <textarea formControlName="descrizione" class="form-control" rows="4" placeholder="Inserisci una breve trama o sinossi..."></textarea>
+          <label class="form-label"
+            >Trama / Descrizione <span class="text-danger d-inline">*</span></label
+          >
+          <textarea
+            formControlName="descrizione"
+            class="form-control"
+            rows="4"
+            placeholder="Inserisci una breve trama o sinossi..."
+          ></textarea>
         </div>
 
         <div class="col-md-6">
           <label class="form-label">Autore <span class="text-danger d-inline">*</span></label>
           <select formControlName="idAutore" class="form-select">
             <option [ngValue]="null" disabled selected>Seleziona l'autore...</option>
-            @for (a of autori(); track (a.id || a.id_autore)) {
-              <option [ngValue]="a.id || a.id_autore">{{ a.nome }} {{ a.cognome }}</option>
+            @for (a of autori(); track a.id || a.id_autore) {
+              @if (a.attivo === 'true' || a.attivo === 1 || a.attivo === true) {
+                <option [ngValue]="a.id || a.id_autore">{{ a.nome }} {{ a.cognome }}</option>
+              }
             }
           </select>
         </div>
@@ -37,42 +50,51 @@
           <label class="form-label">Editore <span class="text-danger d-inline">*</span></label>
           <select formControlName="idEditore" class="form-select">
             <option [ngValue]="null" disabled selected>Seleziona l'editore...</option>
-            @for (e of editori(); track (e.id || e.id_editore)) {
-              <option [ngValue]="e.id || e.id_editore">{{ e.nome }}</option>
+            @for (e of editori(); track e.id || e.id_editore) {
+              @if (e.attivo === 'true' || e.attivo === 1 || e.attivo === true) {
+                <option [ngValue]="e.id || e.id_editore">{{ e.nome }}</option>
+              }
             }
           </select>
         </div>
 
         <div class="col-12 mt-3">
-          <label class="form-label">Categorie (Genere) <span class="text-danger d-inline">*</span></label>
-          
+          <label class="form-label"
+            >Categorie (Genere) <span class="text-danger d-inline">*</span></label
+          >
+
           <div class="categorie-grid">
-            @for (c of categorie(); track (c.id || c.id_categoria)) {
-              <div class="categoria-pill">
-                <input type="checkbox" 
-                       [id]="'cat-' + (c.id || c.id_categoria)" 
-                       [value]="c.id || c.id_categoria"
-                       [checked]="form.get('idCategorie')?.value.includes(c.id || c.id_categoria)"
-                       (change)="onCategoriaChange(c.id || c.id_categoria)">
-                <label [for]="'cat-' + (c.id || c.id_categoria)">{{ c.nome }}</label>
-              </div>
+            @for (c of categorie(); track c.id || c.id_categoria) {
+              @if (c.attivo === 'true' || c.attivo === 1 || c.attivo === true) {
+                <div class="categoria-pill">
+                  <input
+                    type="checkbox"
+                    [id]="'cat-' + (c.id || c.id_categoria)"
+                    [value]="c.id || c.id_categoria"
+                    [checked]="form.get('idCategorie')?.value.includes(c.id || c.id_categoria)"
+                    (change)="onCategoriaChange(c.id || c.id_categoria)"
+                  />
+                  <label [for]="'cat-' + (c.id || c.id_categoria)">{{ c.nome }}</label>
+                </div>
+              }
             }
           </div>
-          
+
           @if (form.get('idCategorie')?.invalid && form.get('idCategorie')?.touched) {
             <small class="text-danger mt-2">Seleziona almeno una categoria.</small>
           }
         </div>
-
       </div>
 
-      <hr>
+      <hr />
 
       <div class="formati-section">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <div>
             <h5>Versioni e Prezzi 📦</h5>
-            <p class="text-muted mb-0">Gestisci i formati, inserisci l'ISBN, i prezzi e le copertine per ciascun formato.</p>
+            <p class="text-muted mb-0">
+              Gestisci i formati, inserisci l'ISBN, i prezzi e le copertine per ciascun formato.
+            </p>
           </div>
         </div>
 
@@ -82,17 +104,20 @@
               <tr>
                 <th style="width: 12%">Supporto</th>
                 <th style="width: 13%">Copertina</th>
-                <th style="width: 15%">ISBN</th> 
+                <th style="width: 15%">ISBN</th>
                 <th style="width: 12%">Prezzo</th>
                 <th style="width: 8%">Q.tà</th>
-                <th style="width: 25%">Immagine</th> <th style="width: 8%" class="text-center">Attivo</th> 
+                <th style="width: 25%">Immagine</th>
+                <th style="width: 8%" class="text-center">Attivo</th>
                 <th style="width: 7%" class="text-center">Azioni</th>
               </tr>
             </thead>
             <tbody>
               @for (formato of formati.controls; let i = $index; track i) {
-                <tr [formGroup]="getFormatoGroup(i)" [class.opacity-50]="!getFormatoGroup(i).get('attivo')?.value">
-                  
+                <tr
+                  [formGroup]="getFormatoGroup(i)"
+                  [class.opacity-50]="!getFormatoGroup(i).get('attivo')?.value"
+                >
                   <td>
                     <select formControlName="tipoSupporto" class="form-select form-select-sm">
                       @for (tipo of tipiSupporto; track tipo.value) {
@@ -109,19 +134,42 @@
                         }
                       </select>
                     } @else {
-                      <div style="padding: 6px; color: #94a3b8; font-size: 0.85rem; text-align: center; background: #f1f5f9; border-radius: 6px;">
+                      <div
+                        style="
+                          padding: 6px;
+                          color: #94a3b8;
+                          font-size: 0.85rem;
+                          text-align: center;
+                          background: #f1f5f9;
+                          border-radius: 6px;
+                        "
+                      >
                         Digitale
                       </div>
                     }
                   </td>
 
                   <td>
-                    <input type="text" formControlName="isbn" class="form-control form-control-sm" placeholder="Es: 978880466..."
-                           [class.is-invalid]="getFormatoGroup(i).get('isbn')?.invalid && getFormatoGroup(i).get('isbn')?.touched"
-                           maxlength="13">
-                           
-                    @if (getFormatoGroup(i).get('isbn')?.invalid && getFormatoGroup(i).get('isbn')?.touched) {
-                      <small class="text-danger d-block mt-1" style="font-size: 0.7rem; line-height: 1.1;">
+                    <input
+                      type="text"
+                      formControlName="isbn"
+                      class="form-control form-control-sm"
+                      placeholder="Es: 978880466..."
+                      [class.is-invalid]="
+                        getFormatoGroup(i).get('isbn')?.invalid &&
+                        getFormatoGroup(i).get('isbn')?.touched
+                      "
+                      maxlength="13"
+                    />
+
+                    @if (
+                      getFormatoGroup(i).get('isbn')?.invalid &&
+                      getFormatoGroup(i).get('isbn')?.touched
+                    ) {
+                      <small
+                        class="text-danger d-block mt-1"
+                        style="font-size: 0.7rem; line-height: 1.1"
+                      >
                         Inserisci 13 cifre.
                       </small>
                     }
@@ -130,41 +178,59 @@
                   <td>
                     <div class="input-group input-group-sm">
                       <span class="input-group-text">€</span>
-                      <input type="number" formControlName="prezzo" class="form-control" step="0.01" min="0.01">
+                      <input
+                        type="number"
+                        formControlName="prezzo"
+                        class="form-control"
+                        step="0.01"
+                        min="0.01"
+                      />
                     </div>
                   </td>
 
                   <td>
-                    @if (getFormatoGroup(i).get('tipoSupporto')?.value !== 'EBOOK') {
-                      <input type="number" formControlName="quantita" class="form-control form-control-sm" min="0">
-                    } @else {
-                      <div style="padding: 6px; color: #94a3b8; font-size: 1.2rem; line-height: 1; text-align: center; background: #f1f5f9; border-radius: 6px;" title="Quantità illimitata per i formati digitali">
-                        
-                      </div>
-                    }
+                    <input type="number" formControlName="quantita" class="form-control form-control-sm" min="1">
                   </td>
 
                   <td>
                     <div class="d-flex align-items-center gap-2">
                       @if (getFormatoGroup(i).get('copertina')?.value) {
-                        <img [src]="getImmagineUrl(getFormatoGroup(i).get('copertina')?.value)" alt="Copertina" style="max-height: 40px; border-radius: 4px; border: 1px solid #ccc;">
+                        <img
+                          [src]="getImmagineUrl(getFormatoGroup(i).get('copertina')?.value)"
+                          alt="Copertina"
+                          style="max-height: 40px; border-radius: 4px; border: 1px solid #ccc"
+                        />
                       }
-                      <input type="file" (change)="onFileSelected($event, i)" class="form-control form-control-sm" accept="image/*">
+                      <input
+                        type="file"
+                        (change)="onFileSelected($event, i)"
+                        class="form-control form-control-sm"
+                        accept="image/*"
+                      />
                     </div>
                   </td>
 
                   <td class="text-center">
                     <div class="form-check form-switch d-flex justify-content-center m-0">
-                      <input class="form-check-input" type="checkbox" formControlName="attivo" style="cursor: pointer; width: 2.5em; height: 1.25em;">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        formControlName="attivo"
+                        style="cursor: pointer; width: 2.5em; height: 1.25em"
+                      />
                     </div>
                   </td>
 
                   <td class="text-center">
-                    <button type="button" class="btn btn-sm btn-danger" (click)="rimuoviFormato(i)" title="Rimuovi questo formato">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger"
+                      (click)="rimuoviFormato(i)"
+                      title="Rimuovi questo formato"
+                    >
                       ✕
                     </button>
                   </td>
-
                 </tr>
               }
             </tbody>
@@ -172,54 +238,92 @@
         </div>
 
         <div class="mt-3">
-          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="aggiungiFormatoPredefinito('CARTACEO', 'FLESSIBILE')">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="aggiungiFormatoPredefinito('CARTACEO', 'FLESSIBILE')"
+          >
             + Copertina Flessibile
           </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="aggiungiFormatoPredefinito('CARTACEO', 'RIGIDA')">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="aggiungiFormatoPredefinito('CARTACEO', 'RIGIDA')"
+          >
             + Copertina Rigida
           </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="aggiungiFormatoPredefinito('EBOOK', 'FLESSIBILE')">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            (click)="aggiungiFormatoPredefinito('EBOOK', 'FLESSIBILE')"
+          >
             + E-book
           </button>
         </div>
       </div>
 
-      <div style="background: #fee2e2; border: 2px solid #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 20px; margin-top: 20px;">
-        <h4 style="color: #b91c1c;">🕵️ Debug Form (Cerca la scritta INVALID)</h4>
-        
-        <div style="display: flex; gap: 40px; font-family: monospace; font-size: 14px;">
+      <div
+        style="
+          background: #fee2e2;
+          border: 2px solid #ef4444;
+          padding: 15px;
+          border-radius: 8px;
+          margin-bottom: 20px;
+          margin-top: 20px;
+        "
+      >
+        <h4 style="color: #b91c1c">🕵️ Debug Form (Cerca la scritta INVALID)</h4>
+
+        <div style="display: flex; gap: 40px; font-family: monospace; font-size: 14px">
           <div>
-            <strong>CAMPI PRINCIPALI:</strong><br>
-            Titolo: <b>{{ form.get('titolo')?.status }}</b><br>
-            Descrizione: <b>{{ form.get('descrizione')?.status }}</b><br>
-            Autore: <b>{{ form.get('idAutore')?.status }}</b><br>
-            Editore: <b>{{ form.get('idEditore')?.status }}</b><br>
-            Categorie: <b>{{ form.get('idCategorie')?.status }}</b><br>
+            <strong>CAMPI PRINCIPALI:</strong><br />
+            Titolo: <b>{{ form.get('titolo')?.status }}</b
+            ><br />
+            Descrizione: <b>{{ form.get('descrizione')?.status }}</b
+            ><br />
+            Autore: <b>{{ form.get('idAutore')?.status }}</b
+            ><br />
+            Editore: <b>{{ form.get('idEditore')?.status }}</b
+            ><br />
+            Categorie: <b>{{ form.get('idCategorie')?.status }}</b
+            ><br />
           </div>
-          
+
           <div>
-            <strong>FORMATI ({{ formati.length }}):</strong><br>
+            <strong>FORMATI ({{ formati.length }}):</strong><br />
             @for (f of formati.controls; let i = $index; track i) {
-              <div style="margin-bottom: 10px; border-bottom: 1px solid #fca5a5; padding-bottom: 5px;">
-                Riga {{ i + 1 }} - Globale: <b>{{ f.status }}</b><br>
-                - Supporto: <b>{{ f.get('tipoSupporto')?.status }}</b><br>
-                - Copertina: <b>{{ f.get('tipoCopertina')?.status }}</b><br>
-                - ISBN: <b>{{ f.get('isbn')?.status }}</b> <span style="color:red">{{ f.get('isbn')?.errors | json }}</span><br>
-                - Prezzo: <b>{{ f.get('prezzo')?.status }}</b> <span style="color:red">{{ f.get('prezzo')?.errors | json }}</span><br>
-                - Quantità: <b>{{ f.get('quantita')?.status }}</b> <span style="color:red">{{ f.get('quantita')?.errors | json }}</span><br>
+              <div
+                style="margin-bottom: 10px; border-bottom: 1px solid #fca5a5; padding-bottom: 5px"
+              >
+                Riga {{ i + 1 }} - Globale: <b>{{ f.status }}</b
+                ><br />
+                - Supporto: <b>{{ f.get('tipoSupporto')?.status }}</b
+                ><br />
+                - Copertina: <b>{{ f.get('tipoCopertina')?.status }}</b
+                ><br />
+                - ISBN: <b>{{ f.get('isbn')?.status }}</b>
+                <span style="color: red">{{ f.get('isbn')?.errors | json }}</span
+                ><br />
+                - Prezzo: <b>{{ f.get('prezzo')?.status }}</b>
+                <span style="color: red">{{ f.get('prezzo')?.errors | json }}</span
+                ><br />
+                - Quantità: <b>{{ f.get('quantita')?.status }}</b>
+                <span style="color: red">{{ f.get('quantita')?.errors | json }}</span
+                ><br />
               </div>
             }
           </div>
         </div>
       </div>
-      
+
       <div class="form-actions mt-5">
-        <button type="button" class="btn btn-secondary" routerLink="/catalogo" [disabled]="loading">Annulla</button>
+        <button type="button" class="btn btn-secondary" routerLink="/catalogo" [disabled]="loading">
+          Annulla
+        </button>
         <button type="submit" class="btn btn-primary" [disabled]="loading || formati.length === 0">
           {{ editMode ? 'Aggiorna Libro' : 'Crea Libro' }}
         </button>
       </div>
-      
     </form>
   </div>
 </div>
