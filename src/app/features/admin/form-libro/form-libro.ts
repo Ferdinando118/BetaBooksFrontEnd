@@ -107,9 +107,16 @@ export class FormLibro implements OnInit {
     }
   }
 
-  rimuoviFormato(index: number): void {
+rimuoviFormato(index: number): void {
     this.formati.removeAt(index);
-    this.selectedFiles.delete(index); // Rimuovi il file dalla mappa se il formato viene cancellato
+    
+    // Riassegna gli indici della mappa per mantenere allineati i file
+    const nuovaMappa = new Map<number, File>();
+    this.selectedFiles.forEach((file, key) => {
+      if (key < index) nuovaMappa.set(key, file);
+      if (key > index) nuovaMappa.set(key - 1, file); // Scala di uno
+    });
+    this.selectedFiles = nuovaMappa;
   }
 
   getFormatoGroup(index: number): FormGroup {
