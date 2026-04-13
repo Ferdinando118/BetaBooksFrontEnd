@@ -12,7 +12,7 @@ import { CategoriaService } from '../../../core/services/categoria';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './form-libro.html',
-  styleUrl: './form-libro.css'
+  styleUrl: './form-libro.css',
 })
 export class FormLibro implements OnInit {
   private autoreService = inject(AutoreService);
@@ -27,7 +27,7 @@ export class FormLibro implements OnInit {
   editMode = false;
   idLibro?: number;
   loading = false;
-  
+
   // NUOVO: Usiamo una Map per tenere traccia del file caricato per ogni indice del FormArray
   selectedFiles = new Map<number, File>();
 
@@ -38,12 +38,12 @@ export class FormLibro implements OnInit {
 
   tipiSupporto = [
     { value: 'CARTACEO', label: 'Cartaceo' },
-    { value: 'EBOOK', label: 'E-book' }
+    { value: 'EBOOK', label: 'E-book' },
   ];
 
   tipiCopertina = [
     { value: 'FLESSIBILE', label: 'Copertina flessibile' },
-    { value: 'RIGIDA', label: 'Copertina rigida' }
+    { value: 'RIGIDA', label: 'Copertina rigida' },
   ];
 
   constructor() {
@@ -52,8 +52,8 @@ export class FormLibro implements OnInit {
       descrizione: ['', Validators.required],
       idAutore: [null, Validators.required],
       idEditore: [null, Validators.required],
-      idCategorie: [[], Validators.required], 
-      formati: this.fb.array([])
+      idCategorie: [[], Validators.required],
+      formati: this.fb.array([]),
     });
   }
 
@@ -75,7 +75,16 @@ export class FormLibro implements OnInit {
     return this.form.get('formati') as FormArray;
   }
 
-  creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSIBILE', prezzo = 1.0, quantita = 1, isbn = '', attivo = true, copertina = ''): FormGroup {
+  creaFormatiGroup(
+    id?: number,
+    tipoSupporto = 'CARTACEO',
+    tipoCopertina = 'FLESSIBILE',
+    prezzo = 1.0,
+    quantita = 1,
+    isbn = '',
+    attivo = true,
+    copertina = '',
+  ): FormGroup {
     return this.fb.group({
       id: [id],
       tipoSupporto: [tipoSupporto, Validators.required],
@@ -84,15 +93,15 @@ export class FormLibro implements OnInit {
       prezzo: [prezzo, [Validators.required, Validators.min(0)]],
       quantita: [quantita, [Validators.min(0)]],
       attivo: [attivo],
-      copertina: [copertina] 
+      copertina: [copertina],
     });
   }
 
   aggiungiFormatoPredefinito(tipoSupporto: string, tipoCopertina: string): void {
-    const esiste = this.formati.value.some((f: any) => 
-      f.tipoSupporto === tipoSupporto && f.tipoCopertina === tipoCopertina
+    const esiste = this.formati.value.some(
+      (f: any) => f.tipoSupporto === tipoSupporto && f.tipoCopertina === tipoCopertina,
     );
-    
+
     if (!esiste) {
       this.formati.push(this.creaFormatiGroup(undefined, tipoSupporto, tipoCopertina));
     }
@@ -108,9 +117,9 @@ export class FormLibro implements OnInit {
   }
 
   caricaAnagrafiche() {
-    this.autoreService.getAll().subscribe(data => this.autori.set(data));
-    this.editoreService.getAll().subscribe(data => this.editori.set(data));
-    this.categoriaService.getAll().subscribe(data => this.categorie.set(data));
+    this.autoreService.getAll().subscribe((data) => this.autori.set(data));
+    this.editoreService.getAll().subscribe((data) => this.editori.set(data));
+    this.categoriaService.getAll().subscribe((data) => this.categorie.set(data));
   }
 
   caricaDatiLibro(id: number) {
@@ -119,27 +128,29 @@ export class FormLibro implements OnInit {
         this.form.patchValue({
           titolo: res.titolo,
           descrizione: res.descrizione,
-          idAutore: res.autore?.id_autore || res.autore?.id, 
-          idEditore: res.editore?.id_editore || res.editore?.id, 
-          idCategorie: res.categorie?.map((c: any) => c.id_categoria || c.id) || []
+          idAutore: res.autore?.id_autore || res.autore?.id,
+          idEditore: res.editore?.id_editore || res.editore?.id,
+          idCategorie: res.categorie?.map((c: any) => c.id_categoria || c.id) || [],
         });
 
         if (res.formati && res.formati.length > 0) {
           this.formatiEsistenti.set(res.formati);
           res.formati.forEach((f: any) => {
-            this.formati.push(this.creaFormatiGroup(
-              f.id,
-              f.tipoSupporto || 'CARTACEO',
-              f.tipoCopertina || 'FLESSIBILE',
-              f.prezzo || 1.0,
-              f.quantita || 0,
-              f.isbn || '',
-              f.attivo !== undefined ? f.attivo : true,
-              f.copertina 
-            ));
+            this.formati.push(
+              this.creaFormatiGroup(
+                f.id,
+                f.tipoSupporto || 'CARTACEO',
+                f.tipoCopertina || 'FLESSIBILE',
+                f.prezzo || 1.0,
+                f.quantita || 0,
+                f.isbn || '',
+                f.attivo !== undefined ? f.attivo : true,
+                f.copertina,
+              ),
+            );
           });
         }
-      }
+      },
     });
   }
 
@@ -161,12 +172,12 @@ export class FormLibro implements OnInit {
   }
 
   onCategoriaChange(idCategoria: number) {
-    const categorieAttuali = this.form.get('idCategorie')?.value as number[] || [];
-    
+    const categorieAttuali = (this.form.get('idCategorie')?.value as number[]) || [];
+
     const nuoveCategorie = categorieAttuali.includes(idCategoria)
-      ? categorieAttuali.filter(id => id !== idCategoria)
+      ? categorieAttuali.filter((id) => id !== idCategoria)
       : [...categorieAttuali, idCategoria];
-      
+
     this.form.patchValue({ idCategorie: nuoveCategorie });
     this.form.get('idCategorie')?.markAsTouched();
   }
@@ -174,12 +185,12 @@ export class FormLibro implements OnInit {
   salva() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      alert("Il form contiene errori. Ricontrollare i dati inseriti.");
+      alert('Il form contiene errori. Ricontrollare i dati inseriti.');
       return;
     }
 
     if (this.formati.length === 0) {
-      alert("Aggiungi almeno un formato al libro.");
+      alert('Aggiungi almeno un formato al libro.');
       return;
     }
 
@@ -191,31 +202,36 @@ export class FormLibro implements OnInit {
       idAutore: Number(this.form.value.idAutore),
       idEditore: Number(this.form.value.idEditore),
       idCategorie: this.form.value.idCategorie?.map((id: any) => Number(id)) || [],
-      tipoSupporto: 'CARTACEO', 
-      tipoCopertina: 'FLESSIBILE', 
-      prezzo: 0, 
-      quantita: 0, 
-      isbn: '' 
+      tipoSupporto: 'CARTACEO',
+      tipoCopertina: 'FLESSIBILE',
+      prezzo: 0,
+      quantita: 0,
+      isbn: '',
     };
 
     if (this.editMode) {
       libroData.id = this.idLibro;
       this.libroService.update(libroData).subscribe({
         next: () => this.salvaFormati(),
-        error: (err) => this.gestisciErrore(err)
+        error: (err) => this.gestisciErrore(err),
       });
     } else {
       this.libroService.create(libroData).subscribe({
         next: (res: any) => {
-          const nuovoIdLibro = res.id || res.id_libro || (res.obj ? res.obj.id || res.obj : null); 
+          const nuovoIdLibro = res.id || res.id_libro || (res.obj ? res.obj.id || res.obj : null);
           if (nuovoIdLibro) {
             this.idLibro = nuovoIdLibro;
             this.salvaFormati();
           } else {
-            this.gestisciErrore({ error: { message: "Salvataggio riuscito, ma non trovo l'ID del libro per salvare i formati. Controlla la console." } });
+            this.gestisciErrore({
+              error: {
+                message:
+                  "Salvataggio riuscito, ma non trovo l'ID del libro per salvare i formati. Controlla la console.",
+              },
+            });
           }
         },
-        error: (err) => this.gestisciErrore(err)
+        error: (err) => this.gestisciErrore(err),
       });
     }
   }
@@ -235,28 +251,34 @@ export class FormLibro implements OnInit {
         id: formato.id,
         idLibro: this.idLibro!,
         tipoSupporto: formato.tipoSupporto,
-        tipoCopertina: formato.tipoSupporto === 'EBOOK' ? null : (formato.tipoCopertina || 'FLESSIBILE'),
+        tipoCopertina:
+          formato.tipoSupporto === 'EBOOK' ? null : formato.tipoCopertina || 'FLESSIBILE',
         isbn: formato.isbn && formato.isbn.trim() !== '' ? formato.isbn : null,
         prezzo: formato.prezzo || 0,
         quantita: formato.quantita || 0,
         attivo: formato.attivo,
-        copertina: formato.copertina 
+        copertina: formato.copertina,
       };
 
-      const operazione = formato.id 
-        ? this.libroService.updateFormato(formatoData) 
+      const operazione = formato.id
+        ? this.libroService.updateFormato(formatoData)
         : this.libroService.createFormato(this.idLibro!, formatoData);
 
       operazione.subscribe({
         next: (res: any) => {
-          const idNuovoFormato = res.id || res.id_formato || (res.obj ? res.obj.id || res.obj : res);
-          
-          // Controlliamo se per QUESTO specifico formato (indice) c'è un file da caricare
+          const idNuovoFormato: number | null = formato.id
+            ? Number(formato.id)
+            : Number(res.id || res.id_formato || res.obj?.id || res.obj) || null;
+
+          console.log('ID formato risolto:', idNuovoFormato, '| tipo:', typeof idNuovoFormato);
+
           const fileToUpload = this.selectedFiles.get(index);
 
           if (fileToUpload && idNuovoFormato) {
-            console.log(`Avvio upload copertina per il formato ${index + 1} (ID: ${idNuovoFormato})`);
-            
+            console.log(
+              `Avvio upload copertina per il formato ${index + 1} (ID: ${idNuovoFormato})`,
+            );
+
             this.libroService.uploadCopertina(idNuovoFormato, fileToUpload).subscribe({
               next: () => {
                 console.log(`✅ Upload immagine completato per formato ${index + 1}!`);
@@ -267,9 +289,8 @@ export class FormLibro implements OnInit {
                 console.error(`❌ Errore upload immagine per formato ${index + 1}:`, err);
                 operazioniCompletate++;
                 if (operazioniCompletate === totaleOperazioni) this.finalizza();
-              }
+              },
             });
-            
           } else {
             operazioniCompletate++;
             if (operazioniCompletate === totaleOperazioni) this.finalizza();
@@ -279,25 +300,25 @@ export class FormLibro implements OnInit {
           console.error(`Errore nel salvataggio del formato ${index + 1}:`, err);
           operazioniCompletate++;
           if (operazioniCompletate === totaleOperazioni) this.finalizza();
-        }
+        },
       });
     });
   }
 
   private finalizza() {
     this.loading = false;
-    alert("Libro e formati salvati con successo!");
+    alert('Libro e formati salvati con successo!');
     this.router.navigate(['/catalogo']);
   }
 
   private gestisciErrore(err: any) {
     this.loading = false;
-    console.group("🔴 DETTAGLIO ERRORE SERVER (HTTP " + err.status + ")");
-    console.error("Oggetto Errore Completo:", err);
-    console.error("Messaggio dal Backend:", err.error?.message || "Nessun messaggio");
-    console.error("Dettagli validazione (se presenti):", err.error?.errors || err.error?.details);
+    console.group('🔴 DETTAGLIO ERRORE SERVER (HTTP ' + err.status + ')');
+    console.error('Oggetto Errore Completo:', err);
+    console.error('Messaggio dal Backend:', err.error?.message || 'Nessun messaggio');
+    console.error('Dettagli validazione (se presenti):', err.error?.errors || err.error?.details);
     console.groupEnd();
-    
-    alert("Attenzione: " + (err.error?.message || "Errore imprevisto dal server."));
+
+    alert('Attenzione: ' + (err.error?.message || 'Errore imprevisto dal server.'));
   }
 }
