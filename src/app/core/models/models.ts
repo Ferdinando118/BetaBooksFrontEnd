@@ -97,7 +97,7 @@ export interface CarrelloItemDTO {
   titoloLibro: string;
   autoreNome: string;     
   autoreCognome: string; 
-  nomeEditore: string;   
+  editoreNome: string;   
   copertina: string;   
   quantita: number;
   prezzoUnitario: number;

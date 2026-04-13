@@ -22,22 +22,36 @@
 
 .item-card {
   display: flex;
-  gap: 16px;
+  gap: 24px; /* Aumentato lo spazio tra immagine e info */
   align-items: center;
-  padding: 16px;
+  padding: 24px; /* Più padding interno per far "respirare" il contenuto */
+  background: white; /* Assicurati che risalti bene */
+  border-radius: var(--bb-radius-md); /* Bordi leggermente più arrotondati */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Aggiunta una leggera ombra per l'effetto "card" */
 }
 
 .item-card img {
-  width: 70px;
-  height: 100px;
-  object-fit: cover;
+  width: 100px;  /* Ingrandito da 70px a 100px */
+  height: 140px; /* Ingrandito da 100px a 140px */
+  object-fit: contain; 
+  background-color: #f8f9fa; 
   border-radius: var(--bb-radius-sm);
   flex-shrink: 0;
+  transition: transform 0.2s; /* Piccolo effetto carino al passaggio del mouse */
+}
+
+/* Opzionale: ingrandiamo anche il testo per bilanciare */
+.item-info h3 { 
+  font-size: 18px; /* Aumentato da 15px */
+}
+
+.item-prezzo-unit { 
+  font-size: 15px; /* Aumentato da 13px */
 }
 
 .item-info { flex: 1; }
-.item-info h3 { font-size: 15px; font-weight: 600; color: var(--bb-blue); }
-.item-prezzo-unit { font-size: 13px; color: var(--bb-gray-600); margin-top: 4px; }
+
+
 
 .item-azioni {
   display: flex;
