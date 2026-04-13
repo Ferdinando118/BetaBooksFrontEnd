@@ -45,7 +45,7 @@
                 <th *ngIf="tabAttiva === 'editori'">Denominazione</th>
                 <th *ngIf="tabAttiva === 'categorie'">Categoria</th>
                 <th>Attivo</th>
-                <th class="text-center" style="width: 100px"></th>
+                <th class="text-center" style="width: 150px"></th>
               </tr>
             </thead>
             <tbody>
@@ -83,6 +83,14 @@
                     title="Modifica"
                   >
                     <span>✏️</span>
+                  </button>
+                  <button
+                    class="btn-action-delete"
+                    (click)="elimina(item)"
+                    type="button"
+                    title="Elimina"
+                  >
+                    <span>🗑️</span>
                   </button>
                 </td>
               </tr>

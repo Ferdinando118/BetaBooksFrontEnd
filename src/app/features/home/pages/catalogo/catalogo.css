@@ -198,6 +198,73 @@
   justify-content: space-between;
   margin-top: auto;
   padding-top: 8px;
+  gap: 12px;
+}
+
+.price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--bb-orange);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Pulsanti icona circolari */
+.btn.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn.btn-icon.btn-like {
+  background: rgba(26, 58, 107, 0.08);
+  color: var(--bb-blue);
+}
+
+.btn.btn-icon.btn-like:hover {
+  background: rgba(26, 58, 107, 0.15);
+  transform: scale(1.1);
+}
+
+.btn.btn-icon.btn-like.liked {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+}
+
+.btn.btn-icon.btn-warning {
+  background: rgba(255, 193, 7, 0.15);
+  color: var(--bb-warning, #ffc107);
+}
+
+.btn.btn-icon.btn-warning:hover {
+  background: rgba(255, 193, 7, 0.25);
+  transform: scale(1.1);
+}
+
+.btn.btn-icon.btn-danger {
+  background: rgba(255, 107, 107, 0.15);
+  color: var(--bb-error, #ff6b6b);
+}
+
+.btn.btn-icon.btn-danger:hover {
+  background: rgba(255, 107, 107, 0.25);
+  transform: scale(1.1);
 }
 .book-cover img {
   width: 100%;

@@ -48,6 +48,30 @@ modifica(item: any) {
   this.showModal = true;
 }
 
+elimina(item: any) {
+  const conferma = confirm(`Sei sicuro di voler eliminare questo elemento?`);
+  if (!conferma) return;
+
+  let service: any;
+
+  if (this.tabAttiva === 'autori') service = this.autoreService;
+  else if (this.tabAttiva === 'editori') service = this.editoreService;
+  else if (this.tabAttiva === 'categorie') service = this.categoriaService;
+
+  if (service && service.delete) {
+    service.delete(item.id).subscribe({
+      next: () => {
+        alert("Elemento eliminato con successo!");
+        this.caricaDati();
+      },
+      error: (err: any) => {
+        console.error("Errore nella eliminazione:", err);
+        alert("Errore nell'eliminazione: " + (err.error?.message || "Riprova più tardi"));
+      }
+    });
+  }
+}
+
 salva() {
   let service: any;
 
