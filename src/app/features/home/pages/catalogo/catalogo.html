@@ -103,11 +103,13 @@
                   </button>
 
                   @if (auth.isAdmin()) {
-                    <button class="btn btn-warning btn-sm" [routerLink]="['/admin/modifica-libro', libro.id]">
-                      Modifica
+                    <button class="btn btn-icon btn-warning" [routerLink]="['/admin/modifica-libro', libro.id]"
+                            title="Modifica">
+                      ✏️
                     </button>
-                    <button class="btn btn-danger btn-sm" (click)="eliminaLibro($event, libro.id)">
-                      Elimina
+                    <button class="btn btn-icon btn-danger" (click)="eliminaLibro($event, libro.id)"
+                            title="Elimina">
+                      🗑️
                     </button>
                   } 
 
