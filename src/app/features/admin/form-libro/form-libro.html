@@ -188,8 +188,14 @@
                     </div>
                   </td>
 
-                  <td>
-                    <input type="number" formControlName="quantita" class="form-control form-control-sm" min="1">
+                 <td>
+                    @if (getFormatoGroup(i).get('tipoSupporto')?.value !== 'EBOOK') {
+                      <input type="number" formControlName="quantita" class="form-control form-control-sm" min="0">
+                    } @else {
+                      <div style="padding: 6px; color: #64748b; font-size: 0.85rem; text-align: center; background: #f1f5f9; border-radius: 6px; font-weight: 500;" title="Quantità illimitata per formati digitali">
+                        
+                      </div>
+                    }
                   </td>
 
                   <td>
