@@ -4,7 +4,6 @@
   </div>
 
   <div class="main-layout">
-    
     <div class="tab-selector">
       <button (click)="selezionaTab('autori')" [class.active]="tabAttiva === 'autori'">
         <span>✍️ Autori</span>
@@ -20,15 +19,19 @@
     <div class="content-area">
       <div *ngIf="tabAttiva">
         <div class="actions-bar">
-          <input 
-            type="text" 
-            [(ngModel)]="searchTerm" 
-            (input)="applicaFiltro()" 
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="applicaFiltro()"
             [placeholder]="'🔍 Cerca ' + tabAttiva + '...'"
-            class="search-input">
-          
+            class="search-input"
+          />
+
           <button class="btn-add" (click)="apriModaleNuovo()">
-            <span>+</span> Aggiungi {{ tabAttiva === 'autori' ? 'Autore' : tabAttiva === 'editori' ? 'Editore' : 'Categoria' }}
+            <span>+</span> Aggiungi
+            {{
+              tabAttiva === 'autori' ? 'Autore' : tabAttiva === 'editori' ? 'Editore' : 'Categoria'
+            }}
           </button>
         </div>
 
@@ -36,108 +39,178 @@
           <table class="admin-table">
             <thead>
               <tr>
-                <th style="width: 80px;">ID</th>
+                <th style="width: 80px">ID</th>
                 <th *ngIf="tabAttiva === 'autori'">Nome e Cognome</th>
-                <th *ngIf="tabAttiva === 'autori'">Nazionalità</th> <th *ngIf="tabAttiva === 'editori'">Denominazione</th>
+                <th *ngIf="tabAttiva === 'autori'">Nazionalità</th>
+                <th *ngIf="tabAttiva === 'editori'">Denominazione</th>
                 <th *ngIf="tabAttiva === 'categorie'">Categoria</th>
-                <th class="text-center" style="width: 100px;"></th>
+                <th>Attivo</th>
+                <th class="text-center" style="width: 100px"></th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let item of datiFiltrati">
                 <td class="id-cell">#{{ item.id }}</td>
-                
+
                 <td *ngIf="tabAttiva === 'autori'">
                   <span class="main-text">{{ item.nome }} {{ item.cognome }}</span>
                 </td>
                 <td *ngIf="tabAttiva === 'autori'">
-                   <span class="badge-geo">{{ item.nazionalita || 'N/D' }}</span>
+                  <span class="badge-geo">{{ item.nazionalita || 'N/D' }}</span>
                 </td>
-                
+
                 <td *ngIf="tabAttiva === 'editori'">
                   <span class="main-text">{{ item.nome }}</span>
                 </td>
-                
+
                 <td *ngIf="tabAttiva === 'categorie'">
                   <span class="main-text">{{ item.nome }}</span>
                 </td>
 
+                <td>
+                  <span class="main-text">{{
+                    item.attivo === true || item.attivo === 'true' || item.attivo === 1
+                      ? '✅'
+                      : '❌'
+                  }}</span>
+                </td>
+
                 <td class="text-center">
-                  <button class="btn-action-edit" (click)="modifica(item)" type="button" title="Modifica">
+                  <button
+                    class="btn-action-edit"
+                    (click)="modifica(item)"
+                    type="button"
+                    title="Modifica"
+                  >
                     <span>✏️</span>
                   </button>
                 </td>
               </tr>
             </tbody>
           </table>
-          
+
           <div class="empty-state" *ngIf="datiFiltrati.length === 0">
             Nessun dato trovato per "{{ searchTerm }}".
           </div>
         </div>
       </div>
-    </div> 
-  </div> 
+    </div>
+  </div>
 </div>
 
 <div class="custom-modal-overlay" *ngIf="showModal">
   <div class="custom-modal">
     <div class="modal-header">
-  <h3>
-    {{ isModifica ? '📝 Modifica' : '✨ Nuovo' }} 
-    {{ tabAttiva === 'autori' ? 'Autore' : tabAttiva === 'editori' ? 'Editore' : 'Categoria' }}
-  </h3>
-</div>
+      <h3>
+        {{ isModifica ? '📝 Modifica' : '✨ Nuovo' }}
+        {{ tabAttiva === 'autori' ? 'Autore' : tabAttiva === 'editori' ? 'Editore' : 'Categoria' }}
+      </h3>
+    </div>
 
     <div class="modal-body">
-  
-  <div *ngIf="tabAttiva === 'autori'" class="form-container">
-    <div class="form-group">
-      <label>Nome</label>
-      <input type="text" [(ngModel)]="formData.nome" placeholder="Es. Mario" class="form-input">
-    </div>
-    
-    <div class="form-group">
-      <label>Cognome</label>
-      <input type="text" [(ngModel)]="formData.cognome" placeholder="Es. Rossi" class="form-input">
-    </div>
+      <div *ngIf="tabAttiva === 'autori'" class="form-container">
+        <div class="form-group">
+          <label>Nome</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.nome"
+            placeholder="Es. Mario"
+            class="form-input"
+          />
+        </div>
 
-    <div class="form-group">
-      <label>Nazionalità</label>
-      <input type="text" [(ngModel)]="formData.nazionalita" placeholder="Es. Italiana" class="form-input">
-    </div>
+        <div class="form-group">
+          <label>Cognome</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.cognome"
+            placeholder="Es. Rossi"
+            class="form-input"
+          />
+        </div>
 
-    <div class="form-group">
-      <label>Biografia</label>
-      <textarea [(ngModel)]="formData.biografia" placeholder="Racconta qualcosa sull'autore..." class="form-input"></textarea>
-    </div>
-  </div>
+        <div class="form-group">
+          <label>Nazionalità</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.nazionalita"
+            placeholder="Es. Italiana"
+            class="form-input"
+          />
+        </div>
 
-  <div *ngIf="tabAttiva === 'editori'" class="form-container">
-    <div class="form-group">
-      <label>Denominazione</label>
-      <input type="text" [(ngModel)]="formData.nome" placeholder="Nome della casa editrice" class="form-input">
-    </div>
-    <div class="form-group">
-      <label>Descrizione</label>
-      <textarea [(ngModel)]="formData.descrizione" placeholder="Descrivi l'editore..." class="form-input"></textarea>
-    </div>
-  </div>
+        <div class="form-group">
+          <label>Biografia</label>
+          <textarea
+            [(ngModel)]="formData.biografia"
+            placeholder="Racconta qualcosa sull'autore..."
+            class="form-input"
+          ></textarea>
+        </div>
 
-  <div *ngIf="tabAttiva === 'categorie'" class="form-container">
-    <div class="form-group">
-      <label>Nome</label>
-      <input type="text" [(ngModel)]="formData.nome" placeholder="Es. Romanzo, Saggio..." class="form-input">
+        <div class="form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="formData.attivo" />
+            Autore attivo
+          </label>
+        </div>
+      </div>
+
+      <div *ngIf="tabAttiva === 'editori'" class="form-container">
+        <div class="form-group">
+          <label>Denominazione</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.nome"
+            placeholder="Nome della casa editrice"
+            class="form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label>Descrizione</label>
+          <textarea
+            [(ngModel)]="formData.descrizione"
+            placeholder="Descrivi l'editore..."
+            class="form-input"
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="formData.attivo" />
+            Editore attivo
+          </label>
+        </div>
+      </div>
+
+      <div *ngIf="tabAttiva === 'categorie'" class="form-container">
+        <div class="form-group">
+          <label>Nome</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.nome"
+            placeholder="Es. Romanzo, Saggio..."
+            class="form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label>Descrizione</label>
+          <textarea
+            [(ngModel)]="formData.descrizione"
+            placeholder="Cosa include questa categoria?"
+            class="form-input"
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="formData.attivo" />
+            Categoria attiva
+          </label>
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-      <label>Descrizione</label>
-      <textarea [(ngModel)]="formData.descrizione" placeholder="Cosa include questa categoria?" class="form-input"></textarea>
-    </div>
-  </div>
-</div>
     <div class="modal-footer">
       <button class="btn-cancel" (click)="closeModal()">Annulla</button>
       <button class="btn-confirm" (click)="salva()">{{ isModifica ? 'Aggiorna' : 'Salva' }}</button>
     </div>
-  
+  </div>
 </div>

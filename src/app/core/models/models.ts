@@ -45,18 +45,21 @@ export interface Autore {
   cognome: string;
   nazionalita?: string;
   biografia?: string;
+  attivo: boolean;
 }
 
 export interface Editore {
   id: number;
   nome: string;
   descrizione?: string;
+  attivo: boolean;
 }
 
 export interface Categoria {
   id: number;
   nome: string;
   descrizione?: string;
+  attivo: boolean;
 }
 
 export interface Libro {
