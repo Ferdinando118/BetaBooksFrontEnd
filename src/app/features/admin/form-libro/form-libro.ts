@@ -107,9 +107,9 @@ export class FormLibro implements OnInit {
     }
   }
 
-rimuoviFormato(index: number): void {
+  rimuoviFormato(index: number): void {
     this.formati.removeAt(index);
-    
+
     // Riassegna gli indici della mappa per mantenere allineati i file
     const nuovaMappa = new Map<number, File>();
     this.selectedFiles.forEach((file, key) => {
@@ -271,16 +271,37 @@ rimuoviFormato(index: number): void {
         ? this.libroService.updateFormato(formatoData)
         : this.libroService.createFormato(this.idLibro!, formatoData);
 
+        console.log('Dati formato inviati:', JSON.stringify(formatoData));
+
       operazione.subscribe({
         next: (res: any) => {
-          const idNuovoFormato: number | null = formato.id
-            ? Number(formato.id)
-            : Number(res.id || res.id_formato || res.obj?.id || res.obj) || null;
+          // --- FIX ESTRAZIONE ID ---
+          // Iniziamo con l'ID che già conosciamo (se siamo in modifica)
+          let idNuovoFormato: number | null = formato.id ? Number(formato.id) : null;
 
-          console.log('ID formato risolto:', idNuovoFormato, '| tipo:', typeof idNuovoFormato);
+          // Se siamo in creazione, cerchiamo l'ID nella risposta del server in tutti i modi possibili
+          if (!idNuovoFormato && res !== null && res !== undefined) {
+            if (typeof res === 'number') {
+              idNuovoFormato = res; // Il server ha mandato un numero puro
+            } else if (typeof res === 'string' && !isNaN(Number(res))) {
+              idNuovoFormato = Number(res); // Il server ha mandato una stringa numerica
+            } else {
+              // Il server ha mandato un oggetto JSON
+              idNuovoFormato =
+                res.id ||
+                res.id_formato ||
+                res.obj?.id ||
+                (typeof res.obj === 'number' ? res.obj : null);
+            }
+          }
+
+          idNuovoFormato = idNuovoFormato ? Number(idNuovoFormato) : null;
+          console.log('Risposta backend:', res, '-> ID Formato trovato:', idNuovoFormato);
+          // --- FINE FIX ---
 
           const fileToUpload = this.selectedFiles.get(index);
 
+          // Se l'utente ha messo un file E abbiamo trovato l'ID, partiamo con l'upload!
           if (fileToUpload && idNuovoFormato) {
             console.log(
               `Avvio upload copertina per il formato ${index + 1} (ID: ${idNuovoFormato})`,
@@ -299,6 +320,12 @@ rimuoviFormato(index: number): void {
               },
             });
           } else {
+            if (fileToUpload && !idNuovoFormato) {
+              console.error(
+                "⚠️ File immagine selezionato, ma il backend non ha restituito l'ID del formato!",
+              );
+            }
+            // Proseguiamo comunque senza bloccare il form
             operazioniCompletate++;
             if (operazioniCompletate === totaleOperazioni) this.finalizza();
           }
@@ -327,5 +354,28 @@ rimuoviFormato(index: number): void {
     console.groupEnd();
 
     alert('Attenzione: ' + (err.error?.message || 'Errore imprevisto dal server.'));
+  }
+
+  eliminaFormato(index: number): void {
+    const gruppo = this.getFormatoGroup(index);
+    const id = gruppo.get('id')?.value;
+
+    // Controlla esplicitamente: null, undefined, 0, '' → tutti trattati come "non salvato"
+    if (!id || id === 0) {
+      this.rimuoviFormato(index);
+      return;
+    }
+    if (confirm('Sei sicuro di voler eliminare questo libro dal catalogo?')) {
+      this.libroService.eliminaFormato(id).subscribe({
+        next: () => {
+          alert('Formato eliminato con successo!');
+          this.rimuoviFormato(index);
+        },
+        error: (err: any) => {
+          console.error("Errore durante l'eliminazione:", err);
+          alert('Errore: impossibile eliminare il formato.');
+        },
+      });
+    }
   }
 }
