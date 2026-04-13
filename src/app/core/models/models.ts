@@ -201,3 +201,12 @@ export interface PasswordRecoveryReq {
   token: string;
   nuovaPassword: string;
 }
+
+export interface Registrazione {
+  email: string;
+  password: string;
+  ruolo?: string; 
+  nome: string;
+  cognome: string;
+  validato?: boolean;
+}

@@ -29,7 +29,7 @@ export class Register {
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
-
+/*
   submit(): void {
   if (this.form.invalid) { this.form.markAllAsTouched(); return; }
   this.loading = true;
@@ -40,10 +40,10 @@ export class Register {
   };
 
   // 1. Registriamo l'utente (Email e Password)
+  
   this.auth.register(payloadUtente).subscribe({
     next: (nuovoUtente: any) => {
-      // 2. L'utente è stato creato. Ora creiamo il suo Profilo Anagrafico!
-      // Assicurati che Java restituisca l'ID dell'utente appena creato
+
       const idDelNuovoUtente = nuovoUtente.id || nuovoUtente.obj; 
 
       if (idDelNuovoUtente) {
@@ -53,10 +53,10 @@ export class Register {
           cognome: this.form.value.cognome
         };
         
-        // Chiamata al ProfiloService (dovrai iniettarlo nel costruttore di Register)
+      
         this.profiloService.saveProfilo(payloadProfilo).subscribe({
           next: () => this.router.navigate(['/auth/login']),
-          error: () => { /* Gestisci eventuale errore profilo */ }
+          error: () => {  }
         });
       } else {
         this.router.navigate(['/auth/login']);
@@ -64,6 +64,32 @@ export class Register {
     },
     error: () => {
       this.errore = 'Registrazione fallita. Email già in uso?';
+      this.loading = false;
+    }
+  });
+}*/
+
+submit(): void {
+  if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+  this.loading = true;
+
+  // Inviamo un unico payload con TUTTO quello che serve (email, pwd, nome, cognome)
+  const payloadCompleto = {
+    email: this.form.value.email,
+    password: this.form.value.password,
+    nome: this.form.value.nome,
+    cognome: this.form.value.cognome
+  };
+
+  // Chiamiamo una sola volta il backend
+  this.auth.register(payloadCompleto).subscribe({
+    next: () => {
+      // SUCCESS: il backend ha creato sia l'utente che il profilo in un colpo solo
+      this.router.navigate(['/auth/login']);
+    },
+    error: (err) => {
+      // ERROR: il backend gestirà l'errore (es. email già esistente)
+      this.errore = 'Registrazione fallita. Riprova.';
       this.loading = false;
     }
   });
