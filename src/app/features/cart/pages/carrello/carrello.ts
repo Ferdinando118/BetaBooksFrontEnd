@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CarrelloService } from '../../../../core/services/carrello';
 import { CarrelloDTO } from '../../../../core/models/models';
 
+
 @Component({
   selector: 'app-carrello',
   standalone: false,
@@ -11,6 +12,7 @@ import { CarrelloDTO } from '../../../../core/models/models';
 export class Carrello implements OnInit {
   carrello: CarrelloDTO | null = null;
   private cdr = inject(ChangeDetectorRef);
+
 
   constructor(public carrelloService: CarrelloService) {}
 /*
@@ -107,4 +109,20 @@ export class Carrello implements OnInit {
       error: (err) => alert("Errore durante lo spostamento: " + err.error.message)
     });
   }
+
+// Svuota carrello
+svuotaCarrello(): void {
+  if (confirm('Sei sicuro di voler svuotare il carrello?')) {
+
+    this.carrelloService.svuota().subscribe({
+      next: () => {
+        alert("Carrello svuotato con successo!");
+     
+      },
+      error: (err) => alert("Errore durante lo svuotamento: " + err.error.message)
+    });
+  }
+}
+
+
 }

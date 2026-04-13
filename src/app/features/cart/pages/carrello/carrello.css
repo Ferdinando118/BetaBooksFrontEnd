@@ -1,8 +1,17 @@
+.header-carrello {
+  display: flex;
+  align-items: center; /* Questa è la chiave: allinea tutto al centro verticalmente */
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
 .page-title {
   font-size: 26px;
   font-weight: 700;
   color: var(--bb-blue);
-  margin-bottom: 24px;
+  margin-bottom: 0; /* IMPORTANTE: Rimuovi il margine inferiore dal titolo */
+  line-height: 1;   /* Aiuta a centrare il testo perfettamente */
 }
 
 .empty {
@@ -10,6 +19,8 @@
   padding: 60px 20px;
   color: var(--bb-gray-400);
 }
+
+
 
 .carrello-layout {
   display: grid;
@@ -22,28 +33,43 @@
 
 .item-card {
   display: flex;
-  gap: 16px;
+  gap: 24px; /* Aumentato lo spazio tra immagine e info */
   align-items: center;
-  padding: 16px;
+  padding: 24px; /* Più padding interno per far "respirare" il contenuto */
+  background: white; /* Assicurati che risalti bene */
+  border-radius: var(--bb-radius-md); /* Bordi leggermente più arrotondati */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Aggiunta una leggera ombra per l'effetto "card" */
 }
 
 .item-card img {
-  width: 70px;
-  height: 100px;
-  object-fit: cover;
+  width: 120px;  
+  height: 170px; 
+  object-fit: contain;
+  background-color: #f8f9fa;
   border-radius: var(--bb-radius-sm);
   flex-shrink: 0;
 }
 
+
+.item-info h3 { 
+  font-size: 18px;
+}
+
+.item-prezzo-unit { 
+  font-size: 15px; 
+}
+
 .item-info { flex: 1; }
-.item-info h3 { font-size: 15px; font-weight: 600; color: var(--bb-blue); }
-.item-prezzo-unit { font-size: 13px; color: var(--bb-gray-600); margin-top: 4px; }
+
+
 
 .item-azioni {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-end; /* Allinea tutto a destra */
+  justify-content: center;
+  gap: 12px;
+  min-width: 180px; /* Diamo un po' di spazio alla colonna delle azioni */
 }
 
 .quantita-ctrl {
@@ -67,17 +93,13 @@
 
 .quantita-ctrl span { font-weight: 600; min-width: 20px; text-align: center; }
 
-.item-subtotale { font-weight: 700; color: var(--bb-orange-dark); font-size: 15px; }
-
-.btn-rimuovi {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  opacity: 0.6;
-  transition: opacity 0.2s;
+.item-subtotale {
+  font-weight: 700;
+  color: var(--bb-orange-dark);
+  font-size: 16px;
+  margin: 0;
 }
-.btn-rimuovi:hover { opacity: 1; }
+
 
 /* Riepilogo */
 .riepilogo {
@@ -105,8 +127,93 @@
 
 .w-full { width: 100%; justify-content: center; }
 
+
+
+/* NUOVA CLASSE per il pulsante wishlist */
+.btn-wishlist {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Spazio tra cuore, testo e freccia */
+  
+  /* Stile solido colorato come il checkout */
+  background-color: var(--bb-orange); /* O var(--bb-accent) se usi quel nome */
+  color: white;
+  
+  border: none;
+  border-radius: var(--bb-radius-sm);
+  padding: 8px 16px; /* Dimensioni compatte per la riga */
+  
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  
+  transition: background-color 0.2s, transform 0.1s;
+  
+  /* Assicura che si posizioni bene sotto il subtotale */
+  margin-top: 8px;
+  width: auto; /* Non a larghezza intera per non rovinare la riga */
+}
+
+.btn-wishlist:hover {
+  background-color: var(--bb-orange-dark); /* Un tono più scuro al passaggio */
+}
+
+.btn-wishlist:active {
+  transform: translateY(1px); /* Piccolo feedback al click */
+}
+
 @media (max-width: 768px) {
   .carrello-layout { grid-template-columns: 1fr; }
   .riepilogo { position: static; }
   .item-card { flex-wrap: wrap; }
+}
+
+
+/* Stile del cestino aggiornato */
+.btn-cestino {
+  background-color: var(--bb-gray-100);
+  border: 1px solid var(--bb-gray-200);
+  border-radius: var(--bb-radius-sm);
+  width: 40px;  /* Più grande, facile da cliccare */
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px; /* Icona più grande */
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--bb-gray-600);
+}
+
+.btn-cestino:hover {
+  background-color: #fee2e2; /* Rosso chiaro al passaggio del mouse */
+  color: #dc2626; /* Icona diventa rossa */
+  border-color: #fca5a5;
+}
+
+/* Il contenitore che raggruppa prezzo, quantità e cestino */
+.blocco-prezzo-quantita {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Spazio tra prezzo e i controlli */
+  justify-content: flex-end; /* Mantiene tutto allineato a destra */
+}
+
+/* Rimuoviamo il margine che avevamo messo prima nel blocco quantità */
+.blocco-quantita-rimozione {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0; 
+}
+
+/* Assicuriamoci che il prezzo non sia troppo grande */
+.item-subtotale {
+  font-weight: 700;
+  color: var(--bb-orange-dark);
+  font-size: 16px;
+  margin: 0;
+  min-width: 80px; /* Diamo una larghezza fissa per evitare salti grafici */
+  text-align: right;
 }
