@@ -98,9 +98,16 @@ export class FormLibro implements OnInit {
     }
   }
 
-  rimuoviFormato(index: number): void {
+rimuoviFormato(index: number): void {
     this.formati.removeAt(index);
-    this.selectedFiles.delete(index); // Rimuovi il file dalla mappa se il formato viene cancellato
+    
+    // Riassegna gli indici della mappa per mantenere allineati i file
+    const nuovaMappa = new Map<number, File>();
+    this.selectedFiles.forEach((file, key) => {
+      if (key < index) nuovaMappa.set(key, file);
+      if (key > index) nuovaMappa.set(key - 1, file); // Scala di uno
+    });
+    this.selectedFiles = nuovaMappa;
   }
 
   getFormatoGroup(index: number): FormGroup {
@@ -249,15 +256,22 @@ export class FormLibro implements OnInit {
 
       operazione.subscribe({
         next: (res: any) => {
-          const idNuovoFormato = res.id || res.id_formato || (res.obj ? res.obj.id || res.obj : res);
           
-          // Controlliamo se per QUESTO specifico formato (indice) c'è un file da caricare
+          // 🛠️ IL FIX È QUI: 
+          // Se stiamo aggiornando usiamo l'ID che già conosciamo.
+          // Se stiamo creando, lo andiamo a pescare dalla risposta del server.
+          let targetFormatoId = formato.id;
+          if (!targetFormatoId && res) {
+            targetFormatoId = res.id || res.id_formato || (res.obj ? res.obj.id || res.obj : res);
+          }
+          
           const fileToUpload = this.selectedFiles.get(index);
 
-          if (fileToUpload && idNuovoFormato) {
-            console.log(`Avvio upload copertina per il formato ${index + 1} (ID: ${idNuovoFormato})`);
+          // Procedi con l'upload solo se c'è un file e abbiamo l'ID corretto
+          if (fileToUpload && targetFormatoId) {
+            console.log(`Avvio upload copertina per il formato ${index + 1} (ID: ${targetFormatoId})`);
             
-            this.libroService.uploadCopertina(idNuovoFormato, fileToUpload).subscribe({
+            this.libroService.uploadCopertina(targetFormatoId, fileToUpload).subscribe({
               next: () => {
                 console.log(`✅ Upload immagine completato per formato ${index + 1}!`);
                 operazioniCompletate++;
