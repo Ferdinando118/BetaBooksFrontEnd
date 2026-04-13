@@ -1,5 +1,10 @@
 <div class="carrello-wrapper">
-  <h1 class="page-title">🛒 Il tuo Carrello</h1>
+  <div class="header-carrello">
+    <h1 class="page-title">🛒 Il tuo Carrello</h1>
+    @if (carrello && carrello.items && carrello.items.length > 0) {
+      <button class="btn btn-outline" (click)="svuotaCarrello()">Svuota Carrello</button>
+    }
+  </div>
 
   @if (!carrello || !carrello.items || carrello.items.length === 0) {
     <div class="empty card">
@@ -30,24 +35,33 @@
               <p class="text-xs">Editore: {{ item.editoreNome }}</p>
               <p class="item-prezzo-unit">€ {{ item.prezzoUnitario | number:'1.2-2' }} cad.</p>
             </div>
-            
-            <div class="item-azioni">
-              <div class="quantita-ctrl">
-                <button (click)="diminuisci(item.id)">−</button>
-                <span>{{ item.quantita }}</span>
-                <button (click)="aumenta(item.id)">+</button>
-              </div>
-              
-              <p class="item-subtotale">€ {{ item.prezzoTotaleRiga | number:'1.2-2' }}</p>
-              
-              <button class="btn-rimuovi" (click)="rimuovi(item.id)">🗑</button>
-            </div>
+                  <div class="item-azioni">
+                     
+                  <div class="blocco-prezzo-quantita">
+                    
+                    <p class="item-subtotale">€ {{ item.prezzoTotaleRiga | number:'1.2-2' }}</p>
+
+                    <div class="blocco-quantita-rimozione">
+                      <div class="quantita-ctrl">
+                        <button (click)="diminuisci(item.id)">−</button>
+                        <span>{{ item.quantita }}</span>
+                        <button (click)="aumenta(item.id)">+</button>
+                      </div>
+                      <button class="btn-cestino" (click)="rimuovi(item.id)" title="Rimuovi">🗑</button>
+                    </div>
+                    
+                  </div>
+                   <button class="btn-wishlist" (click)="spostaInWishlist(item.id)">
+                        Wishlist →
+                      </button>
+                </div>
 
           </div>
         }
       </div> 
 
       <aside class="riepilogo card">
+
         <h2>Riepilogo ordine</h2>
         <hr class="divider">
 
