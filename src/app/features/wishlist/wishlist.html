@@ -1,35 +1,47 @@
 <div class="carrello-wrapper">
-  <h1 class="page-title">❤️ La tua Lista dei Desideri</h1>
+  <div class="wishlist-layout">
+    <div class="header-wishlist">
+    <h1 class="page-title">❤️ LA TUA WISHLIST</h1>
+        @if (wishlistItems && wishlistItems.length > 0) {
+      <button class="btn btn-outline" (click)="svuotaWishlist()">Svuota Wishlist</button>
+    }
+  </div>
+    
 
-  @if (wishlistItems.length === 0) {
-    <div class="empty card">
-      <p style="font-size: 48px;">✨</p>
-      <p>La tua wishlist è vuota</p>
-      <a routerLink="/" class="btn btn-accent mt-16">Torna al catalogo</a>
-    </div>
-  } @else {
-    <div class="wishlist-layout">
-      <div class="items-list">
-          @for (item of wishlistItems; track item.id) {
-            <div class="item-card card">
-              <img src="/assets/images/default-book.png" alt="Copertina" class="item-img">
-              
-              <div class="item-info">
-                <h3>{{ item.libro.titolo }}</h3>
-                <p class="text-muted">{{ item.libro.descrizione }}</p>
-                </div>
-              
-              <div class="item-azioni-wishlist">
-                <button class="btn btn-accent" (click)="spostaAlCarrello(item.id)">
-                  🛒 Sposta nel carrello
-                </button>
-                <button class="btn-cestino" (click)="rimuoviDallaWishlist(item.id)" title="Rimuovi">
-                  🗑
-                </button>
-              </div>
-            </div>
-          }
+    @if (wishlistItems.length === 0) {
+      <div class="empty card">
+        <p style="font-size: 48px;">✨</p>
+        <p>La tua wishlist è vuota</p>
+        <a routerLink="/" class="btn btn-orange mt-16">Sfoglia il catalogo</a>
       </div>
-    </div>
-  }
+    } @else {
+      <div class="items-list">
+        @for (item of wishlistItems; track item.id) {
+          <div class="item-card card">
+            <img [src]="item.copertina" alt="Copertina" class="item-img">
+            
+            <div class="item-info">
+                <h3>{{ item.libro.titolo }}</h3>
+                
+                <p class="text-muted">
+                  di <strong>{{ item.libro.autore.nome }} {{ item.libro.autore.cognome }}</strong>
+                </p>
+                
+                <p class="text-xs">Editore: {{ item.libro.editore.nome }}</p>
+            
+              </div>
+            
+            <div class="item-azioni-wishlist">
+              <button class="btn btn-accent" (click)="spostaAlCarrello(item.id)">
+                🛒 Sposta nel carrello
+              </button>
+              <button class="btn-cestino" (click)="rimuoviDallaWishlist(item)" title="Rimuovi">
+                🗑
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
 </div>

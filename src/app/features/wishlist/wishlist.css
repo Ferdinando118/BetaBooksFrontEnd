@@ -1,4 +1,3 @@
-/* --- 1. BASI (Prese dal carrello.css) --- */
 .item-card {
   display: flex;
   gap: 24px;
@@ -23,10 +22,12 @@
 .item-info h3 { font-size: 18px; color: var(--bb-blue); margin-bottom: 4px; }
 .item-prezzo-unit { font-size: 15px; color: var(--bb-orange-dark); font-weight: 600; }
 
-/* --- 2. LAYOUT WISHLIST --- */
+
+/* --- 2. LAYOUT WISHLIST (Contenitore centrato) --- */
 .wishlist-layout {
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 800px;    
+  margin: 0 auto;      
+  padding: 0 20px;     
 }
 
 .items-list { 
@@ -45,7 +46,7 @@
 
 /* Bottone Sposta nel carrello */
 .btn-accent {
-  background-color: var(--bb-blue);
+  background-color: var(--bb-orange);
   color: white;
   padding: 10px 20px;
   border-radius: var(--bb-radius-sm);
@@ -54,6 +55,9 @@
   cursor: pointer;
 }
 
+.btn-accent:hover {
+  background-color: var(--bb-orange-dark); 
+}
 /* Cestino (condiviso col carrello) */
 .btn-cestino {
   background-color: var(--bb-gray-100);
@@ -74,6 +78,68 @@
   background-color: #fee2e2;
   color: #dc2626;
   border-color: #fca5a5;
+}
+
+/* Header flessibile */
+.header-wishlist {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  gap: 16px;           
+  width: 100%;      
+}
+
+.page-title {
+  text-align: left;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--bb-blue);
+  margin-bottom: 0;     /* Fondamentale: non deve avere margini extra */
+  white-space: nowrap;  
+  flex-shrink: 1;       
+}
+
+/* Bottone Svuota */
+.btn-outline-danger {
+  flex-shrink: 0;       /* Impedisce al bottone di restringersi o deformarsi */
+  white-space: nowrap;  /* Il testo dentro il bottone non deve andare a capo */
+  background-color: transparent;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+  padding: 8px 16px;
+  border-radius: var(--bb-radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc2626;
+  color: white;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--bb-gray-400);
+}
+
+/* Pulsante stile Arancione (da usare per Sfoglia il catalogo) */
+.btn-orange {
+  background-color: var(--bb-orange); /* Assicurati che questa variabile sia definita */
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--bb-radius-sm);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none; /* Rimuove la sottolineatura dai link */
+  display: inline-block;
+}
+
+.btn-orange:hover {
+  background-color: var(--bb-orange-dark);
 }
 
 /* --- 4. RESPONSIVE --- */

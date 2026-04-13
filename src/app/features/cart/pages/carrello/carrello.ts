@@ -15,28 +15,14 @@ export class Carrello implements OnInit {
 
 
   constructor(public carrelloService: CarrelloService) {}
-/*
-  ngOnInit(): void {
-    this.carrelloService.carrello$.subscribe((data) => {
-      if (data && data.items) {
-        // Ordiniamo gli item per ID, così l'ordine rimane costante
-        const itemsOrdinati = [...data.items].sort((a, b) => a.id - b.id);
-        this.carrello = { ...data, items: itemsOrdinati };
-      } else {
-        this.carrello = data;
-      }
-      this.cdr.detectChanges();
-    });
-    this.carrelloService.loadCarrello();
-  }*/
+
 
    ngOnInit(): void {
-  // Sottoscrizione unica al servizio
+
   this.carrelloService.carrello$.subscribe((data) => {
     if (data && data.items) {
       const urlServer = 'http://localhost:8080/uploads/';
       
-      // Mappiamo gli item per formattare l'URL dell'immagine
       const itemsMappati = data.items.map(item => ({
         ...item,
         copertina: item.copertina 
