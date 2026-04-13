@@ -246,10 +246,11 @@ export class FormLibro implements OnInit {
   private salvaFormati(): void {
     const formatiDaSalvare = this.formati.value as any[];
     let operazioniCompletate = 0;
+    let erroriOccorsi = 0;
     const totaleOperazioni = formatiDaSalvare.length;
 
     if (totaleOperazioni === 0) {
-      this.finalizza();
+      this.finalizza(0);
       return;
     }
 
@@ -311,12 +312,16 @@ export class FormLibro implements OnInit {
               next: () => {
                 console.log(`✅ Upload immagine completato per formato ${index + 1}!`);
                 operazioniCompletate++;
-                if (operazioniCompletate === totaleOperazioni) this.finalizza();
+                //if (operazioniCompletate === totaleOperazioni) this.finalizza();
+                if (operazioniCompletate + erroriOccorsi === totaleOperazioni) this.finalizza(erroriOccorsi);
               },
               error: (err) => {
+                erroriOccorsi++;
                 console.error(`❌ Errore upload immagine per formato ${index + 1}:`, err);
-                operazioniCompletate++;
-                if (operazioniCompletate === totaleOperazioni) this.finalizza();
+                //operazioniCompletate++;
+                //if (operazioniCompletate === totaleOperazioni) this.finalizza();
+                this.gestisciErrore(err); 
+              if (operazioniCompletate + erroriOccorsi === totaleOperazioni) this.finalizza(erroriOccorsi);
               },
             });
           } else {
@@ -327,24 +332,41 @@ export class FormLibro implements OnInit {
             }
             // Proseguiamo comunque senza bloccare il form
             operazioniCompletate++;
-            if (operazioniCompletate === totaleOperazioni) this.finalizza();
+           // if (operazioniCompletate === totaleOperazioni) this.finalizza();
+           if (operazioniCompletate + erroriOccorsi === totaleOperazioni) this.finalizza(erroriOccorsi);
           }
         },
         error: (err) => {
+          erroriOccorsi++;
+          this.gestisciErrore(err);
           console.error(`Errore nel salvataggio del formato ${index + 1}:`, err);
-          operazioniCompletate++;
-          if (operazioniCompletate === totaleOperazioni) this.finalizza();
+          //operazioniCompletate++;
+          //if (operazioniCompletate === totaleOperazioni) this.finalizza();
+          if (operazioniCompletate + erroriOccorsi === totaleOperazioni) {
+              this.finalizza(erroriOccorsi);
+            }
         },
       });
     });
   }
-
+/*
   private finalizza() {
     this.loading = false;
     alert('Libro e formati salvati con successo!');
     this.router.navigate(['/catalogo']);
+  }*/
+ private finalizza(numeroErrori: number) {
+  this.loading = false;
+  if (numeroErrori > 0) {
+    // L'utente vede l'errore specifico grazie a gestisciErrore
+    // ma NON viene mandato via, così può correggere l'ISBN sbagliato
+    console.warn(`Operazione terminata con ${numeroErrori} errori.`);
+  } else {
+    alert('Libro e formati salvati con successo!');
+    this.router.navigate(['/catalogo']);
   }
-
+}
+/*
   private gestisciErrore(err: any) {
     this.loading = false;
     console.group('🔴 DETTAGLIO ERRORE SERVER (HTTP ' + err.status + ')');
@@ -354,7 +376,28 @@ export class FormLibro implements OnInit {
     console.groupEnd();
 
     alert('Attenzione: ' + (err.error?.message || 'Errore imprevisto dal server.'));
+  }*/
+
+    private gestisciErrore(err: any) {
+  this.loading = false;
+
+  // Se il server manda un errore di validazione generico
+  let messaggio = "Errore imprevisto dal server.";
+
+  if (err.error && typeof err.error === 'string') {
+    messaggio = err.error; // Il server ha mandato il testo nudo e crudo
+  } else if (err.error && err.error.message) {
+    messaggio = err.error.message; // Il server ha mandato un JSON con chiave 'message'
+  } else if (err.message) {
+    messaggio = err.message; // Errore di connessione o altro
   }
+
+  alert('Attenzione: ' + messaggio);
+  
+  // Opzionale: logga per sicurezza
+  console.error("Errore gestito:", err);
+}
+    
 
   eliminaFormato(index: number): void {
     const gruppo = this.getFormatoGroup(index);

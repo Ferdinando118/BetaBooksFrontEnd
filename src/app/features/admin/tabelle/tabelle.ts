@@ -31,7 +31,9 @@ formData: any = {};
 
 apriModaleNuovo() {
   this.isModifica = false;
-  this.formData = {}; // Reset campi
+  this.formData = {
+    attivo: false // <--- Se l'utente non la tocca, varrà false
+  };
   this.showModal = true;
 }
 
@@ -48,7 +50,9 @@ modifica(item: any) {
 
 salva() {
   let service: any;
+
   const payload = { ...this.formData };
+  payload.attivo = !!payload.attivo;
 
   // 1. Seleziona il servizio in base alla tab attiva
   if (this.tabAttiva === 'autori') service = this.autoreService;
