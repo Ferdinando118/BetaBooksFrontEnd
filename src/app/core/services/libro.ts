@@ -60,7 +60,6 @@ export class LibroService {
     return this.miPiaceSet.has(libroId);
   }
 
-
   toggleMiPiace(libroId: number): boolean {
     if (this.miPiaceSet.has(libroId)) {
       this.miPiaceSet.delete(libroId);
@@ -68,14 +67,12 @@ export class LibroService {
       this.miPiaceSet.add(libroId);
     }
     this.saveMiPiace();
-    return this.miPiaceSet.has(libroId); 
+    return this.miPiaceSet.has(libroId);
   }
 
   // ─── LIBRO ───────────────────────────────────────────
   getAll() {
-    return this.http.get<any[]>(`${this.url}/getAll`).pipe(
-      tap(data => this.libri.set(data))
-    );
+    return this.http.get<any[]>(`${this.url}/getAll`).pipe(tap((data) => this.libri.set(data)));
   }
 
   getById(id: number) {
@@ -84,28 +81,26 @@ export class LibroService {
   }
 
   create(body: LibroReq) {
-    return this.http.post<any>(`${this.url}/create`, body).pipe(
-      tap(() => this.getAll().subscribe())
-    );
+    return this.http
+      .post<any>(`${this.url}/create`, body)
+      .pipe(tap(() => this.getAll().subscribe()));
   }
 
   update(body: LibroReq) {
-    return this.http.put<any>(`${this.url}/update`, body).pipe(
-      tap(() => this.getAll().subscribe())
-    );
+    return this.http
+      .put<any>(`${this.url}/update`, body)
+      .pipe(tap(() => this.getAll().subscribe()));
   }
 
   delete(id: number): Observable<any> {
-    return this.http.delete(`${this.url}/delete/${id}`).pipe(
-      tap(() => this.getAll().subscribe())
-    );
+    return this.http.delete(`${this.url}/delete/${id}`).pipe(tap(() => this.getAll().subscribe()));
   }
 
   // ─── FORMATO ─────────────────────────────────────────
   createFormato(idLibro: number, body: any) {
     return this.http.post<any>(`${this.url}/formato/create/${idLibro}`, body);
   }
-  
+
   updateFormato(body: FormatoLibroReq) {
     return this.http.put<any>(`${this.url}/formato/update`, body);
   }
@@ -134,5 +129,9 @@ export class LibroService {
     const formData = new FormData();
     formData.append('file', file); // Deve coincidere con @RequestPart("file") in Java
     return this.http.post<any>(`${this.url}/formato/copertina/${idFormato}`, formData);
+  }
+
+  eliminaFormato(id: number) {
+    return this.http.delete<any>(`${this.url}/formato/elimina/${id}`);
   }
 }
