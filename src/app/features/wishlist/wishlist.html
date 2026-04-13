@@ -1,37 +1,35 @@
 <div class="carrello-wrapper">
   <h1 class="page-title">❤️ La tua Lista dei Desideri</h1>
 
-  @if (wishlistItems().length === 0) {
+  @if (wishlistItems.length === 0) {
     <div class="empty card">
       <p style="font-size: 48px;">✨</p>
       <p>La tua wishlist è vuota</p>
       <a routerLink="/" class="btn btn-accent mt-16">Torna al catalogo</a>
     </div>
   } @else {
-    <div class="carrello-layout"> <div class="items-list">
-        @for (item of wishlistItems(); track item.id) {
-          <div class="item-card card">
-            
-            <img src="https://placehold.co/80x110/f8a5c2/ffffff?text=📚" alt="Copertina">
-            
-            <div class="item-info">
-              <h3>{{ item.titoloLibro }}</h3>
-              <p class="text-muted">{{ item.autore || 'Autore non specificato' }}</p>
-            </div>
-            
-            <div class="item-azioni">
-              <button class="btn btn-accent btn-sm" (click)="spostaAlCarrello(item)">
-                Sposta nel carrello
-              </button>
+    <div class="wishlist-layout">
+      <div class="items-list">
+          @for (item of wishlistItems; track item.id) {
+            <div class="item-card card">
+              <img src="/assets/images/default-book.png" alt="Copertina" class="item-img">
               
-              <button class="btn-rimuovi" (click)="rimuoviDallaWishlist(item.idFormato)" title="Rimuovi">
-                🗑
-              </button>
+              <div class="item-info">
+                <h3>{{ item.libro.titolo }}</h3>
+                <p class="text-muted">{{ item.libro.descrizione }}</p>
+                </div>
+              
+              <div class="item-azioni-wishlist">
+                <button class="btn btn-accent" (click)="spostaAlCarrello(item.id)">
+                  🛒 Sposta nel carrello
+                </button>
+                <button class="btn-cestino" (click)="rimuoviDallaWishlist(item.id)" title="Rimuovi">
+                  🗑
+                </button>
+              </div>
             </div>
-          </div>
-        }
+          }
       </div>
-      
     </div>
   }
 </div>

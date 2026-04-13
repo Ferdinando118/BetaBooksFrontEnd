@@ -1,54 +1,70 @@
-import { Component, inject, signal, OnInit } from '@angular/core'; // Aggiungi inject e signal
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { WishlistService } from '../../core/services/wishlist';
 import { AuthService } from '../../core/services/auth';
+import { CommonModule, DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-wishlist',
-  imports: [],
+  standalone: true, 
+  imports: [CommonModule, DecimalPipe], 
   templateUrl: './wishlist.html',
-  styleUrl: './wishlist.css',
+  styleUrl: './wishlist.css'
 })
 export class Wishlist implements OnInit {
-  // Iniezione moderna dei servizi (disponibile da Angular 14+)
+  wishlistItems: any[] = []; // Array semplice, non un signal
+  
   private wishlistService = inject(WishlistService);
   private auth = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
-  // Definizione dei segnali
-  wishlistItems = signal<any[]>([]);
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.getWishlist();
   }
 
-  getWishlist() {
+  getWishlist(): void {
     const userId = this.auth.getUserId();
     if (!userId) return;
     
-    this.wishlistService.getWishlistByUser(userId).subscribe(items => {
-      this.wishlistItems.set(items);
+    this.wishlistService.getWishlistByUser(userId).subscribe({
+      next: (items) => {
+        const urlServer = 'http://localhost:8080/uploads/';
+        
+        // Mappiamo le immagini come facevi nel carrello
+        this.wishlistItems = items.map(item => ({
+          ...item,
+          copertina: item.copertina 
+            ? (item.copertina.startsWith('http') ? item.copertina : urlServer + item.copertina) 
+            : '/assets/images/default-book.png'
+        }));
+        
+        this.cdr.detectChanges(); // Forza aggiornamento vista
+      },
+      error: (err) => console.error("Errore caricamento wishlist:", err)
     });
   }
 
-  spostaAlCarrello(item: any) {
+  spostaAlCarrello(item: any): void {
     this.wishlistService.spostaNelCarrello(item.id).subscribe({
       next: () => {
-        this.getWishlist(); // Ricarica la lista dopo lo spostamento
+        alert("Prodotto spostato nel carrello!");
+        this.getWishlist(); // Ricarica la lista
       },
-      error: (err) => console.error("Errore nello spostamento", err)
+      error: (err) => alert("Errore: " + (err.error?.message || "Impossibile spostare"))
     });
   }
 
-  // Aggiungi questo metodo nel tuo Wishlist.ts
-rimuoviDallaWishlist(idFormato: number) {
-  const userId = this.auth.getUserId();
-  if (!userId) return;
 
-  this.wishlistService.toggle(userId, idFormato, true).subscribe({
-    next: () => {
-      // Aggiorniamo la lista rimuovendo l'elemento
-      this.getWishlist(); 
-    },
-    error: (err: any) => console.error("Errore rimozione:", err)
-  });
-}
+      rimuoviDallaWishlist(idWishlist: number): void {
+        const userId = this.auth.getUserId();
+        if (!userId) return;
+
+        // Usa l'id dell'item (es: 24, 25, 27)
+        // Nota: ho sostituito 'idFormato' con 'idWishlist'
+        this.wishlistService.toggle(userId, idWishlist, true).subscribe({
+          next: () => {
+            this.getWishlist(); 
+          },
+          error: (err) => console.error("Errore rimozione:", err)
+        });
+      }
 }
