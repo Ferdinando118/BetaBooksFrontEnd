@@ -27,8 +27,9 @@ export class FormLibro implements OnInit {
   editMode = false;
   idLibro?: number;
   loading = false;
-  selectedFile: File | null = null;
-  immagineAttuale = signal<string | null>(null);
+  
+  // NUOVO: Usiamo una Map per tenere traccia del file caricato per ogni indice del FormArray
+  selectedFiles = new Map<number, File>();
 
   autori = signal<any[]>([]);
   editori = signal<any[]>([]);
@@ -74,7 +75,7 @@ export class FormLibro implements OnInit {
     return this.form.get('formati') as FormArray;
   }
 
-creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSIBILE', prezzo = 1.0, quantita = 1, isbn = '', attivo = true, copertina = ''): FormGroup {
+  creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSIBILE', prezzo = 1.0, quantita = 1, isbn = '', attivo = true, copertina = ''): FormGroup {
     return this.fb.group({
       id: [id],
       tipoSupporto: [tipoSupporto, Validators.required],
@@ -83,7 +84,7 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
       prezzo: [prezzo, [Validators.required, Validators.min(0)]],
       quantita: [quantita, [Validators.min(0)]],
       attivo: [attivo],
-      copertina: [copertina] // Campo nascosto per non perdere il dato
+      copertina: [copertina] 
     });
   }
 
@@ -99,6 +100,7 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
 
   rimuoviFormato(index: number): void {
     this.formati.removeAt(index);
+    this.selectedFiles.delete(index); // Rimuovi il file dalla mappa se il formato viene cancellato
   }
 
   getFormatoGroup(index: number): FormGroup {
@@ -123,14 +125,6 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
         });
 
         if (res.formati && res.formati.length > 0) {
-          // --- NOVITÀ: Salviamo la vecchia immagine per mostrarla! ---
-          const primaCopertina = res.formati.find((f: any) => f.copertina)?.copertina;
-          if (primaCopertina) {
-            const urlServer = 'http://localhost:8080/uploads/';
-            this.immagineAttuale.set(primaCopertina.startsWith('http') ? primaCopertina : urlServer + primaCopertina);
-          }
-          // -----------------------------------------------------------
-
           this.formatiEsistenti.set(res.formati);
           res.formati.forEach((f: any) => {
             this.formati.push(this.creaFormatiGroup(
@@ -141,7 +135,7 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
               f.quantita || 0,
               f.isbn || '',
               f.attivo !== undefined ? f.attivo : true,
-              f.copertina // Passiamo la vecchia copertina al Form Group
+              f.copertina 
             ));
           });
         }
@@ -149,8 +143,21 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
     });
   }
 
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0] as File;
+  // NUOVO: Salva il file nella mappa usando l'indice del formato come chiave
+  onFileSelected(event: any, index: number) {
+    const file = event.target.files[0] as File;
+    if (file) {
+      this.selectedFiles.set(index, file);
+    } else {
+      this.selectedFiles.delete(index);
+    }
+  }
+
+  // NUOVO: Helper per formattare l'URL della miniatura in tabella
+  getImmagineUrl(copertina: string | null): string | null {
+    if (!copertina) return null;
+    if (copertina.startsWith('http')) return copertina;
+    return 'http://localhost:8080/uploads/' + copertina;
   }
 
   onCategoriaChange(idCategoria: number) {
@@ -200,10 +207,7 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
     } else {
       this.libroService.create(libroData).subscribe({
         next: (res: any) => {
-          // console.log("RISPOSTA SERVER: " + JSON.stringify(res));
-
           const nuovoIdLibro = res.id || res.id_libro || (res.obj ? res.obj.id || res.obj : null); 
-
           if (nuovoIdLibro) {
             this.idLibro = nuovoIdLibro;
             this.salvaFormati();
@@ -218,8 +222,6 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
 
   private salvaFormati(): void {
     const formatiDaSalvare = this.formati.value as any[];
-    
-    // VARIABILI RIPRISTINATE E CORRETTE
     let operazioniCompletate = 0;
     const totaleOperazioni = formatiDaSalvare.length;
 
@@ -229,7 +231,7 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
     }
 
     formatiDaSalvare.forEach((formato, index) => {
-      const formatoData: any = { // Usiamo any per poter agganciare la copertina
+      const formatoData: any = {
         id: formato.id,
         idLibro: this.idLibro!,
         tipoSupporto: formato.tipoSupporto,
@@ -238,7 +240,7 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
         prezzo: formato.prezzo || 0,
         quantita: formato.quantita || 0,
         attivo: formato.attivo,
-        copertina: formato.copertina // Rimandiamo la copertina vecchia al DB, così non la cancella!
+        copertina: formato.copertina 
       };
 
       const operazione = formato.id 
@@ -247,22 +249,22 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
 
       operazione.subscribe({
         next: (res: any) => {
-          
           const idNuovoFormato = res.id || res.id_formato || (res.obj ? res.obj.id || res.obj : res);
-          console.log(`Formato ${index + 1} salvato. ID estratto:`, idNuovoFormato);
+          
+          // Controlliamo se per QUESTO specifico formato (indice) c'è un file da caricare
+          const fileToUpload = this.selectedFiles.get(index);
 
-          if (index === 0 && this.selectedFile && idNuovoFormato) {
+          if (fileToUpload && idNuovoFormato) {
+            console.log(`Avvio upload copertina per il formato ${index + 1} (ID: ${idNuovoFormato})`);
             
-            console.log("Avvio upload copertina per il formato:", idNuovoFormato);
-            
-            this.libroService.uploadCopertina(idNuovoFormato, this.selectedFile).subscribe({
+            this.libroService.uploadCopertina(idNuovoFormato, fileToUpload).subscribe({
               next: () => {
-                console.log("✅ Upload immagine completato con successo!");
+                console.log(`✅ Upload immagine completato per formato ${index + 1}!`);
                 operazioniCompletate++;
                 if (operazioniCompletate === totaleOperazioni) this.finalizza();
               },
               error: (err) => {
-                console.error('❌ Errore upload immagine:', err);
+                console.error(`❌ Errore upload immagine per formato ${index + 1}:`, err);
                 operazioniCompletate++;
                 if (operazioniCompletate === totaleOperazioni) this.finalizza();
               }
@@ -288,7 +290,7 @@ creaFormatiGroup(id?: number, tipoSupporto = 'CARTACEO', tipoCopertina = 'FLESSI
     this.router.navigate(['/catalogo']);
   }
 
- private gestisciErrore(err: any) {
+  private gestisciErrore(err: any) {
     this.loading = false;
     console.group("🔴 DETTAGLIO ERRORE SERVER (HTTP " + err.status + ")");
     console.error("Oggetto Errore Completo:", err);
