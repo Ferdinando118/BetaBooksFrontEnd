@@ -42,6 +42,8 @@ export class Profilo implements OnInit {
   errorePassword = '';
   successoPassword = false;
 
+  regexTelefono = /^[0-9]{10}$/;
+
   formPassword = {
     vecchiaPassword: '',
     nuovaPassword: '',
@@ -108,17 +110,15 @@ export class Profilo implements OnInit {
 
   // ─── GESTIONE PROFILO ──────────────────────────────────────────────
 
-salvaProfilo(): void {
+  salvaProfilo(): void {
     if (this.formProfilo.invalid) return;
-
-    
 
     this.loadingProfilo = true;
     const val = this.formProfilo.value;
 
-    if(val.telefono.length!=10){
+    if (!this.regexTelefono.test(val.telefono)) {
       this.loadingProfilo = false;
-      alert("Il numero di telefono dev'essere di 10 cifre");
+      alert('Il numero di telefono deve contenere esattamente 10 cifre numeriche');
       return;
     }
 
@@ -134,7 +134,7 @@ salvaProfilo(): void {
       this.loadingProfilo = false;
       this.salvatoProfilo = true;
       this.profiloEsistente = pReq; // <--- Aggiorna i dati locali con quelli appena salvati
-      
+
       this.cdr.detectChanges(); // <--- AGGIUNGI QUESTO QUI!
 
       setTimeout(() => {
@@ -264,7 +264,7 @@ salvaProfilo(): void {
   // GESTIONE CAMBIO PWD
 
   apriDialogPassword(): void {
-     console.log('APRI DIALOG CHIAMATO');
+    console.log('APRI DIALOG CHIAMATO');
     this.mostraDialogPassword = true;
     this.errorePassword = '';
     this.successoPassword = false;
