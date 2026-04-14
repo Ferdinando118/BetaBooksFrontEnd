@@ -46,6 +46,11 @@
         </p>
 
         <div class="libro-meta">
+
+          <span>
+               𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃 {{formatoSelezionato()?.isbn}}
+          </span>
+
           @if (libro()!.editore) {
             <span>🏢 {{ libro()!.editore.nome }}</span>
           }
@@ -61,6 +66,7 @@
               📦 {{ disponibile() ? formatoSelezionato()!.quantita + ' disponibili' : 'Esaurito' }}
             }
           </span>
+          
         </div>
 
         @if (libro()!.categorie?.length > 0) {
