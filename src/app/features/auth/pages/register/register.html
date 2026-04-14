@@ -38,6 +38,11 @@
         <input type="password" formControlName="password" placeholder="••••••••">
       </div>
 
+      <div class="form-group">
+        <label>Conferma Password</label>
+        <input type="password" formControlName="passwordConferma" placeholder="••••••••">
+      </div>
+
       @if (errore) {
         <div class="alert-error">{{ errore }}</div>
       }

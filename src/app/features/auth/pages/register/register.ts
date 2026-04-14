@@ -26,13 +26,21 @@ export class Register {
       nome:     ['', Validators.required],
       cognome:  ['', Validators.required],
       email:    ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      passwordConferma: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 /*
   submit(): void {
   if (this.form.invalid) { this.form.markAllAsTouched(); return; }
   this.loading = true;
+
+ //console.log(this.form.value.email+ 'e' +this.form.value.password + 'e' + this.form.value.passwordConferma);
+
+  if( this.form.value.password != this.form.value.passwordConferma ){
+    this.errore='password non coincidono';
+    return;
+  }
 
   const payloadUtente = {
     email: this.form.value.email,
@@ -50,7 +58,7 @@ export class Register {
         const payloadProfilo = {
           idUtente: idDelNuovoUtente,
           nome: this.form.value.nome,
-          cognome: this.form.value.cognome
+          cognome: this.form.value.cognome          
         };
         
       
@@ -72,6 +80,13 @@ export class Register {
 submit(): void {
   if (this.form.invalid) { this.form.markAllAsTouched(); return; }
   this.loading = true;
+
+  if( this.form.value.password != this.form.value.passwordConferma ){
+    this.errore='password non coincidono';
+    this.loading=false;
+    this.form.markAllAsTouched();
+    return;
+  }
 
   // Inviamo un unico payload con TUTTO quello che serve (email, pwd, nome, cognome)
   const payloadCompleto = {
