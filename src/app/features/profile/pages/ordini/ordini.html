@@ -56,6 +56,7 @@
               <div class="ordine-meta">
                 <span class="ordine-id">Numero dell'ordine: #{{ ordine.id }}</span>
                 <span class="ordine-data">Effettuato in data: {{ ordine.dataOrdine | date:'dd/MM/yyyy' }}</span>
+                <span class="ordine-data">Indirizzo di consegna: {{ ordine.indirizzo || '/'}}</span>
               </div>
 
               <div class="ordine-centro">
@@ -114,6 +115,8 @@
                       <div class="item-info">
                         <p class="item-titolo">{{ item.titoloLibro }}</p>
                         <p class="text-muted">Qtà: {{ item.quantita }}</p>
+                       <p class="text-muted">Tipo Supporto: {{ item.tipoSupporto || '/' }}</p>
+                        <p class="text-muted">Tipo Copertina: {{ item.tipoCopertina || '/' }}</p>
                       </div>
                       <span class="item-prezzo">€ {{ item.prezzoUnitarioAcquisto | number:'1.2-2' }}</span>
                     </div>
