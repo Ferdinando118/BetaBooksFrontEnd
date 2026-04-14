@@ -36,6 +36,7 @@ export interface Indirizzo {
   provincia?: string;
   paese: string;
   noteConsegna?: string;
+  attivo: boolean;
 }
 
 // ── CATALOGO ──────────────────────────────────────
