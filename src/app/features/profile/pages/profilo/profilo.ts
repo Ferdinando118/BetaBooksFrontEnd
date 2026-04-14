@@ -110,8 +110,17 @@ export class Profilo implements OnInit {
 
 salvaProfilo(): void {
     if (this.formProfilo.invalid) return;
+
+    
+
     this.loadingProfilo = true;
     const val = this.formProfilo.value;
+
+    if(val.telefono.length!=10){
+      this.loadingProfilo = false;
+      alert("Il numero di telefono dev'essere di 10 cifre");
+      return;
+    }
 
     const pReq = {
       ...this.profiloEsistente,

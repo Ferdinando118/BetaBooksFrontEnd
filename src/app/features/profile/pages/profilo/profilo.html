@@ -67,7 +67,7 @@
         <div class="row g-3">
           
           @for (ind of indirizzi; track ind.id) {
-
+            @if(ind.attivo === true){
             <div class="col-md-6">
               <div
                 class="border p-3 rounded position-relative h-100"
@@ -109,7 +109,7 @@
                 </div>
               </div>
             </div>
-          
+          }
           }
         </div>
       }
