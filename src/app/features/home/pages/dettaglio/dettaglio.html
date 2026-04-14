@@ -4,17 +4,21 @@
 
 @if (!loading() && libro()) {
   <div class="dettaglio-wrapper">
-
     <aside class="dettaglio-cover">
-      
-      <img [src]="getImmagine(formatoSelezionato()?.copertina || libro()!.copertina)" 
-           [alt]="libro()!.titolo"
-           onerror="this.onerror=null; this.src='/assets/images/default-book.png'">
-
-      @if (disponibile()) {
-        <button class="btn btn-accent w-full"
-                (click)="aggiungiAlCarrello()"
-                [disabled]="aggiunto()">
+      <img
+        [src]="getImmagine(formatoSelezionato()?.copertina || libro()!.copertina)"
+        [alt]="libro()!.titolo"
+        onerror="
+          this.onerror = null;
+          this.src = '/assets/images/default-book.png';
+        "
+      />
+      @if (disponibile() ) {
+        <button
+          class="btn btn-accent w-full"
+          (click)="aggiungiAlCarrello()"
+          [disabled]="aggiunto()"
+        >
           {{ aggiunto() ? '✅ Aggiunto!' : '🛒 Aggiungi al carrello' }}
         </button>
       } @else {
@@ -49,7 +53,7 @@
             <span>📅 {{ libro()!.anno }}</span>
           }
           <span>🌐 {{ libro()!.lingua }}</span>
-          
+
           <span>
             @if (formatoSelezionato()?.tipoSupporto === 'EBOOK') {
               📥 Download Immediato
@@ -67,47 +71,73 @@
           </div>
         }
 
-@if (formati().length > 0) {
-          <div class="formati-selector" style="margin-top: 20px;">
-            <p class="text-muted" style="font-size: 13px; margin-bottom: 8px;">Scegli il formato desiderato:</p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              
+        @if (formati().length > 0) {
+          <div class="formati-selector" style="margin-top: 20px">
+            <p class="text-muted" style="font-size: 13px; margin-bottom: 8px">
+              Scegli il formato desiderato:
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap">
               @for (f of formati(); track f.id) {
-                <div class="formato-box"
-                     style="border: 2px solid; padding: 10px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; position: relative;"
-                     [style.borderColor]="formatoSelezionato()?.id === f.id ? '#0d6efd' : '#e2e8f0'"
-                     [style.backgroundColor]="formatoSelezionato()?.id === f.id ? '#f0f7ff' : '#fff'"
-                     [style.opacity]="!f.attivo ? '0.6' : '1'"
-                     (click)="formatoSelezionato.set(f)">
-                  
-                  <div style="font-weight: 600; font-size: 14px; color: #1e293b;" 
-                       [style.textDecoration]="!f.attivo ? 'line-through' : 'none'">
+                <div
+                  class="formato-box"
+                  style="
+                    border: 2px solid;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    position: relative;
+                  "
+                  [style.borderColor]="formatoSelezionato()?.id === f.id ? '#0d6efd' : '#e2e8f0'"
+                  [style.backgroundColor]="formatoSelezionato()?.id === f.id ? '#f0f7ff' : '#fff'"
+                  [style.opacity]="!f.attivo ? '0.6' : '1'"
+                  (click)="formatoSelezionato.set(f)"
+                >
+                  <div
+                    style="font-weight: 600; font-size: 14px; color: #1e293b"
+                    [style.textDecoration]="!f.attivo ? 'line-through' : 'none'"
+                  >
                     {{ getLabelFormato(f) }}
                   </div>
-                  
-                  <div style="font-size: 15px; font-weight: bold; margin-top: 4px;"
-                       [style.color]="!f.attivo ? '#94a3b8' : '#0d6efd'">
-                    € {{ f.prezzo | number:'1.2-2' }}
+
+                  <div
+                    style="font-size: 15px; font-weight: bold; margin-top: 4px"
+                    [style.color]="!f.attivo ? '#94a3b8' : '#0d6efd'"
+                  >
+                    € {{ f.prezzo | number: '1.2-2' }}
                   </div>
 
                   @if (!f.attivo) {
-                    <div style="margin-top: 6px;">
-                      <span style="font-size: 10px; background-color: #fee2e2; color: #ef4444; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase;">
+                    <div style="margin-top: 6px">
+                      <span
+                        style="
+                          font-size: 10px;
+                          background-color: #fee2e2;
+                          color: #ef4444;
+                          padding: 2px 6px;
+                          border-radius: 4px;
+                          font-weight: 700;
+                          text-transform: uppercase;
+                        "
+                      >
                         Disattivato
                       </span>
                     </div>
                   }
-
                 </div>
               }
-
             </div>
           </div>
         }
 
-        <div class="prezzo-box" style="margin-top: 20px;">
-          <span class="price">€ {{ formatoSelezionato() ? (formatoSelezionato()!.prezzo | number:'1.2-2') : 'N/D' }}</span>
-          
+        <div class="prezzo-box" style="margin-top: 20px">
+          <span class="price"
+            >€
+            {{
+              formatoSelezionato() ? (formatoSelezionato()!.prezzo | number: '1.2-2') : 'N/D'
+            }}</span
+          >
+
           @if (libro()!.valutazioneMedia) {
             <span class="stelle-media">
               ★ {{ libro()!.valutazioneMedia }} / 5
@@ -117,14 +147,54 @@
         </div>
 
         @if (libro()!.descrizione) {
-          <hr class="divider">
-          <p style="line-height: 1.6; margin-top: 12px">{{ libro()!.descrizione }}</p>
+          <hr class="divider" />
+          <div style="margin-top: 12px">
+            <b>Sul libro:</b>
+            <div class="bio-container" [class.expanded]="descrizioneEspansa">
+              <p class="bio-text" style="line-height: 1.6; margin: 0">
+                {{ libro()!.descrizione }}
+              </p>
+            </div>
+            <button class="read-more-btn" (click)="descrizioneEspansa = !descrizioneEspansa">
+              {{ descrizioneEspansa ? 'Mostra meno ▲' : 'Continua a leggere ▼' }}
+            </button>
+          </div>
         }
+        <hr class="divider" />
+        <div style="margin-top: 12px">
+          <b>Sull'autore:</b>
+          <div class="bio-container" [class.expanded]="biografiaEspansa">
+            <p class="bio-text" style="line-height: 1.6; margin: 0">
+              {{ libro()!.autore?.biografia }}
+            </p>
+          </div>
+          <button class="read-more-btn" (click)="biografiaEspansa = !biografiaEspansa">
+            {{ biografiaEspansa ? 'Mostra meno ▲' : 'Continua a leggere ▼' }}
+          </button>
+        </div>
+
+        <hr class="divider" />
+          <div style="margin-top: 12px">
+            <b>Sull'editore:</b>
+            <div class="bio-container" [class.expanded]="editoreEspanso">
+              <p class="bio-text" style="line-height: 1.6; margin: 0">
+                {{ libro()!.editore?.descrizione }}
+              </p>
+            </div>
+            <button class="read-more-btn" (click)="editoreEspanso = !editoreEspanso">
+              {{ editoreEspanso ? 'Mostra meno ▲' : 'Continua a leggere ▼' }}
+            </button>
+          </div>
+
+        
+
       </div>
+
+      
 
       <div class="card" style="margin-top: 24px">
         <h2 class="section-title">Recensioni</h2>
-        <hr class="divider">
+        <hr class="divider" />
 
         @if (recensioni().length === 0) {
           <p class="text-muted">Nessuna recensione ancora. Sii il primo!</p>
@@ -134,7 +204,7 @@
           <div class="recensione">
             <div class="rec-header">
               <span class="rec-stelle">{{ stelle(r.valutazione) }}</span>
-              <span class="text-muted">{{ r.data | date:'dd/MM/yyyy' }}</span>
+              <span class="text-muted">{{ r.data | date: 'dd/MM/yyyy' }}</span>
             </div>
             @if (r.descrizione) {
               <p class="rec-testo">{{ r.descrizione }}</p>
@@ -143,29 +213,34 @@
         }
 
         @if (auth.isLoggedIn() && !recensioneInviata()) {
-          <hr class="divider">
-          <h3 style="font-size:15px; font-weight:600; color:var(--bb-blue); margin-bottom:12px">
+          <hr class="divider" />
+          <h3 style="font-size: 15px; font-weight: 600; color: var(--bb-blue); margin-bottom: 12px">
             Lascia una recensione
           </h3>
           <form [formGroup]="formRecensione" (ngSubmit)="inviaRecensione()">
             <div class="form-group">
               <label>Voto (1-5)</label>
-              <input type="number" formControlName="valutazione" min="1" max="5">
+              <input type="number" formControlName="valutazione" min="1" max="5" />
             </div>
             <div class="form-group">
               <label>Commento</label>
-              <textarea formControlName="descrizione" rows="3"
-                        placeholder="Cosa ne pensi di questo libro?"></textarea>
+              <textarea
+                formControlName="descrizione"
+                rows="3"
+                placeholder="Cosa ne pensi di questo libro?"
+              ></textarea>
             </div>
 
             <button type="submit" class="btn btn-primary btn-sm">Invia recensione</button>
 
             @if (erroreRecensione()) {
-              <div class="text-danger small fw-bold" style="display: block; margin-top: 15px !important;">
+              <div
+                class="text-danger small fw-bold"
+                style="display: block; margin-top: 15px !important"
+              >
                 ⚠️ {{ erroreRecensione() }}
               </div>
             }
-
           </form>
         }
 
@@ -175,7 +250,6 @@
           </div>
         }
       </div>
-
     </div>
   </div>
 }
