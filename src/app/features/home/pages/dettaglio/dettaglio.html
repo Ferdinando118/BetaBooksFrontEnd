@@ -155,7 +155,7 @@
         @if (libro()!.descrizione) {
           <hr class="divider" />
           <div style="margin-top: 12px">
-            <b>Sul libro:</b>
+            <b>Sul libro 📖</b>
             <div class="bio-container" [class.expanded]="descrizioneEspansa">
               <p class="bio-text" style="line-height: 1.6; margin: 0">
                 {{ libro()!.descrizione }}
@@ -168,7 +168,7 @@
         }
         <hr class="divider" />
         <div style="margin-top: 12px">
-          <b>Sull'autore:</b>
+          <b>Sull'autore 👤</b>
           <div class="bio-container" [class.expanded]="biografiaEspansa">
             <p class="bio-text" style="line-height: 1.6; margin: 0">
               {{ libro()!.autore?.biografia }}
@@ -181,7 +181,7 @@
 
         <hr class="divider" />
           <div style="margin-top: 12px">
-            <b>Sull'editore:</b>
+            <b>Sull'editore 🏢</b>
             <div class="bio-container" [class.expanded]="editoreEspanso">
               <p class="bio-text" style="line-height: 1.6; margin: 0">
                 {{ libro()!.editore?.descrizione }}
