@@ -32,6 +32,8 @@
           @if (indirizzi.length > 0 && !mostraNuovoIndirizzo) {
             <div class="indirizzi-grid">
               @for (ind of indirizzi; track ind.id) {
+
+@if (ind.attivo === true ) {
                 <div class="indirizzo-card" 
                      [class.selected]="indirizzoSelezionato === ind.id"
                      (click)="selezionaIndirizzo(ind.id!)">
@@ -47,6 +49,7 @@
                     <input type="radio" [checked]="indirizzoSelezionato === ind.id" readonly> Seleziona
                   </div>
                 </div>
+              }
               }
             </div>
           }
