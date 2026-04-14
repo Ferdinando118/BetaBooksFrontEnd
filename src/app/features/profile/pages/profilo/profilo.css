@@ -757,3 +757,27 @@
   font-weight: 600;
   font-size: 0.9rem;
 }
+
+/* Contenitore per allineare i due input */
+.phone-combined-container {
+  display: flex;
+  gap: 8px; /* Spazio tra prefisso e telefono */
+  align-items: center;
+}
+
+/* Stile per il prefisso (piccolino) */
+.prefisso-input {
+  flex: 0 0 70px; /* Non cresce, non restringe, larghezza fissa 70px */
+  text-align: center;
+  background-color: #f8f9fa; /* Grigino leggero per distinguerlo */
+}
+
+/* Stile per il telefono (si prende il resto dello spazio) */
+.telefono-input {
+  flex: 1; /* Occupa tutto lo spazio rimanente */
+}
+
+/* Opzionale: focus coordinato */
+.phone-combined-container .form-control:focus {
+  z-index: 2;
+}
