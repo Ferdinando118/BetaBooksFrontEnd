@@ -29,5 +29,9 @@ export class RecensioneService {
     return this.http.delete<Resp>(`${this.apiUrl}/delete`, { params });
   }
 
+  update(req: any): Observable<any> {
+    return this.http.put<any>(`http://localhost:8080/api/recensione/update`, req);
+  }
+
 } 
 

@@ -29,6 +29,7 @@ export class Dettaglio implements OnInit {
   biografiaEspansa = false;
   descrizioneEspansa = false;
   editoreEspanso = false;
+  recensioneInModifica: any | null = null;
 
   // --- 2. Computed Signals ---
   // Ora controlla se IL FORMATO SELEZIONATO ha quantità > 0
@@ -79,12 +80,16 @@ export class Dettaglio implements OnInit {
     this.caricaRecensioni(id);
   }
 
-  caricaRecensioni(idLibro: number) {
-    this.recensioneService.getByLibro(idLibro).subscribe({
-      next: (res) => this.recensioni.set(res),
-      error: (err) => console.error('Errore recensioni:', err)
-    });
-  }
+ caricaRecensioni(idLibro: number) {
+  this.recensioneService.getByLibro(idLibro).subscribe({
+    next: (res) => {
+      this.recensioni.set(res);
+    
+    }
+  });
+}
+
+
 
   // NUOVO METODO: Crea l'etichetta testuale per i bottoni dei formati
   getLabelFormato(f: any): string {
@@ -129,35 +134,53 @@ export class Dettaglio implements OnInit {
     });
   }
 
-  inviaRecensione(): void {
+ inviaRecensione(): void {
     if (this.formRecensione.invalid) return;
 
     const utenteLoggato = this.auth.grant().utente;
-
     if (!utenteLoggato) {
       this.erroreRecensione.set("Devi effettuare il login per lasciare una recensione.");
       return;
     }
 
-    const req = {
+    // 1. Definiamo la base della richiesta
+    const req: any = {
       valutazione: this.formRecensione.value.valutazione,
       descrizione: this.formRecensione.value.descrizione,
       idLibro: this.libro()?.id,
       idUtente: utenteLoggato.id 
     };
 
-    this.recensioneService.create(req).subscribe({
-      next: (res) => {
-        this.recensioneInviata.set(true);
-        this.erroreRecensione.set(null);
-        this.caricaRecensioni(this.libro()?.id);
-      },
-      error: (err) => {
-        console.error("Errore API:", err);
-        const msg = err?.error?.message || "Errore di connessione al server (403)";
-        this.erroreRecensione.set(msg);
-      }
-    });
+    // 2. Se stiamo modificando, aggiungiamo l'ID della recensione!
+    if (this.recensioneInModifica) {
+      req.id = this.recensioneInModifica.id; 
+      
+      this.recensioneService.update(req).subscribe({
+        next: () => {
+          this.recensioneInModifica = null; // Reset dello stato di modifica
+          this.formRecensione.reset({ valutazione: 5 }); // Pulisci il form
+          this.caricaRecensioni(this.libro()?.id); // Ricarica la lista aggiornata
+        },
+        error: (err) => {
+          console.error("Errore update:", err);
+          this.erroreRecensione.set("Errore durante l'aggiornamento.");
+        }
+      });
+    } else {
+      // CHIAMATA CREATE (il tuo codice originale va benissimo)
+      this.recensioneService.create(req).subscribe({
+        next: (res) => {
+          this.recensioneInviata.set(true);
+          this.erroreRecensione.set(null);
+          this.caricaRecensioni(this.libro()?.id);
+        },
+        error: (err) => {
+          console.error("Errore API:", err);
+          const msg = err?.error?.message || "Errore di connessione al server";
+          this.erroreRecensione.set(msg);
+        }
+      });
+    }
   }
   
   stelle(n: number): string {
@@ -170,4 +193,30 @@ export class Dettaglio implements OnInit {
     if (!lista.length) return 0;
     return lista.reduce((acc, r) => acc + r.valutazione, 0) / lista.length;
   }
+
+  preparaModifica(recensione: any): void {
+  this.recensioneInModifica = recensione;
+  // Carichiamo i dati della recensione nel form esistente
+  this.formRecensione.patchValue({
+    valutazione: recensione.valutazione,
+    descrizione: recensione.descrizione
+  });
+}
+
+eliminaRecensione(id: number): void {
+  // Richiesta di conferma per sicurezza
+  if (confirm("Sei sicuro di voler eliminare questa recensione?")) {
+    this.recensioneService.delete(id).subscribe({
+      next: (res) => {
+        // Dopo l'eliminazione, ricarichiamo la lista per rimuovere la recensione dalla vista
+        this.caricaRecensioni(this.libro()?.id);
+      },
+      error: (err) => {
+        console.error("Errore durante l'eliminazione:", err);
+        alert("Impossibile eliminare la recensione: " + (err.error?.message || "Errore sconosciuto"));
+      }
+    });
+  }
+}
+
 }

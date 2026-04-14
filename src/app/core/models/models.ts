@@ -170,6 +170,7 @@ export interface Recensione {
   valutazione: number;   // 1-5
   descrizione?: string;
   data: string;
+  nomeUtente:string;
 }
 
 export interface WishlistItem {

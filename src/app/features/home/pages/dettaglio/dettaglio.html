@@ -205,8 +205,19 @@
         @for (r of recensioni(); track r.id) {
           <div class="recensione">
             <div class="rec-header">
-              <span class="rec-stelle">{{ stelle(r.valutazione) }}</span>
-              <span class="text-muted">{{ r.data | date: 'dd/MM/yyyy' }}</span>
+              <div class="rec-info">
+                <span class="rec-autore">{{ r.nomeUtente }}</span>
+                <span class="rec-data text-muted">• {{ r.data | date: 'dd/MM/yyyy' }}</span>
+              </div>
+
+              <div class="rec-actions">
+                <span class="rec-stelle">{{ stelle(r.valutazione) }}</span>
+                
+                @if (auth.isLoggedIn() && auth.grant().utente?.id === r.idUtente) {
+                  <button class="btn btn-sm btn-outline" (click)="preparaModifica(r)">✏️</button>
+                  <button class="btn btn-sm btn-outline" (click)="eliminaRecensione(r.id)">🗑️</button>
+                }
+              </div>
             </div>
             @if (r.descrizione) {
               <p class="rec-testo">{{ r.descrizione }}</p>

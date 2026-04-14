@@ -162,3 +162,61 @@
   text-decoration: underline;
   color: var(--bb-blue);
 }
+
+.rec-header {
+  display: flex;
+  justify-content: space-between; /* Spinge gli elementi ai lati estremi */
+  align-items: center;            /* Allinea verticalmente al centro */
+  margin-bottom: 10px;
+}
+
+.rec-info {
+  display: flex;
+  gap: 8px; /* Spazio tra nome e data */
+  font-size: 0.9rem;
+}
+
+.rec-autore {
+  font-weight: 600;
+  color: #334155;
+}
+
+.rec-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Spazio tra stelle e bottoni */
+}
+
+.rec-stelle {
+  color: #f59e0b; /* Colore oro per le stelle */
+  font-size: 1rem;
+}
+
+/* Stile per il contenitore di ogni singola recensione */
+.recensione {
+  background-color: #fff; /* Sfondo bianco per staccare dal fondo pagina */
+  border: 1px solid #e2e8f0; /* Un bordo sottile e chiaro */
+  border-radius: 8px; /* Bordi arrotondati per un look moderno */
+  padding: 16px; /* Spazio interno per dare "respiro" al contenuto */
+  margin-bottom: 16px; /* Spazio tra una recensione e l'altra */
+  
+  /* Ombreggiatura leggera e morbida (box-shadow) */
+  /* Sintassi: box-shadow: h-offset v-offset blur-radius spread-radius color; */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
+  
+  /* Aggiungi una transizione fluida per un eventuale effetto hover (opzionale) */
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+/* Effetto al passaggio del mouse (opzionale): aumenta leggermente l'ombra */
+.recensione:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Stili aggiuntivi per gli elementi interni (se non li hai già definiti) */
+.rec-testo {
+  margin-top: 12px;
+  color: #4b5563;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
