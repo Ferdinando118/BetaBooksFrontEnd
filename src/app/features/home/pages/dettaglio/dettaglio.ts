@@ -6,6 +6,7 @@ import { LibroService } from '../../../../core/services/libro';
 import { CarrelloService } from '../../../../core/services/carrello';
 import { AuthService } from '../../../../core/services/auth';
 import { RecensioneService } from '../../../../core/services/recensione';
+import { AutoreService } from '../../../../core/services/autore';
 
 @Component({
   selector: 'app-dettaglio',
@@ -24,6 +25,10 @@ export class Dettaglio implements OnInit {
   aggiunto = signal(false);
   recensioneInviata = signal(false);
   erroreRecensione = signal<string | null>(null);
+
+  biografiaEspansa = false;
+  descrizioneEspansa = false;
+  editoreEspanso = false;
 
   // --- 2. Computed Signals ---
   // Ora controlla se IL FORMATO SELEZIONATO ha quantità > 0

@@ -112,3 +112,44 @@
   .dettaglio-wrapper { grid-template-columns: 1fr; }
   .dettaglio-cover { position: static; }
 }
+
+.bio-container {
+  max-height: 4.8em; /* ~3 righe visibili */
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  position: relative;
+}
+
+.bio-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2em;
+  background: linear-gradient(transparent, white); /* adatta al tuo sfondo */
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.bio-container.expanded {
+  max-height: 1000px; /* valore grande abbastanza */
+}
+
+.bio-container.expanded::after {
+  opacity: 0;
+}
+
+.read-more-btn {
+  background: none;
+  border: none;
+  color: #007bff; /* adatta al tuo colore primario */
+  cursor: pointer;
+  padding: 4px 0;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+
+.read-more-btn:hover {
+  text-decoration: underline;
+}
