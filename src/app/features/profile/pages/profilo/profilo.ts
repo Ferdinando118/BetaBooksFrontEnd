@@ -101,6 +101,8 @@ export class Profilo implements OnInit {
   caricaIndirizzi() {
     this.profiloService.findIndirizziByUser(this.utente!.id).subscribe((list) => {
       this.indirizzi = list || [];
+
+      this.cdr.detectChanges();
     });
   }
 

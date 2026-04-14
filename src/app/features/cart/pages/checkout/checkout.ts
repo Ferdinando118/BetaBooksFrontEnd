@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -24,6 +24,7 @@ export class Checkout implements OnInit {
   private profiloService = inject(ProfiloService);
   private libroService = inject(LibroService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   // --- STATO CARRELLO E ORDINE ---
   items: CarrelloItemDTO[] = [];
@@ -80,6 +81,7 @@ export class Checkout implements OnInit {
           }
           this.caricaFormatiPerItem(item);
         });
+        this.cdr.detectChanges();
       } else if (!this.ordinato) {
         this.router.navigate(['/cart']);
       }
@@ -225,6 +227,7 @@ export class Checkout implements OnInit {
           // Se non ha indirizzi, forziamo l'apertura del form
           this.mostraNuovoIndirizzo = true;
         }
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error("Errore recupero indirizzi:", err);
@@ -307,11 +310,13 @@ export class Checkout implements OnInit {
         this.ordinato = true; 
         this.loading = false;
         this.carrelloService.loadCarrello(); 
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error("Errore:", err);
         this.loading = false;
         alert("Errore: " + (err.error?.message || "Impossibile completare l'ordine"));
+        this.cdr.detectChanges();
       }
     });
   }
