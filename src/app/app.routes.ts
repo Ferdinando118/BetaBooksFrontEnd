@@ -11,6 +11,7 @@ import { EmailValidation } from './features/auth/pages/email-validation/email-va
 import { RecuperoPassword } from './features/recupero-password/recupero-password';
 import { NuovaPassword } from './features/nuova-password/nuova-password';
 import { Wishlist } from './features/wishlist/wishlist';
+import { DettagliAutore } from './features/dettagli-autore/dettagli-autore';
 
 
 export const routes: Routes = [
@@ -71,6 +72,10 @@ export const routes: Routes = [
   {
     path: 'nuova-password',
     component: NuovaPassword,
+  },
+  {
+    path: 'autori/:id',
+    component: DettagliAutore,
   },
   { path: '**', redirectTo: '' },
 ];

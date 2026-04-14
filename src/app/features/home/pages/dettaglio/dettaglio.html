@@ -13,7 +13,7 @@
           this.src = '/assets/images/default-book.png';
         "
       />
-      @if (disponibile() ) {
+      @if (disponibile()) {
         <button
           class="btn btn-accent w-full"
           (click)="aggiungiAlCarrello()"
@@ -39,17 +39,19 @@
         }
 
         <p class="libro-autore">
-          di <strong>{{ libro()!.autore?.nome }} {{ libro()!.autore?.cognome }}</strong>
+          di
+          <strong>
+            <a [routerLink]="['/autori', libro()!.autore?.id]" class="autore-link">
+              {{ libro()!.autore?.nome }} {{ libro()!.autore?.cognome }}
+            </a>
+          </strong>
           @if (libro()!.autore?.nazionalita) {
             · {{ libro()!.autore?.nazionalita }}
           }
         </p>
 
         <div class="libro-meta">
-
-          <span>
-               𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃 {{formatoSelezionato()?.isbn}}
-          </span>
+          <span> 𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃 {{ formatoSelezionato()?.isbn }} </span>
 
           @if (libro()!.editore) {
             <span>🏢 {{ libro()!.editore.nome }}</span>
@@ -66,7 +68,6 @@
               📦 {{ disponibile() ? formatoSelezionato()!.quantita + ' disponibili' : 'Esaurito' }}
             }
           </span>
-          
         </div>
 
         @if (libro()!.categorie?.length > 0) {
@@ -180,23 +181,18 @@
         </div>
 
         <hr class="divider" />
-          <div style="margin-top: 12px">
-            <b>Sull'editore 🏢</b>
-            <div class="bio-container" [class.expanded]="editoreEspanso">
-              <p class="bio-text" style="line-height: 1.6; margin: 0">
-                {{ libro()!.editore?.descrizione }}
-              </p>
-            </div>
-            <button class="read-more-btn" (click)="editoreEspanso = !editoreEspanso">
-              {{ editoreEspanso ? 'Mostra meno ▲' : 'Continua a leggere ▼' }}
-            </button>
+        <div style="margin-top: 12px">
+          <b>Sull'editore 🏢</b>
+          <div class="bio-container" [class.expanded]="editoreEspanso">
+            <p class="bio-text" style="line-height: 1.6; margin: 0">
+              {{ libro()!.editore?.descrizione }}
+            </p>
           </div>
-
-        
-
+          <button class="read-more-btn" (click)="editoreEspanso = !editoreEspanso">
+            {{ editoreEspanso ? 'Mostra meno ▲' : 'Continua a leggere ▼' }}
+          </button>
+        </div>
       </div>
-
-      
 
       <div class="card" style="margin-top: 24px">
         <h2 class="section-title">Recensioni</h2>

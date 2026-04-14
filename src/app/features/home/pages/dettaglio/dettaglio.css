@@ -153,3 +153,12 @@
 .read-more-btn:hover {
   text-decoration: underline;
 }
+
+.autore-link {
+  color: inherit;
+  text-decoration: none;
+}
+.autore-link:hover {
+  text-decoration: underline;
+  color: var(--bb-blue);
+}

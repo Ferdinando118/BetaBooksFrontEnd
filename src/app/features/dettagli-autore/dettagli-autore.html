@@ -1,0 +1,48 @@
+@if (autore(); as data) {
+  <div class="autore-wrapper">
+
+    <!-- Card Autore -->
+    <div class="card autore-header">
+      <div class="autore-meta">
+        <h1 class="autore-nome">{{ data.nome }} {{ data.cognome }}</h1>
+        @if (data.nazionalita) {
+          <span class="autore-nazione">🌐 {{ data.nazionalita }}</span>
+        }
+      </div>
+      @if (data.biografia) {
+        <p class="autore-bio">{{ data.biografia }}</p>
+      }
+    </div>
+
+    <!-- Libri -->
+    <div class="card">
+      <h2 class="section-title">Libri di {{ data.nome }} {{ data.cognome }}</h2>
+      <hr class="divider" />
+
+      <div class="libri-list">
+        @for (libro of libriDellAutore(); track libro.id) {
+          <div class="libro-item">
+
+            <!-- Copertina cliccabile -->
+            <a [routerLink]="['/libro', libro.id]" class="libro-cover-link">
+              <img
+                [src]="getImmagine(libro)"
+                [alt]="libro.titolo"
+                onerror="this.onerror=null; this.src='/assets/images/default-book.png';"
+                class="libro-cover"
+              />
+            </a>
+          </div>
+        } @empty {
+          <p class="text-muted">Nessun libro trovato per questo autore.</p>
+        }
+      </div>
+    </div>
+
+  </div>
+} @else {
+  <div class="stato-pagina">
+    <div class="spinner"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+}
