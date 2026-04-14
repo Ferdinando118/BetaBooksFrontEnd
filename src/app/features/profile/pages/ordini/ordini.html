@@ -54,8 +54,9 @@
             <div class="ordine-header" (click)="toggleDettaglio(ordine.id)">
 
               <div class="ordine-meta">
-                <span class="ordine-id">#{{ ordine.id }}</span>
-                <span class="ordine-data">{{ ordine.dataOrdine | date:'dd/MM/yyyy' }}</span>
+                <span class="ordine-id">Numero dell'ordine: #{{ ordine.id }}</span>
+                <span class="ordine-data">Effettuato in data: {{ ordine.dataOrdine | date:'dd/MM/yyyy' }}</span>
+                <span class="ordine-data">Indirizzo di consegna: {{ ordine.indirizzo || '/'}}</span>
               </div>
 
               <div class="ordine-centro">
@@ -63,18 +64,7 @@
                   {{ iconaStato(ordine.stato) }} {{ ordine.stato }}
                 </span>
                 <div class="ordine-items-preview">
-                  @for (item of ordine.items | slice:0:3; track item.id) {
-                    @if (item.copertina) {
-                      <img [src]="getImmagine(item.copertina)"
-                           [alt]="item.titoloLibro"
-                           class="mini-preview"
-                           (error)="$event.target.src='/assets/images/default-book.png'">
-                    } @else {
-                      <img src="assets/images/default-book.png"
-                           [alt]="item.titoloLibro"
-                           class="mini-preview">
-                    }
-                  }
+                  
                   @if (ordine.items.length > 3) {
                     <div class="more-items-badge">+{{ ordine.items.length - 3 }}</div>
                   }
@@ -82,7 +72,7 @@
               </div>
 
               <div class="ordine-destra">
-                <span class="price">€ {{ ordine.totaleComplessivo | number:'1.2-2' }}</span>
+                <span class="price">Totale: € {{ ordine.totaleComplessivo | number:'1.2-2' }}</span>
                 <span class="toggle-icon">{{ ordineAperto === ordine.id ? '▲' : '▼' }}</span>
               </div>
 
@@ -110,20 +100,23 @@
                 </div>
 
                 <div class="dettaglio-info">
-                  <span class="text-muted">Pagamento:</span>
+                  <span class="text-muted">Metodo di Pagamento:</span>
                   <strong>{{ ordine.metodoPagamento }}</strong>
                 </div>
 
                 <div class="ordine-items">
                   @for (item of ordine.items; track item.id) {
                     <div class="ordine-item">
-                      <img [src]="getImmagine(item.copertina)"
-                           [alt]="item.titoloLibro"
-                           class="img-copertina-ordine"
-                           onerror="this.onerror=null; this.src='/assets/images/default-book.png'">
+                      <img 
+                        [src]="item.copertina" 
+                        (error)="item.copertina = '/assets/images/default-book.png'" 
+                        alt="Copertina di {{ item.titoloLibro }}"
+                        class="img-copertina-ordine">
                       <div class="item-info">
                         <p class="item-titolo">{{ item.titoloLibro }}</p>
                         <p class="text-muted">Qtà: {{ item.quantita }}</p>
+                       <p class="text-muted">Tipo Supporto: {{ item.tipoSupporto || '/' }}</p>
+                        <p class="text-muted">Tipo Copertina: {{ item.tipoCopertina || '/' }}</p>
                       </div>
                       <span class="item-prezzo">€ {{ item.prezzoUnitarioAcquisto | number:'1.2-2' }}</span>
                     </div>

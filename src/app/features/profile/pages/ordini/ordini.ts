@@ -36,8 +36,6 @@ export class Ordini implements OnInit {
   ];
 
   ngOnInit(): void {
-    //this.caricaOrdini();
-
   this.filtriChange$.pipe(
     switchMap(() => {
       const utente = this.auth.grant().utente;
@@ -48,11 +46,43 @@ export class Ordini implements OnInit {
       );
     })
   ).subscribe({
-    next: (ordini) => { this.ordini = ordini; this.loading = false;  this.cdr.markForCheck()},
-    error: (err) => { console.error(err); this.loading = false; this.cdr.markForCheck();}
-  });
+  next: (ordini) => {
+    // 1. STAMPA SEMPRE COSA ARRIVA DAL SERVER
+    console.log("DEBUG ORDINI ARRIVATI:", ordini); 
+    
+    if (!ordini || ordini.length === 0) {
+      console.log("La lista ordini è vuota.");
+      this.ordini = [];
+    } else {
+      const urlServer = 'http://localhost:8080/uploads/';
+      
+      this.ordini = ordini.map(ordine => {
+        // 2. CONTROLLA COME SI CHIAMA LA LISTA DEI LIBRI DENTRO L'ORDINE
+        console.log("Struttura ordine:", ordine); 
+        
+        return {
+          ...ordine,
+          // Se qui 'items' è undefined, allora il nome nel DTO è diverso!
+          items: (ordine.items || []).map((item: any) => ({
+            ...item,
+            copertina: item.copertina 
+              ? (item.copertina.startsWith('http') ? item.copertina : urlServer + item.copertina) 
+              : '/assets/images/default-book.png'
+          }))
+        };
+      });
+    }
+    
+    this.loading = false;
+    this.cdr.markForCheck();
+  },
+  error: (err) => { 
+    console.error("ERRORE NELLA PIPE:", err); 
+    this.loading = false; 
+    this.cdr.markForCheck(); 
+  }
+});
 
-  // Prima chiamata
   this.filtriChange$.next();
 }
   
@@ -112,14 +142,4 @@ export class Ordini implements OnInit {
     }
   }
 
-  // --- NUOVO METODO PER IL BUG DELLE IMMAGINI ---
-  getImmagine(copertina: string | undefined | null): string {
-    if (!copertina) {
-      return '/assets/images/default-book.png'; 
-    }
-    if (copertina.startsWith('http')) {
-      return copertina;
-    }
-    return 'http://localhost:8080/uploads/' + copertina;
-  }
 }

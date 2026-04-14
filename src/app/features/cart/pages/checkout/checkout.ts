@@ -73,6 +73,7 @@ export class Checkout implements OnInit {
     this.carrelloService.carrello$.subscribe((data: CarrelloDTO | null) => {
       if (data && data.items && data.items.length > 0) {
         this.items = data.items;
+        console.log(this.items);
         this.totale = data.prezzoTotaleComplessivo;
         // Inizializza i formati disponibili
         this.items.forEach(item => {

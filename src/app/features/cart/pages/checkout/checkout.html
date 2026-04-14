@@ -3,8 +3,10 @@
     <p style="font-size: 64px;">✅</p>
     <h2>Ordine confermato!</h2>
     <p class="text-muted">Grazie per il tuo acquisto su BetaBooks.</p>
-    <a routerLink="/profile/ordini" class="btn btn-primary mt-16">I miei ordini</a>
-    <a routerLink="/" class="btn btn-outline mt-16" style="margin-top:10px">Torna al catalogo</a>
+    <div class="success-actions">
+      <a routerLink="/profile/ordini" class="btn btn-primary">I miei ordini</a>
+      <a routerLink="/" class="btn btn-primary">Torna al catalogo</a>
+    </div>
   </div>
 }
 
@@ -32,6 +34,8 @@
           @if (indirizzi.length > 0 && !mostraNuovoIndirizzo) {
             <div class="indirizzi-grid">
               @for (ind of indirizzi; track ind.id) {
+
+@if (ind.attivo === true ) {
                 <div class="indirizzo-card" 
                      [class.selected]="indirizzoSelezionato === ind.id"
                      (click)="selezionaIndirizzo(ind.id!)">
@@ -47,6 +51,7 @@
                     <input type="radio" [checked]="indirizzoSelezionato === ind.id" readonly> Seleziona
                   </div>
                 </div>
+              }
               }
             </div>
           }

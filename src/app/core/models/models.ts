@@ -150,6 +150,7 @@ export interface OrdineDTO {
     totaleComplessivo: number;
     metodoPagamento: string; tracking?: TrackingDTO;
     items: OrdineItemDTO[]; // O usa l'interfaccia specifica degli item se l'hai creata
+    indirizzo:string;
 }
 
 export interface OrdineItemDTO {
@@ -158,6 +159,8 @@ export interface OrdineItemDTO {
   copertina: string | null;
   quantita: number;
   prezzoUnitarioAcquisto: number;
+  tipoSupporto?: string;    //  (Copertina flessibile, Copertina rigida, E-book)
+  tipoCopertina?: string;
 }
 // ── RECENSIONE & WISHLIST ─────────────────────────
 export interface Recensione {

@@ -94,6 +94,13 @@ body {
 .btn-primary {
   background: #6366f1;
   color: white;
+  /* Proprietà per centrare */
+  display: flex;
+  justify-content: center; /* Centra orizzontalmente */
+  align-items: center;     /* Centra verticalmente */
+  
+  /* Opzionale: assicura che il testo sia sempre ben allineato */
+  text-align: center;
 }
 
 .btn-primary:hover {
@@ -197,7 +204,7 @@ body {
 
 .text-muted {
   color: #6b7280;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 /* ===== METODI PAGAMENTO ===== */
@@ -272,6 +279,22 @@ body {
 .success h2 {
   margin: 10px 0;
   font-size: 24px;
+}
+
+.success-actions {
+  display: flex;
+  justify-content: center; 
+  gap: 20px;             
+  margin-top: 24px;  
+  align-items: center;     /* Centra verticalmente */
+  /* Opzionale: assicura che il testo sia sempre ben allineato */
+  text-align: center;     
+}
+
+
+.success-actions .btn {
+  min-width: 180px;
+  text-align: center;
 }
 
 /* ===== RESPONSIVE ===== */

@@ -108,7 +108,7 @@ export class Profilo implements OnInit {
 
   // ─── GESTIONE PROFILO ──────────────────────────────────────────────
 
-  salvaProfilo(): void {
+salvaProfilo(): void {
     if (this.formProfilo.invalid) return;
     this.loadingProfilo = true;
     const val = this.formProfilo.value;
@@ -124,7 +124,14 @@ export class Profilo implements OnInit {
     this.profiloService.saveProfilo(pReq).subscribe(() => {
       this.loadingProfilo = false;
       this.salvatoProfilo = true;
-      setTimeout(() => (this.salvatoProfilo = false), 3000);
+      this.profiloEsistente = pReq; // <--- Aggiorna i dati locali con quelli appena salvati
+      
+      this.cdr.detectChanges(); // <--- AGGIUNGI QUESTO QUI!
+
+      setTimeout(() => {
+        this.salvatoProfilo = false;
+        this.cdr.detectChanges(); // <--- Serve anche qui per far sparire il messaggio "✅ Profilo salvato!"
+      }, 3000);
     });
   }
 
