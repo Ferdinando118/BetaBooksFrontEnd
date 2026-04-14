@@ -43,7 +43,8 @@ export class Profilo implements OnInit {
   successoPassword = false;
 
   regexTelefono = /^[0-9]{10}$/;
-  errors='';
+  regexPrefisso = /^\+[0-9]{2}$/;
+  errors = '';
 
   formPassword = {
     vecchiaPassword: '',
@@ -62,6 +63,7 @@ export class Profilo implements OnInit {
       nome: ['', Validators.required],
       cognome: ['', Validators.required],
       telefono: [''],
+      prefisso: [''],
     });
 
     // FORM 2: INDIRIZZO (corretto "citta" in "comune"!)
@@ -90,7 +92,7 @@ export class Profilo implements OnInit {
     this.profiloService.findByUtente(idUtente).subscribe((p) => {
       if (p) {
         this.profiloEsistente = p;
-        this.formProfilo.patchValue({ nome: p.nome, cognome: p.cognome, telefono: p.telefono });
+        this.formProfilo.patchValue({ nome: p.nome, cognome: p.cognome, prefisso: p.telefono?.substring(0,3) , telefono: p.telefono?.substring(3) });
       }
     });
 
@@ -114,21 +116,30 @@ export class Profilo implements OnInit {
   salvaProfilo(): void {
     if (this.formProfilo.invalid) return;
 
+    this.errors='';
     this.loadingProfilo = true;
     const val = this.formProfilo.value;
 
     if (!this.regexTelefono.test(val.telefono)) {
       this.loadingProfilo = false;
       //alert('Il numero di telefono deve contenere esattamente 10 cifre numeriche');
-      this.errors='Il numero di telefono deve contenere esattamente 10 cifre numeriche'
+      this.errors = 'Il numero di telefono deve contenere esattamente 10 cifre numeriche';
       return;
     }
+
+    if (!this.regexPrefisso.test(val.prefisso)) {
+      this.loadingProfilo = false;
+      this.errors = 'Il prefisso deve essere nel formato +39';
+      return;
+    }
+
+    const telefonoCompleto = val.prefisso.trim() + val.telefono.trim();
 
     const pReq = {
       ...this.profiloEsistente,
       nome: val.nome,
       cognome: val.cognome,
-      telefono: val.telefono,
+      telefono: telefonoCompleto,
       idUtente: this.utente!.id,
     } as ProfiloUtente;
 
