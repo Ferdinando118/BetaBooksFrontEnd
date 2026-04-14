@@ -44,7 +44,7 @@
       </div>
 
       @if (errore) {
-        <div class="alert-error">{{ errore }}</div>
+        <div class="alert-error" style="white-space: pre-line">{{ errore }}</div>
       }
 
       <button type="submit" class="btn btn-accent w-full" [disabled]="loading">

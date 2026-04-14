@@ -9,7 +9,7 @@ import { ProfiloService } from '../../../../core/services/profilo';
   selector: 'app-register',
   standalone: false,
   templateUrl: './register.html',
-  styleUrl: './register.css'
+  styleUrl: './register.css',
 })
 export class Register {
   form: FormGroup;
@@ -20,17 +20,17 @@ export class Register {
     private profiloService: ProfiloService,
     private fb: FormBuilder,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
   ) {
     this.form = this.fb.group({
-      nome:     ['', Validators.required],
-      cognome:  ['', Validators.required],
-      email:    ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      passwordConferma: ['', [Validators.required, Validators.minLength(6)]]
+      nome: ['', Validators.required],
+      cognome: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+      passwordConferma: ['', [Validators.required]],
     });
   }
-/*
+  /*
   submit(): void {
   if (this.form.invalid) { this.form.markAllAsTouched(); return; }
   this.loading = true;
@@ -77,41 +77,74 @@ export class Register {
   });
 }*/
 
-submit(): void {
-  if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-  this.loading = true;
+  submit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.loading = true;
 
-  if( this.form.value.password != this.form.value.passwordConferma ){
-    this.errore='password non coincidono';
-    this.loading=false;
-    this.form.markAllAsTouched();
-    return;
+    if (this.form.value.password != this.form.value.passwordConferma) {
+      this.errore = 'password non coincidono';
+      this.loading = false;
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    if(this.validaPassword(this.form.value.password).errors.length !== 0){
+      this.errore = '';
+      for (const e of this.validaPassword(this.form.value.password).errors){
+        this.errore = this.errore + e + '\n';
+      }
+      this.loading = false;
+      this.form.markAllAsTouched();
+      return;
+    }
+    
+
+    // Inviamo un unico payload con TUTTO quello che serve (email, pwd, nome, cognome)
+    const payloadCompleto = {
+      email: this.form.value.email,
+      password: this.form.value.password,
+      nome: this.form.value.nome,
+      cognome: this.form.value.cognome,
+    };
+
+    // Chiamiamo una sola volta il backend
+    this.auth.register(payloadCompleto).subscribe({
+      next: () => {
+        // SUCCESS: il backend ha creato sia l'utente che il profilo in un colpo solo
+        this.router.navigate(['/auth/login']);
+      },
+      error: (err) => {
+        // ERROR: il backend gestirà l'errore (es. email già esistente)
+        this.errore = 'Registrazione fallita. Riprova.';
+        this.loading = false;
+      },
+    });
   }
 
-  // Inviamo un unico payload con TUTTO quello che serve (email, pwd, nome, cognome)
-  const payloadCompleto = {
-    email: this.form.value.email,
-    password: this.form.value.password,
-    nome: this.form.value.nome,
-    cognome: this.form.value.cognome
-  };
+  validaPassword(password: string): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
+    if (!/[A-Z]/.test(password)) errors.push('Almeno una lettera maiuscola');
+    if (!/[a-z]/.test(password)) errors.push('Almeno una lettera minuscola');
+    if (!/[0-9]/.test(password)) errors.push('Almeno un numero');
+    if (!/[#?!@$%^&*-]/.test(password)) errors.push('Almeno un carattere speciale (#?!@$%^&*-)');
+    if (password.length < 8) errors.push('Almeno 8 caratteri');
 
-  // Chiamiamo una sola volta il backend
-  this.auth.register(payloadCompleto).subscribe({
-    next: () => {
-      // SUCCESS: il backend ha creato sia l'utente che il profilo in un colpo solo
-      this.router.navigate(['/auth/login']);
-    },
-    error: (err) => {
-      // ERROR: il backend gestirà l'errore (es. email già esistente)
-      this.errore = 'Registrazione fallita. Riprova.';
-      this.loading = false;
-    }
-  });
-}
+    return { valid: errors.length === 0, errors };
+  }
 
-  get nome()     { return this.form.get('nome')!; }
-  get cognome()  { return this.form.get('cognome')!; }
-  get email()    { return this.form.get('email')!; }
-  get password() { return this.form.get('password')!; }
+  get nome() {
+    return this.form.get('nome')!;
+  }
+  get cognome() {
+    return this.form.get('cognome')!;
+  }
+  get email() {
+    return this.form.get('email')!;
+  }
+  get password() {
+    return this.form.get('password')!;
+  }
 }
