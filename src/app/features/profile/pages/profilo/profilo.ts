@@ -43,6 +43,7 @@ export class Profilo implements OnInit {
   successoPassword = false;
 
   regexTelefono = /^[0-9]{10}$/;
+  errors='';
 
   formPassword = {
     vecchiaPassword: '',
@@ -118,7 +119,8 @@ export class Profilo implements OnInit {
 
     if (!this.regexTelefono.test(val.telefono)) {
       this.loadingProfilo = false;
-      alert('Il numero di telefono deve contenere esattamente 10 cifre numeriche');
+      //alert('Il numero di telefono deve contenere esattamente 10 cifre numeriche');
+      this.errors='Il numero di telefono deve contenere esattamente 10 cifre numeriche'
       return;
     }
 
