@@ -28,7 +28,6 @@ export class FormLibro implements OnInit {
   idLibro?: number;
   loading = false;
 
-  // NUOVO: Usiamo una Map per tenere traccia del file caricato per ogni indice del FormArray
   selectedFiles = new Map<number, File>();
 
   autori = signal<any[]>([]);
@@ -110,11 +109,10 @@ export class FormLibro implements OnInit {
   rimuoviFormato(index: number): void {
     this.formati.removeAt(index);
 
-    // Riassegna gli indici della mappa per mantenere allineati i file
     const nuovaMappa = new Map<number, File>();
     this.selectedFiles.forEach((file, key) => {
       if (key < index) nuovaMappa.set(key, file);
-      if (key > index) nuovaMappa.set(key - 1, file); // Scala di uno
+      if (key > index) nuovaMappa.set(key - 1, file);
     });
     this.selectedFiles = nuovaMappa;
   }
@@ -161,7 +159,6 @@ export class FormLibro implements OnInit {
     });
   }
 
-  // NUOVO: Salva il file nella mappa usando l'indice del formato come chiave
   onFileSelected(event: any, index: number) {
     const file = event.target.files[0] as File;
     if (file) {
@@ -171,7 +168,6 @@ export class FormLibro implements OnInit {
     }
   }
 
-  // NUOVO: Helper per formattare l'URL della miniatura in tabella
   getImmagineUrl(copertina: string | null): string | null {
     if (!copertina) return null;
     if (copertina.startsWith('http')) return copertina;
@@ -272,22 +268,18 @@ export class FormLibro implements OnInit {
         ? this.libroService.updateFormato(formatoData)
         : this.libroService.createFormato(this.idLibro!, formatoData);
 
-        console.log('Dati formato inviati:', JSON.stringify(formatoData));
+      console.log('Dati formato inviati:', JSON.stringify(formatoData));
 
       operazione.subscribe({
         next: (res: any) => {
-          // --- FIX ESTRAZIONE ID ---
-          // Iniziamo con l'ID che già conosciamo (se siamo in modifica)
           let idNuovoFormato: number | null = formato.id ? Number(formato.id) : null;
 
-          // Se siamo in creazione, cerchiamo l'ID nella risposta del server in tutti i modi possibili
           if (!idNuovoFormato && res !== null && res !== undefined) {
             if (typeof res === 'number') {
-              idNuovoFormato = res; // Il server ha mandato un numero puro
+              idNuovoFormato = res;
             } else if (typeof res === 'string' && !isNaN(Number(res))) {
-              idNuovoFormato = Number(res); // Il server ha mandato una stringa numerica
+              idNuovoFormato = Number(res);
             } else {
-              // Il server ha mandato un oggetto JSON
               idNuovoFormato =
                 res.id ||
                 res.id_formato ||
@@ -298,11 +290,9 @@ export class FormLibro implements OnInit {
 
           idNuovoFormato = idNuovoFormato ? Number(idNuovoFormato) : null;
           console.log('Risposta backend:', res, '-> ID Formato trovato:', idNuovoFormato);
-          // --- FINE FIX ---
 
           const fileToUpload = this.selectedFiles.get(index);
 
-          // Se l'utente ha messo un file E abbiamo trovato l'ID, partiamo con l'upload!
           if (fileToUpload && idNuovoFormato) {
             console.log(
               `Avvio upload copertina per il formato ${index + 1} (ID: ${idNuovoFormato})`,
@@ -312,16 +302,17 @@ export class FormLibro implements OnInit {
               next: () => {
                 console.log(`✅ Upload immagine completato per formato ${index + 1}!`);
                 operazioniCompletate++;
-                //if (operazioniCompletate === totaleOperazioni) this.finalizza();
-                if (operazioniCompletate + erroriOccorsi === totaleOperazioni) this.finalizza(erroriOccorsi);
+
+                if (operazioniCompletate + erroriOccorsi === totaleOperazioni)
+                  this.finalizza(erroriOccorsi);
               },
               error: (err) => {
                 erroriOccorsi++;
                 console.error(`❌ Errore upload immagine per formato ${index + 1}:`, err);
-                //operazioniCompletate++;
-                //if (operazioniCompletate === totaleOperazioni) this.finalizza();
-                this.gestisciErrore(err); 
-              if (operazioniCompletate + erroriOccorsi === totaleOperazioni) this.finalizza(erroriOccorsi);
+
+                this.gestisciErrore(err);
+                if (operazioniCompletate + erroriOccorsi === totaleOperazioni)
+                  this.finalizza(erroriOccorsi);
               },
             });
           } else {
@@ -330,80 +321,58 @@ export class FormLibro implements OnInit {
                 "⚠️ File immagine selezionato, ma il backend non ha restituito l'ID del formato!",
               );
             }
-            // Proseguiamo comunque senza bloccare il form
+
             operazioniCompletate++;
-           // if (operazioniCompletate === totaleOperazioni) this.finalizza();
-           if (operazioniCompletate + erroriOccorsi === totaleOperazioni) this.finalizza(erroriOccorsi);
+
+            if (operazioniCompletate + erroriOccorsi === totaleOperazioni)
+              this.finalizza(erroriOccorsi);
           }
         },
         error: (err) => {
           erroriOccorsi++;
           this.gestisciErrore(err);
           console.error(`Errore nel salvataggio del formato ${index + 1}:`, err);
-          //operazioniCompletate++;
-          //if (operazioniCompletate === totaleOperazioni) this.finalizza();
+
           if (operazioniCompletate + erroriOccorsi === totaleOperazioni) {
-              this.finalizza(erroriOccorsi);
-            }
+            this.finalizza(erroriOccorsi);
+          }
         },
       });
     });
   }
-/*
-  private finalizza() {
+
+  private finalizza(numeroErrori: number) {
     this.loading = false;
-    alert('Libro e formati salvati con successo!');
-    this.router.navigate(['/catalogo']);
-  }*/
- private finalizza(numeroErrori: number) {
-  this.loading = false;
-  if (numeroErrori > 0) {
-    // L'utente vede l'errore specifico grazie a gestisciErrore
-    // ma NON viene mandato via, così può correggere l'ISBN sbagliato
-    console.warn(`Operazione terminata con ${numeroErrori} errori.`);
-  } else {
-    alert('Libro e formati salvati con successo!');
-    this.router.navigate(['/catalogo']);
+    if (numeroErrori > 0) {
+      console.warn(`Operazione terminata con ${numeroErrori} errori.`);
+    } else {
+      alert('Libro e formati salvati con successo!');
+      this.router.navigate(['/catalogo']);
+    }
   }
-}
-/*
+
   private gestisciErrore(err: any) {
     this.loading = false;
-    console.group('🔴 DETTAGLIO ERRORE SERVER (HTTP ' + err.status + ')');
-    console.error('Oggetto Errore Completo:', err);
-    console.error('Messaggio dal Backend:', err.error?.message || 'Nessun messaggio');
-    console.error('Dettagli validazione (se presenti):', err.error?.errors || err.error?.details);
-    console.groupEnd();
 
-    alert('Attenzione: ' + (err.error?.message || 'Errore imprevisto dal server.'));
-  }*/
+    let messaggio = 'Errore imprevisto dal server.';
 
-    private gestisciErrore(err: any) {
-  this.loading = false;
+    if (err.error && typeof err.error === 'string') {
+      messaggio = err.error;
+    } else if (err.error && err.error.message) {
+      messaggio = err.error.message;
+    } else if (err.message) {
+      messaggio = err.message;
+    }
 
-  // Se il server manda un errore di validazione generico
-  let messaggio = "Errore imprevisto dal server.";
+    alert('Attenzione: ' + messaggio);
 
-  if (err.error && typeof err.error === 'string') {
-    messaggio = err.error; // Il server ha mandato il testo nudo e crudo
-  } else if (err.error && err.error.message) {
-    messaggio = err.error.message; // Il server ha mandato un JSON con chiave 'message'
-  } else if (err.message) {
-    messaggio = err.message; // Errore di connessione o altro
+    console.error('Errore gestito:', err);
   }
-
-  alert('Attenzione: ' + messaggio);
-  
-  // Opzionale: logga per sicurezza
-  console.error("Errore gestito:", err);
-}
-    
 
   eliminaFormato(index: number): void {
     const gruppo = this.getFormatoGroup(index);
     const id = gruppo.get('id')?.value;
 
-    // Controlla esplicitamente: null, undefined, 0, '' → tutti trattati come "non salvato"
     if (!id || id === 0) {
       this.rimuoviFormato(index);
       return;

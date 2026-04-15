@@ -22,7 +22,7 @@ export interface FormatoLibroDTO {
   prezzo: number;
   quantita: number;
   attivo: boolean;
-  copertina?: string; // Questa è la stringa Base64 che arriva da Java
+  copertina?: string; 
 }
 
 export interface LibroDTO {

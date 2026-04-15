@@ -10,24 +10,24 @@ export class ProfiloService {
 
   constructor(private http: HttpClient) {}
 
-  // 1. GET con withCredentials
+ 
   findByUtente(idUtente: number): Observable<ProfiloUtente> {
     return this.http.get<ProfiloUtente>(`${this.API_PROFILI}/utente/${idUtente}`, { withCredentials: true });
   }
 
   saveProfilo(profilo: ProfiloUtente): Observable<any> {
-    // Definiamo le opzioni complete
+   
     const options = { withCredentials: true, responseType: 'text' as 'json' };
 
     if (profilo.id) {
-      // USIAMO 'options' qui
+    
       return this.http.put(`${this.API_PROFILI}/${profilo.id}`, profilo, options);
     } else {
       return this.http.post(this.API_PROFILI, profilo, { withCredentials: true });
     }
   }
 
-  // 2. GET con withCredentials
+  
   findIndirizziByUser(idUtente: number): Observable<Indirizzo[]> {
     return this.http.get<Indirizzo[]>(`${this.API_INDIRIZZI}/user/${idUtente}`, { withCredentials: true });
   }
@@ -36,7 +36,7 @@ export class ProfiloService {
     const options = { withCredentials: true, responseType: 'text' as 'json' };
 
     if (indirizzo.id) {
-      // USIAMO 'options' qui
+      
       return this.http.put(`${this.API_INDIRIZZI}/${indirizzo.id}`, indirizzo, options);
     } else {
       return this.http.post(this.API_INDIRIZZI, indirizzo, { withCredentials: true });

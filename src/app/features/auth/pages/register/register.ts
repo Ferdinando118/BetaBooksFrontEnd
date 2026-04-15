@@ -30,52 +30,6 @@ export class Register {
       passwordConferma: ['', [Validators.required]],
     });
   }
-  /*
-  submit(): void {
-  if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-  this.loading = true;
-
- //console.log(this.form.value.email+ 'e' +this.form.value.password + 'e' + this.form.value.passwordConferma);
-
-  if( this.form.value.password != this.form.value.passwordConferma ){
-    this.errore='password non coincidono';
-    return;
-  }
-
-  const payloadUtente = {
-    email: this.form.value.email,
-    password: this.form.value.password
-  };
-
-  // 1. Registriamo l'utente (Email e Password)
-  
-  this.auth.register(payloadUtente).subscribe({
-    next: (nuovoUtente: any) => {
-
-      const idDelNuovoUtente = nuovoUtente.id || nuovoUtente.obj; 
-
-      if (idDelNuovoUtente) {
-        const payloadProfilo = {
-          idUtente: idDelNuovoUtente,
-          nome: this.form.value.nome,
-          cognome: this.form.value.cognome          
-        };
-        
-      
-        this.profiloService.saveProfilo(payloadProfilo).subscribe({
-          next: () => this.router.navigate(['/auth/login']),
-          error: () => {  }
-        });
-      } else {
-        this.router.navigate(['/auth/login']);
-      }
-    },
-    error: () => {
-      this.errore = 'Registrazione fallita. Email già in uso?';
-      this.loading = false;
-    }
-  });
-}*/
 
   submit(): void {
     if (this.form.invalid) {
@@ -91,18 +45,16 @@ export class Register {
       return;
     }
 
-    if(this.validaPassword(this.form.value.password).errors.length !== 0){
+    if (this.validaPassword(this.form.value.password).errors.length !== 0) {
       this.errore = '';
-      for (const e of this.validaPassword(this.form.value.password).errors){
+      for (const e of this.validaPassword(this.form.value.password).errors) {
         this.errore = this.errore + e + '\n';
       }
       this.loading = false;
       this.form.markAllAsTouched();
       return;
     }
-    
 
-    // Inviamo un unico payload con TUTTO quello che serve (email, pwd, nome, cognome)
     const payloadCompleto = {
       email: this.form.value.email,
       password: this.form.value.password,
@@ -110,14 +62,11 @@ export class Register {
       cognome: this.form.value.cognome,
     };
 
-    // Chiamiamo una sola volta il backend
     this.auth.register(payloadCompleto).subscribe({
       next: () => {
-        // SUCCESS: il backend ha creato sia l'utente che il profilo in un colpo solo
         this.router.navigate(['/auth/login']);
       },
       error: (err) => {
-        // ERROR: il backend gestirà l'errore (es. email già esistente)
         this.errore = 'Registrazione fallita. Riprova.';
         this.loading = false;
       },

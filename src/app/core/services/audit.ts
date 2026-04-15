@@ -11,12 +11,11 @@ export class AuditService {
 
   constructor(private http: HttpClient) {}
 
-  // Recupera tutti i log
+
   findAll(): Observable<AuditLogDTO[]> {
     return this.http.get<AuditLogDTO[]>(`${this.API}/getAll`);
   }
 
-  // Recupera log filtrati per nome tabella
   findByTabella(nomeTabella: string): Observable<AuditLogDTO[]> {
     return this.http.get<AuditLogDTO[]>(`${this.API}/getByTabella`, {
       params: { nomeTabella }

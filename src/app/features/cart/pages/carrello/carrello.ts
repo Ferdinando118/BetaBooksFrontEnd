@@ -30,20 +30,20 @@ export class Carrello implements OnInit {
           : '/assets/images/default-book.png'
       }));
 
-      // Ordiniamo gli item mappati
+      
       const itemsOrdinati = [...itemsMappati].sort((a, b) => a.id - b.id);
       
-      // Assegniamo al modello del componente
+      
       this.carrello = { ...data, items: itemsOrdinati };
     } else {
       this.carrello = data;
     }
     
-    // Forza il ricaricamento della vista
+    
     this.cdr.detectChanges();
   });
 
-  // Caricamento iniziale
+  
   this.carrelloService.loadCarrello();
 }
       
@@ -54,12 +54,12 @@ export class Carrello implements OnInit {
       this.cdr.detectChanges();
     },
     error: (err) => {
-      // intercettiamo il messaggio lanciato dal backend
-      // Se l'errore è un 400 Bad Request, il messaggio sarà nel corpo della risposta
+      
+      
       const messagioErrore = err.error?.message || err.error || "Non è possibile aumentare la quantità.";
       
       console.error("Errore server:", err);
-      alert(messagioErrore); // mostra il messaggio specifico all'utente
+      alert(messagioErrore); 
     }
   });
 }
@@ -68,7 +68,7 @@ export class Carrello implements OnInit {
     this.carrelloService.diminuisci(idItem).subscribe({
       next: () => {
           this.carrelloService.loadCarrello();
-          this.cdr.detectChanges(); // forza l'aggiornamento dopo la chiamata
+          this.cdr.detectChanges(); 
         }
     });
   }
@@ -77,9 +77,9 @@ export class Carrello implements OnInit {
     if(confirm("Sei sicuro di voler rimuovere questo articolo dal carrello?")) {
       this.carrelloService.rimuovi(idItem).subscribe({
         next: () => {
-          //this.carrelloService.loadCarrello();
-          // non serve più chiamare loadCarrello() perché lo fa il servizio col 'tap'
-          this.cdr.detectChanges(); // forza l'aggiornamento dopo la chiamata
+          
+          
+          this.cdr.detectChanges(); 
         }
       });
     }
@@ -96,7 +96,7 @@ export class Carrello implements OnInit {
     });
   }
 
-// Svuota carrello
+
 svuotaCarrello(): void {
   if (confirm('Sei sicuro di voler svuotare il carrello?')) {
 

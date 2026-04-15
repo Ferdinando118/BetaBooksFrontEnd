@@ -40,10 +40,9 @@ export class LibroService {
   libri = signal<any[]>([]);
 
   constructor(private http: HttpClient) {
-    this.loadMiPiace(); // Inizializza i Mi Piace all'avvio del servizio
+    this.loadMiPiace(); 
   }
 
-  // ─── GESTIONE PREFERITI ────────────────────────────────
   private loadMiPiace(): void {
     const saved = localStorage.getItem(this.miPiaceKey);
     if (saved) {
@@ -70,7 +69,6 @@ export class LibroService {
     return this.miPiaceSet.has(libroId);
   }
 
-  // ─── LIBRO ───────────────────────────────────────────
   getAll() {
     return this.http.get<any[]>(`${this.url}/getAll`).pipe(tap((data) => this.libri.set(data)));
   }
@@ -96,7 +94,6 @@ export class LibroService {
     return this.http.delete(`${this.url}/delete/${id}`).pipe(tap(() => this.getAll().subscribe()));
   }
 
-  // ─── FORMATO ─────────────────────────────────────────
   createFormato(idLibro: number, body: any) {
     return this.http.post<any>(`${this.url}/formato/create/${idLibro}`, body);
   }
@@ -124,10 +121,10 @@ export class LibroService {
     return this.http.get<any>(`${this.url}/formato/getCompleto`, { params });
   }
 
-  // ─── COPERTINA (multipart) ────────────────────────────
+
   uploadCopertina(idFormato: number, file: File) {
     const formData = new FormData();
-    formData.append('file', file); // Deve coincidere con @RequestPart("file") in Java
+    formData.append('file', file); 
     return this.http.post<any>(`${this.url}/formato/copertina/${idFormato}`, formData);
   }
 

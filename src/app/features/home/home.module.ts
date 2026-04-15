@@ -6,15 +6,7 @@ import { Catalogo } from './pages/catalogo/catalogo';
 import { Dettaglio } from './pages/dettaglio/dettaglio';
 
 @NgModule({
-  declarations: [
-    Dettaglio
-  ],
-  imports: [
-    CommonModule,
-    Catalogo,
-    FormsModule,           // Serve per [(ngModel)] nella barra di ricerca
-    ReactiveFormsModule,   // Serve per le recensioni nel Dettaglio
-    HomeRoutingModule
-  ]
+  declarations: [Dettaglio],
+  imports: [CommonModule, Catalogo, FormsModule, ReactiveFormsModule, HomeRoutingModule],
 })
 export class HomeModule {}

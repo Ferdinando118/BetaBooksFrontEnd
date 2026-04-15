@@ -12,7 +12,7 @@ import { Checkout } from './pages/checkout/checkout';
   ],
   imports: [
     CommonModule,
-    ReactiveFormsModule, // Necessario per il form del Checkout
+    ReactiveFormsModule,
     CartRoutingModule
   ]
 })

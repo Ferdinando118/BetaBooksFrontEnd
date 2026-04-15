@@ -50,7 +50,6 @@ export class Ordini implements OnInit {
     }
 
     this.loading = true;
-    // Usa getOrdiniUtente per ottenere TUTTI gli ordini, poi filtri lato frontend
     this.ordineService.getOrdiniUtente(utente.id).subscribe({
       next: (ordini) => {
         console.log("✓ Ordini ricevuti dal backend:", ordini);
@@ -64,7 +63,7 @@ export class Ordini implements OnInit {
 
         const urlServer = 'http://localhost:8080/uploads/';
 
-        // Filtra per periodo (se selezionato)
+      
         let ordiniByPeriodo = ordini;
         if (this.filtroPeriodo !== 'TUTTO') {
           const now = new Date();
@@ -83,7 +82,7 @@ export class Ordini implements OnInit {
           });
         }
 
-        // Filtra gli ordini in base al filtroStato
+        
         let ordiniFilterti = ordiniByPeriodo;
 
         console.log(`Filtro attuale: ${this.filtroStato}`);
@@ -100,7 +99,7 @@ export class Ordini implements OnInit {
           console.log("Filtrati ANNULLATI:", ordiniFilterti.map(o => ({ id: o.id, stato: o.stato })));
         }
 
-        // Arricchisci gli ordini con le immagini
+       
         this.ordini = ordiniFilterti.map(ordine => ({
           ...ordine,
           items: (ordine.items || []).map((item: any) => ({
@@ -122,9 +121,9 @@ export class Ordini implements OnInit {
     });
   }
 
-  // Metodo chiamato al cambio dei filtri nel template
+ 
   onFiltroChange(): void {
-    this.ordineAperto = null; // Chiudiamo eventuali dettagli aperti
+    this.ordineAperto = null; 
     this.caricaOrdini();
   }
 
@@ -161,7 +160,7 @@ export class Ordini implements OnInit {
       this.ordineService.annulla(ordineId).subscribe({
         next: () => {
           alert('Ordine annullato con successo.');
-          this.onFiltroChange(); // Ricarica gli ordini
+          this.onFiltroChange(); 
         },
         error: (err) => {
           console.error('Errore nell\'annullamento dell\'ordine', err);

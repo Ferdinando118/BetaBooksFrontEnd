@@ -1,4 +1,4 @@
-// ── ENUM ──────────────────────────────────────────
+
 export enum RuoloUtente   { USER = 'USER', ADMIN = 'ADMIN' }
 export enum StatoOrdine   { IN_ATTESA = 'IN_ATTESA', SPEDITO = 'SPEDITO', CONSEGNATO = 'CONSEGNATO', ANNULLATO = 'ANNULLATO' }
 export enum MetodoPagamento { CARTA = 'CARTA', PAYPAL = 'PAYPAL', CONSEGNA = 'CONSEGNA', BONIFICO = 'BONIFICO' }
@@ -9,7 +9,6 @@ export enum FiltroTemporale {
   ULTIMO_ANNO = 'ULTIMO_ANNO',
   TUTTO = 'TUTTO'
 }
-// ── UTENTE ────────────────────────────────────────
 export interface Utente {
   id: number;
   email: string;
@@ -18,7 +17,7 @@ export interface Utente {
 }
 
 export interface ProfiloUtente {
-  id?: number; // <-- Aggiungi il punto interrogativo qui
+  id?: number; 
   idUtente: number;
   nome: string;
   cognome: string;
@@ -26,7 +25,7 @@ export interface ProfiloUtente {
 }
 
 export interface Indirizzo {
-  id?: number; // <-- Aggiungi il punto interrogativo qui
+  id?: number; 
   idUtente: number;
   isDefault: boolean;
   via: string;
@@ -39,7 +38,6 @@ export interface Indirizzo {
   attivo: boolean;
 }
 
-// ── CATALOGO ──────────────────────────────────────
 export interface Autore {
   id: number;
   nome: string;
@@ -80,12 +78,12 @@ export interface Libro {
   valutazioneMedia?: number;   // calcolata dal backend
 }
 
-// ── CARRELLO ──────────────────────────────────────
+
 export interface CarrelloDTO {
   id: number;
   idUtente: number;
   items: CarrelloItemDTO[];
-  prezzoTotaleComplessivo: number; // Il totale calcolato da Spring Boot!
+  prezzoTotaleComplessivo: number; // calcolato da java
 }
 
 export interface FormatoDisponibileDTO {
@@ -109,10 +107,10 @@ export interface CarrelloItemDTO {
   tipoSupporto?: string;    //  (Copertina flessibile, Copertina rigida, E-book)
   tipoCopertina?: string;  
   idLibro?: number;       
-  formatiDisponibili?: FormatoDisponibileDTO[]; // formati alternativi dello stesso libro
+  formatiDisponibili?: FormatoDisponibileDTO[]; 
 }
 
-// ── ORDINE ────────────────────────────────────────
+
 export interface OrdineItem {
   id: number;
   libro: Libro;
@@ -149,7 +147,7 @@ export interface OrdineDTO {
     stato: string;
     totaleComplessivo: number;
     metodoPagamento: string; tracking?: TrackingDTO;
-    items: OrdineItemDTO[]; // O usa l'interfaccia specifica degli item se l'hai creata
+    items: OrdineItemDTO[]; 
     indirizzo:string;
 }
 
@@ -162,7 +160,7 @@ export interface OrdineItemDTO {
   tipoSupporto?: string;    //  (Copertina flessibile, Copertina rigida, E-book)
   tipoCopertina?: string;
 }
-// ── RECENSIONE & WISHLIST ─────────────────────────
+
 export interface Recensione {
   id: number;
   idUtente: number;
@@ -181,7 +179,7 @@ export interface WishlistItem {
 
 export interface Resp {
     message: string;
-    obj?: any; // Il campo dove Java mette i dati (es. l'ordine o la lista)
+    obj?: any; 
 }
 
 export interface AuditLogDTO {
@@ -192,7 +190,7 @@ export interface AuditLogDTO {
   valoriPrecedenti: any;  
   valoriNuovi: any;     
   utenteDb: string;
-  dataModifica: string;   // LocalDateTime in Java spesso arriva come stringa ISO (es. "2026-04-10T...")
+  dataModifica: string;  
 }
 
 export interface PasswordReq{

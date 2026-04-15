@@ -26,13 +26,13 @@ export class Checkout implements OnInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
-  // --- STATO CARRELLO E ORDINE ---
+  
   items: CarrelloItemDTO[] = [];
   totale = 0;
   ordinato = false;
   loading = false;
 
-  // --- STATO INDIRIZZI ---
+  
   indirizzi: Indirizzo[] = [];
   indirizzoSelezionato: number | null = null;
   mostraNuovoIndirizzo = false;
@@ -45,17 +45,17 @@ export class Checkout implements OnInit {
     { value: MetodoPagamento.BONIFICO, label: '🏦 Bonifico' }
   ];
 
-  // --- FORM SEPARATI ---
-  formCheckout: FormGroup;   // Solo per il metodo di pagamento
-  formIndirizzo: FormGroup;  // Solo per il nuovo indirizzo
+  
+  formCheckout: FormGroup;   
+  formIndirizzo: FormGroup;  
 
   constructor() {
-    // Form per confermare l'ordine
+    
     this.formCheckout = this.fb.group({
       metodoPagamento: [MetodoPagamento.CARTA, Validators.required]
     });
 
-    // Form per creare un nuovo indirizzo (identico a quello del profilo)
+    
     this.formIndirizzo = this.fb.group({
       via: ['', Validators.required],
       civico: ['', Validators.required],
@@ -68,14 +68,14 @@ export class Checkout implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1. Carica il Carrello
+    
     this.carrelloService.loadCarrello();
     this.carrelloService.carrello$.subscribe((data: CarrelloDTO | null) => {
       if (data && data.items && data.items.length > 0) {
         this.items = data.items;
         console.log(this.items);
         this.totale = data.prezzoTotaleComplessivo;
-        // Inizializza i formati disponibili
+        
         this.items.forEach(item => {
           if (!item.formatiDisponibili) {
             item.formatiDisponibili = [];
@@ -88,23 +88,23 @@ export class Checkout implements OnInit {
       }
     });
 
-    // 2. Carica gli Indirizzi dell'utente
+    
     this.caricaIndirizzi();
   }
 
-  // ─── GESTIONE FORMATI ────────────────────────────────────────────────
+  
 
   /**
    * Carica i formati disponibili per un item del carrello
    */
   caricaFormatiPerItem(item: CarrelloItemDTO): void {
-    // Se abbiamo idLibro, usalo direttamente
+    
     if (item.idLibro) {
       this.caricaFormatiByIdLibro(item);
       return;
     }
 
-    // Se no, cerchiamo di ottenerlo dal backend usando il formato corrente
+    
     if (item.idFormatoLibro) {
       this.libroService.getFormatoById(item.idFormatoLibro).subscribe({
         next: (formato: any) => {
@@ -139,7 +139,7 @@ export class Checkout implements OnInit {
           prezzo: f.prezzo || 0
         }));
         
-        // Aggiorna il tipo di supporto e copertina dell'item corrente
+        
         const formatoCorrente = formati.find((f: any) => f.id === item.idFormatoLibro);
         if (formatoCorrente) {
           item.tipoSupporto = formatoCorrente.tipoSupporto;
@@ -174,7 +174,7 @@ export class Checkout implements OnInit {
    */
   cambiaFormato(item: CarrelloItemDTO, nuovoIdFormato: number): void {
     if (isNaN(nuovoIdFormato) || nuovoIdFormato === item.idFormatoLibro) {
-      return; // Nessun cambio o valore non valido
+      return; 
     }
 
     const nuovoFormato = item.formatiDisponibili?.find(f => f.id === nuovoIdFormato);
@@ -183,10 +183,10 @@ export class Checkout implements OnInit {
       return;
     }
 
-    // Rimuovi l'item corrente e aggiungi uno nuovo con il nuovo formato
+    
     this.carrelloService.rimuovi(item.id).subscribe({
       next: () => {
-        // Aggiungi il nuovo formato
+        
         this.carrelloService.aggiungi(nuovoIdFormato, item.quantita).subscribe({
           next: () => {
             console.log('Formato cambiato con successo');
@@ -195,19 +195,19 @@ export class Checkout implements OnInit {
           error: (err) => {
             console.error('Errore durante l\'aggiunta:', err);
             alert('Errore durante l\'aggiunta: ' + (err.error?.message || 'Errore sconosciuto'));
-            this.carrelloService.loadCarrello(); // Ricarica per sincronizzare lo stato
+            this.carrelloService.loadCarrello(); 
           }
         });
       },
       error: (err) => {
         console.error('Errore durante la rimozione:', err);
         alert('Errore durante la rimozione: ' + (err.error?.message || 'Errore sconosciuto'));
-        this.carrelloService.loadCarrello(); // Ricarica per sincronizzare lo stato
+        this.carrelloService.loadCarrello(); 
       }
     });
   }
 
-  // ─── GESTIONE INDIRIZZI ──────────────────────────────────────────────
+  
 
   caricaIndirizzi(): void {
     const utente = this.auth.grant().utente;
@@ -220,12 +220,12 @@ export class Checkout implements OnInit {
         this.loadingIndirizzi = false;
 
         if (this.indirizzi.length > 0) {
-          // Pre-seleziona l'indirizzo predefinito (o il primo della lista)
+          
           const def = this.indirizzi.find(i => i.isDefault);
           this.indirizzoSelezionato = def ? def.id! : this.indirizzi[0].id!;
           this.mostraNuovoIndirizzo = false;
         } else {
-          // Se non ha indirizzi, forziamo l'apertura del form
+          
           this.mostraNuovoIndirizzo = true;
         }
         this.cdr.detectChanges();
@@ -245,7 +245,7 @@ export class Checkout implements OnInit {
   toggleNuovoIndirizzo(): void {
     this.mostraNuovoIndirizzo = !this.mostraNuovoIndirizzo;
     if (this.mostraNuovoIndirizzo) {
-      this.indirizzoSelezionato = null; // Deseleziona gli altri
+      this.indirizzoSelezionato = null; 
       this.formIndirizzo.reset({ paese: 'Italia' });
     }
   }
@@ -265,12 +265,12 @@ export class Checkout implements OnInit {
     const nuovoIndirizzo: Indirizzo = {
       ...this.formIndirizzo.value,
       idUtente: utente.id,
-      isDefault: isFirst // Rende predefinito se è l'unico
+      isDefault: isFirst 
     };
 
     this.profiloService.saveIndirizzo(nuovoIndirizzo).subscribe({
       next: () => {
-        // Ricarica la lista dal database. caricaIndirizzi() imposterà anche l'ID selezionato!
+        
         this.caricaIndirizzi();
       },
       error: (err: any) => {
@@ -281,16 +281,16 @@ export class Checkout implements OnInit {
     });
   }
 
-  // ─── GESTIONE CHECKOUT ───────────────────────────────────────────────
+  
 
   conferma(): void {
-    // Controlla che il form del pagamento sia valido
+    
     if (this.formCheckout.invalid) { 
       this.formCheckout.markAllAsTouched(); 
       return; 
     }
     
-    // Ferma tutto se l'utente non ha scelto/creato un indirizzo
+    
     if (!this.indirizzoSelezionato) {
       alert("Attenzione: Seleziona o aggiungi un indirizzo di spedizione prima di procedere.");
       return;
@@ -301,7 +301,7 @@ export class Checkout implements OnInit {
 
     this.loading = true;
 
-    // Chiamata all'API con l'indirizzo REALE scelto dall'utente!
+    
     this.ordineService.checkout(
       utente.id, 
       this.formCheckout.value.metodoPagamento, 

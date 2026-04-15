@@ -12,181 +12,150 @@ interface AuthResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-
   private readonly API_UTENTI = 'http://localhost:8080/api/utenti';
-  private readonly API_AUTH = 'http://localhost:8080/api/auth'; 
+  private readonly API_AUTH = 'http://localhost:8080/api/auth';
 
   grant = signal({
     isLogged: false,
     isAdmin: false,
     token: null as string | null,
-    utente: null as Utente | null
+    utente: null as Utente | null,
   });
 
-constructor(
-  private http: HttpClient, 
-  private router: Router,
-  @Inject(PLATFORM_ID) private platformId: Object
-) {
-  if (isPlatformBrowser(this.platformId)) {
-    const token = localStorage.getItem('bb_token');
-    const utenteSalvato = localStorage.getItem('bb_utente');
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object,
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      const token = localStorage.getItem('bb_token');
+      const utenteSalvato = localStorage.getItem('bb_utente');
 
-    // 1. RIPRISTINO IMMEDIATO (Sincrono)
-    // Questo permette alla Guardia di leggere i permessi all'istante!
-    if (token && utenteSalvato) {
-      const utente = JSON.parse(utenteSalvato);
-      this.grant.set({
-        isLogged: true,
-        isAdmin: utente.ruolo === 'ADMIN',
-        token: token,
-        utente: utente
-      });
-      console.log("Sessione recuperata localmente:", utente.email);
-    }
-
-    // 2. VERIFICA DI SICUREZZA (Asincrono)
-    // Questo conferma che il token sia ancora valido sul server
-    if (token) {
-      this.checkMe().subscribe({
-        next: (u) => console.log("Sessione confermata dal server per:", u.email),
-        error: (err) => {
-          // Se il server dice che il token non è più valido (401 o 403), facciamo logout
-          if (err.status === 401 || err.status === 403) {
-            console.warn("Sessione scaduta o non valida, eseguo logout.");
-            this.logout();
-          }
-        }
-      });
-    }
-  }
-}
-
-
-
-
-login(email: string, password: string): Observable<any> {
-  // 1. Generiamo il token SUBITO
- // const basicToken = btoa(unescape(encodeURIComponent(`${email}:${password}`)));
- const basicToken = btoa(
-  Array.from(
-    new TextEncoder().encode(`${email}:${password}`)
-  ).map(b => String.fromCharCode(b)).join('')
-);
-  /*
-  // Rimuovi eventuali vecchi dati sporchi prima di settare i nuovi
-    localStorage.removeItem('bb_token');
-  // 2. Lo salviamo temporaneamente per farlo usare all'interceptor 
-  // o lo passiamo manualmente nella chiamata
-  localStorage.setItem('bb_token', basicToken);
-
-  // 3. Invece di /login (POST), usiamo /me (GET) come test di ingresso
-  return this.http.get<Utente>(`${this.API_AUTH}/me`).pipe(
-    tap(utenteLoggato => {
-      if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('bb_utente', JSON.stringify(utenteLoggato));
-        
-        // Aggiorniamo il signal
+      if (token && utenteSalvato) {
+        const utente = JSON.parse(utenteSalvato);
         this.grant.set({
           isLogged: true,
-          isAdmin: utenteLoggato.ruolo === 'ADMIN',
-          token: basicToken,
-          utente: utenteLoggato
+          isAdmin: utente.ruolo === 'ADMIN',
+          token: token,
+          utente: utente,
+        });
+        console.log('Sessione recuperata localmente:', utente.email);
+      }
+
+      if (token) {
+        this.checkMe().subscribe({
+          next: (u) => console.log('Sessione confermata dal server per:', u.email),
+          error: (err) => {
+            if (err.status === 401 || err.status === 403) {
+              console.warn('Sessione scaduta o non valida, eseguo logout.');
+              this.logout();
+            }
+          },
         });
       }
-    })
-  );
-}*/
+    }
+  }
 
- return this.http.get<Utente>(`${this.API_AUTH}/me`, {
-    headers: { Authorization: `Basic ${basicToken}` }
-  }).pipe(
-    tap(utente => {
-      // Salva solo DOPO che il server ha confermato le credenziali
-      localStorage.setItem('bb_token', basicToken);
-      localStorage.setItem('bb_utente', JSON.stringify(utente));
+  login(email: string, password: string): Observable<any> {
+    const basicToken = btoa(
+      Array.from(new TextEncoder().encode(`${email}:${password}`))
+        .map((b) => String.fromCharCode(b))
+        .join(''),
+    );
 
-      this.grant.set({
-        isLogged: true,
-        isAdmin: utente.ruolo === 'ADMIN',
-        token: basicToken,
-        utente
-      });
-    })
-  );
-}/*
-  register(data: { email: string; password: string }): Observable<Utente> {
+    return this.http
+      .get<Utente>(`${this.API_AUTH}/me`, {
+        headers: { Authorization: `Basic ${basicToken}` },
+      })
+      .pipe(
+        tap((utente) => {
+        
+          localStorage.setItem('bb_token', basicToken);
+          localStorage.setItem('bb_utente', JSON.stringify(utente));
+
+          this.grant.set({
+            isLogged: true,
+            isAdmin: utente.ruolo === 'ADMIN',
+            token: basicToken,
+            utente,
+          });
+        }),
+      );
+  } 
+  register(data: Registrazione): Observable<Utente> {
     return this.http.post<Utente>(`${this.API_UTENTI}/register`, data);
-  }*/
- register(data: Registrazione): Observable<Utente> {
-  return this.http.post<Utente>(`${this.API_UTENTI}/register`, data);
-}
+  }
 
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('bb_token');
       localStorage.removeItem('bb_utente');
-      
+
       this.grant.set({
         isLogged: false,
         isAdmin: false,
         token: null,
-        utente: null
+        utente: null,
       });
       this.router.navigate(['/auth/login']);
     }
   }
 
+  checkMe(): Observable<Utente> {
+    return this.http.get<Utente>(`${this.API_AUTH}/me`).pipe(
+      tap((utente) => {
+        if (isPlatformBrowser(this.platformId)) {
+         
+          this.grant.set({
+            isLogged: true,
+            isAdmin: utente.ruolo === 'ADMIN',
+            token: localStorage.getItem('bb_token'),
+            utente: utente,
+          });
+          localStorage.setItem('bb_utente', JSON.stringify(utente));
+        }
+      }),
+    );
+  }
 
-checkMe(): Observable<Utente> {
-  return this.http.get<Utente>(`${this.API_AUTH}/me`).pipe(
-    tap(utente => {
-      if (isPlatformBrowser(this.platformId)) {
-        // Se il server risponde, aggiorniamo il Signal con i dati freschi
-        this.grant.set({
-          isLogged: true,
-          isAdmin: utente.ruolo === 'ADMIN',
-          token: localStorage.getItem('bb_token'),
-          utente: utente
-        });
-        localStorage.setItem('bb_utente', JSON.stringify(utente));
-      }
-    })
-  );
-}
+  verificaMail(email: string): Observable<Resp> {
+    const params = new HttpParams().set('email', email);
+    return this.http.get<Resp>(`${this.API_UTENTI}/sendValidation`, { params });
+  }
 
-verificaMail(email: string): Observable<Resp> {
-  const params = new HttpParams().set('email', email);
-  return this.http.get<Resp>(`${this.API_UTENTI}/sendValidation`, { params });
-}
+  attivaValidazione(email: string): Observable<Resp> {
+    const params = new HttpParams().set('email', email);
+    return this.http.get<Resp>(`${this.API_UTENTI}/emailValidate`, { params });
+  }
 
-attivaValidazione(email: string): Observable<Resp> {
-  const params = new HttpParams().set('email', email);
-  return this.http.get<Resp>(`${this.API_UTENTI}/emailValidate`, { params });
-}
+  cambiaPassword(pwdReq: PasswordReq): Observable<Resp> {
+    return this.http.post<Resp>(`${this.API_UTENTI}/cambiaPassword`, pwdReq);
+  }
 
-cambiaPassword(pwdReq: PasswordReq): Observable<Resp> {
-  return this.http.post<Resp>(`${this.API_UTENTI}/cambiaPassword`, pwdReq);
-}
+  emailCambioPassword(email: string): Observable<any> {
+    return this.http.get(`${this.API_UTENTI}/request-password-recovery?email=${email}`);
+  }
 
-emailCambioPassword(email: string): Observable<any> {
-  return this.http.get(`${this.API_UTENTI}/request-password-recovery?email=${email}`);
-}
+  confirmPasswordRecovery(data: PasswordRecoveryReq): Observable<any> {
+    return this.http.post(`${this.API_UTENTI}/confirm-password-recovery`, data);
+  }
 
-confirmPasswordRecovery(data: PasswordRecoveryReq): Observable<any> {
-  return this.http.post(`${this.API_UTENTI}/confirm-password-recovery`, data);
-}
-
-
-
-  // Comodi metodi per leggere velocemente lo stato
-  getToken(): string | null { return this.grant().token; }
-  isLoggedIn(): boolean { return this.grant().isLogged; }
-  isAdmin(): boolean { return this.grant().isAdmin; }
+  
+  getToken(): string | null {
+    return this.grant().token;
+  }
+  isLoggedIn(): boolean {
+    return this.grant().isLogged;
+  }
+  isAdmin(): boolean {
+    return this.grant().isAdmin;
+  }
 
   getUserId(): number | null {
     const utente = this.grant().utente;
     return utente ? utente.id : null;
   }
-  isValidato() {return this.grant().utente?.validato}
+  isValidato() {
+    return this.grant().utente?.validato;
+  }
 }

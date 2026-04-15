@@ -26,7 +26,6 @@ export class DettagliAutore implements OnInit {
 
     if (!aut || !libri.length) return [];
 
-    // Filtra per autore e rimuovi duplicati per id
     const visti = new Set<number>();
     return libri.filter((l) => {
       if (l.autore.id !== aut.id || visti.has(l.id)) return false;
@@ -43,7 +42,6 @@ export class DettagliAutore implements OnInit {
     });
   }
 
-  // Aggiungi questo metodo al componente
   getImmagine(libro: any): string {
     const copertina = libro.formati?.[0]?.copertina;
     if (!copertina) return '/assets/images/default-book.png';

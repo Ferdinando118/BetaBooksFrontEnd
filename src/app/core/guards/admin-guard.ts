@@ -15,7 +15,6 @@ export const adminGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Se arriviamo qui, l'accesso è negato
   console.warn('Accesso negato: reindirizzamento in corso...');
   router.navigate(['/']); 
   return false;

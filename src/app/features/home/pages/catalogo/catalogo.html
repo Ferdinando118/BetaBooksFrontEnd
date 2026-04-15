@@ -12,8 +12,14 @@
 <div class="container filter-section">
   <div class="toggle-container">
     <button class="btn-funnel" [class.active]="showFilters()" (click)="toggleFilters()">
-      <svg class="icon-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+      <svg
+        class="icon-funnel"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
       </svg>
       <span>{{ showFilters() ? 'Chiudi' : 'Cerca e Filtra' }}</span>
     </button>
@@ -21,16 +27,19 @@
 
   <div class="filters-drawer" [class.open]="showFilters()">
     <div class="drawer-content">
-      
       <div class="filter-group full-width">
         <label>Cosa stai cercando?</label>
         <div class="search-input-wrapper">
-          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg class="search-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
           <input
             type="text"
             [(ngModel)]="ricerca"
             (ngModelChange)="aggiornaFiltri()"
-            placeholder="Titolo, autore o editore...">
+            placeholder="Titolo, autore o editore..."
+          />
         </div>
       </div>
 
@@ -55,7 +64,7 @@
 
       <div class="filter-group flex-row">
         <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="soloPreferiti" (ngModelChange)="aggiornaFiltri()">
+          <input type="checkbox" [(ngModel)]="soloPreferiti" (ngModelChange)="aggiornaFiltri()" />
           <span class="custom-check"></span>
           Solo preferiti
         </label>
@@ -64,13 +73,14 @@
       <div class="filter-group align-end">
         <button class="btn-reset-text" (click)="reset()">Svuota filtri</button>
       </div>
-      
     </div>
   </div>
 </div>
 
 <div class="container risultati-info">
-  <p>Risultati: <strong>{{ libriFiltrati().length }}</strong> libri trovati</p>
+  <p>
+    Risultati: <strong>{{ libriFiltrati().length }}</strong> libri trovati
+  </p>
 </div>
 
 @if (loading()) {
@@ -89,49 +99,53 @@
   } @else {
     <div class="container books-grid">
       @for (libro of libriFiltrati(); track libro.id) {
-
         <article class="book-card">
-
-          <!-- ── Copertina ───────────────────────────── -->
           <div class="book-cover" [routerLink]="['/libro', libro.id]">
             <img
               [src]="libro.copertina"
               (error)="libro.copertina = '/assets/images/default-book.png'"
-              alt="{{ libro.titolo }}">
+              alt="{{ libro.titolo }}"
+            />
 
             @if (!libro.disponibile) {
               <span class="badge-esaurito">Esaurito</span>
             }
 
-            <!-- Cuore — top-left -->
             <button
               class="overlay-btn btn-heart"
               [class.liked]="libro.miPiace"
               (click)="toggleMiPiace($event, libro)"
-              title="Aggiungi ai preferiti">
+              title="Aggiungi ai preferiti"
+            >
               {{ libro.miPiace ? '❤️' : '🤍' }}
             </button>
 
-            <!-- Admin — top-right -->
             @if (auth.isAdmin()) {
               <div class="overlay-admin">
                 <button
                   class="overlay-btn btn-edit"
                   [routerLink]="['/admin/modifica-libro', libro.id]"
                   (click)="$event.stopPropagation()"
-                  title="Modifica">✏️</button>
+                  title="Modifica"
+                >
+                  ✏️
+                </button>
                 <button
                   class="overlay-btn btn-delete"
                   (click)="eliminaLibro($event, libro.id)"
-                  title="Elimina">🗑️</button>
+                  title="Elimina"
+                >
+                  🗑️
+                </button>
               </div>
             }
           </div>
 
-          <!-- ── Info ────────────────────────────────── -->
           <div class="book-body" [routerLink]="['/libro', libro.id]">
             <h3 class="book-title">{{ libro.titolo }}</h3>
-            <p class="book-author">di <strong>{{ libro.autore?.nome }} {{ libro.autore?.cognome }}</strong></p>
+            <p class="book-author">
+              di <strong>{{ libro.autore?.nome }} {{ libro.autore?.cognome }}</strong>
+            </p>
             <p class="book-publisher">{{ libro.editore?.nome }}</p>
 
             @if (libro.valutazioneMedia) {
@@ -142,12 +156,15 @@
             }
           </div>
 
-          <!-- ── Footer ─────────────────────────────── -->
           <div class="book-footer">
-            <span class="price">€ {{ libro.prezzo | number:'1.2-2' }}</span>
+            <span class="price">€ {{ libro.prezzo | number: '1.2-2' }}</span>
 
             @if (libro.formati && libro.formati.length > 1) {
-              <button class="btn btn-accent btn-full" [routerLink]="['/libro', libro.id]" (click)="$event.stopPropagation()">
+              <button
+                class="btn btn-accent btn-full"
+                [routerLink]="['/libro', libro.id]"
+                (click)="$event.stopPropagation()"
+              >
                 Scegli formato
               </button>
             } @else if (libro.disponibile) {
@@ -158,9 +175,7 @@
               <button class="btn btn-disabled btn-full" disabled>Non disponibile</button>
             }
           </div>
-
         </article>
-
       }
     </div>
   }

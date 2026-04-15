@@ -12,14 +12,13 @@ import { AutoreService } from '../../../../core/services/autore';
   selector: 'app-dettaglio',
   standalone: false,
   templateUrl: './dettaglio.html',
-  styleUrl: './dettaglio.css'
+  styleUrl: './dettaglio.css',
 })
 export class Dettaglio implements OnInit {
-  // --- 1. Signals di base ---
   libro = signal<any | null>(null);
   formati = signal<any[]>([]);
-  formatoSelezionato = signal<any | null>(null); // NUOVO: Tiene traccia della scelta dell'utente
-  
+  formatoSelezionato = signal<any | null>(null);
+
   recensioni = signal<any[]>([]);
   loading = signal(true);
   aggiunto = signal(false);
@@ -31,12 +30,10 @@ export class Dettaglio implements OnInit {
   editoreEspanso = false;
   recensioneInModifica: any | null = null;
 
-  // --- 2. Computed Signals ---
-  // Ora controlla se IL FORMATO SELEZIONATO ha quantità > 0
   disponibile = computed(() => {
     const formato = this.formatoSelezionato();
     if (!formato) return false;
-    
+
     return formato.tipoSupporto === 'EBOOK' || formato.quantita > 0;
   });
 
@@ -48,11 +45,11 @@ export class Dettaglio implements OnInit {
     private carrelloService: CarrelloService,
     public auth: AuthService,
     private fb: FormBuilder,
-    private recensioneService: RecensioneService
+    private recensioneService: RecensioneService,
   ) {
     this.formRecensione = this.fb.group({
       valutazione: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
-      descrizione: ['', Validators.required]
+      descrizione: ['', Validators.required],
     });
   }
 
@@ -62,11 +59,10 @@ export class Dettaglio implements OnInit {
     this.libroService.getById(id).subscribe({
       next: (libro) => {
         this.libro.set(libro);
-        
-        // Salviamo i formati e pre-selezioniamo il primo
+
         if (libro.formati && libro.formati.length > 0) {
           this.formati.set(libro.formati);
-          this.formatoSelezionato.set(libro.formati[0]); // Imposta il default
+          this.formatoSelezionato.set(libro.formati[0]);
         }
 
         this.loading.set(false);
@@ -74,24 +70,20 @@ export class Dettaglio implements OnInit {
       error: (err) => {
         console.error('Errore caricamento libro:', err);
         this.loading.set(false);
-      }
+      },
     });
 
     this.caricaRecensioni(id);
   }
 
- caricaRecensioni(idLibro: number) {
-  this.recensioneService.getByLibro(idLibro).subscribe({
-    next: (res) => {
-      this.recensioni.set(res);
-    
-    }
-  });
-}
+  caricaRecensioni(idLibro: number) {
+    this.recensioneService.getByLibro(idLibro).subscribe({
+      next: (res) => {
+        this.recensioni.set(res);
+      },
+    });
+  }
 
-
-
-  // NUOVO METODO: Crea l'etichetta testuale per i bottoni dei formati
   getLabelFormato(f: any): string {
     if (!f) return '';
     if (f.tipoSupporto === 'EBOOK') return 'E-book Digitale';
@@ -110,12 +102,11 @@ export class Dettaglio implements OnInit {
       return;
     }
 
-    if(!this.auth.isValidato()){
+    if (!this.auth.isValidato()) {
       alert('Devi effettuare il login per aggiungere al carrello.');
       return;
     }
 
-    // Usiamo il signal del formato selezionato invece di quello principale
     const formato = this.formatoSelezionato();
     if (!formato) {
       alert('Nessun formato selezionato per questo libro.');
@@ -130,45 +121,44 @@ export class Dettaglio implements OnInit {
       error: (err) => {
         console.error(err);
         alert('Errore: ' + (err.error?.message || 'Impossibile aggiungere il libro'));
-      }
+      },
     });
   }
 
- inviaRecensione(): void {
+  inviaRecensione(): void {
     if (this.formRecensione.invalid) return;
-console.log(this.auth.grant().utente);
+    console.log(this.auth.grant().utente);
     const utenteLoggato = this.auth.grant().utente;
     if (!utenteLoggato) {
-      this.erroreRecensione.set("Devi effettuare il login per lasciare una recensione.");
+      this.erroreRecensione.set('Devi effettuare il login per lasciare una recensione.');
       return;
     }
 
-    // 1. Definiamo la base della richiesta
     const req: any = {
       valutazione: this.formRecensione.value.valutazione,
       descrizione: this.formRecensione.value.descrizione,
       idLibro: this.libro()?.id,
-      idUtente: utenteLoggato.id 
-      
+      idUtente: utenteLoggato.id,
     };
-console.log(utenteLoggato.id);
-    // 2. Se stiamo modificando, aggiungiamo l'ID della recensione!
+    console.log(utenteLoggato.id);
+
     if (this.recensioneInModifica) {
-      req.id = this.recensioneInModifica.id; 
-console.log(this.recensioneInModifica.id + 'e ' + req.id );
+      req.id = this.recensioneInModifica.id;
+      console.log(this.recensioneInModifica.id + 'e ' + req.id);
       this.recensioneService.update(req).subscribe({
         next: () => {
-          this.recensioneInModifica = null; // Reset dello stato di modifica
-          this.formRecensione.reset({ valutazione: 5 }); // Pulisci il form
-          this.caricaRecensioni(this.libro()?.id); // Ricarica la lista aggiornata
+          this.recensioneInModifica = null;
+
+          this.formRecensione.reset({ valutazione: 5 });
+
+          this.caricaRecensioni(this.libro()?.id);
         },
         error: (err) => {
-          console.error("Errore update:", err);
+          console.error('Errore update:', err);
           this.erroreRecensione.set("Errore durante l'aggiornamento.");
-        }
+        },
       });
     } else {
-      // CHIAMATA CREATE (il tuo codice originale va benissimo)
       this.recensioneService.create(req).subscribe({
         next: (res) => {
           this.recensioneInviata.set(true);
@@ -176,14 +166,14 @@ console.log(this.recensioneInModifica.id + 'e ' + req.id );
           this.caricaRecensioni(this.libro()?.id);
         },
         error: (err) => {
-          console.error("Errore API:", err);
-          const msg = err?.error?.message || "Errore di connessione al server";
+          console.error('Errore API:', err);
+          const msg = err?.error?.message || 'Errore di connessione al server';
           this.erroreRecensione.set(msg);
-        }
+        },
       });
     }
   }
-  
+
   stelle(n: number): string {
     const arrotondato = Math.round(n);
     return '★'.repeat(arrotondato) + '☆'.repeat(5 - arrotondato);
@@ -196,56 +186,53 @@ console.log(this.recensioneInModifica.id + 'e ' + req.id );
   }
 
   preparaModifica(recensione: any): void {
-  this.recensioneInModifica = recensione;
-  // Carichiamo i dati della recensione nel form esistente
-  this.formRecensione.patchValue({
-    valutazione: recensione.valutazione,
-    descrizione: recensione.descrizione
-  });
-}
+    this.recensioneInModifica = recensione;
 
-eliminaRecensione(id: number): void {
-  // Richiesta di conferma per sicurezza
-  if (confirm("Sei sicuro di voler eliminare questa recensione?")) {
-    this.recensioneService.delete(id).subscribe({
-      next: (res) => {
-        // Dopo l'eliminazione, ricarichiamo la lista per rimuovere la recensione dalla vista
-        this.caricaRecensioni(this.libro()?.id);
-      },
-      error: (err) => {
-        console.error("Errore durante l'eliminazione:", err);
-        alert("Impossibile eliminare la recensione: " + (err.error?.message || "Errore sconosciuto"));
-      }
+    this.formRecensione.patchValue({
+      valutazione: recensione.valutazione,
+      descrizione: recensione.descrizione,
     });
   }
-}
-statisticheRecensioni = computed(() => {
+
+  eliminaRecensione(id: number): void {
+    if (confirm('Sei sicuro di voler eliminare questa recensione?')) {
+      this.recensioneService.delete(id).subscribe({
+        next: (res) => {
+          this.caricaRecensioni(this.libro()?.id);
+        },
+        error: (err) => {
+          console.error("Errore durante l'eliminazione:", err);
+          alert(
+            'Impossibile eliminare la recensione: ' + (err.error?.message || 'Errore sconosciuto'),
+          );
+        },
+      });
+    }
+  }
+  statisticheRecensioni = computed(() => {
     const lista = this.recensioni();
     const totale = lista.length;
 
-    // Struttura base per 5, 4, 3, 2, 1 stelle
-    const statistiche = [5, 4, 3, 2, 1].map(stelle => ({
+    const statistiche = [5, 4, 3, 2, 1].map((stelle) => ({
       stelle,
       conteggio: 0,
-      percentuale: 0
+      percentuale: 0,
     }));
 
-    // Se non ci sono recensioni, restituisci array vuoto/azzerato
     if (totale === 0) return { totale, media: 0, barre: statistiche };
 
     let sommaVoti = 0;
 
-    lista.forEach(r => {
+    lista.forEach((r) => {
       sommaVoti += r.valutazione;
-      // Trova l'indice corretto (5 stelle = index 0, 4 stelle = index 1, ecc.)
+
       const index = 5 - Math.round(r.valutazione);
       if (index >= 0 && index <= 4) {
         statistiche[index].conteggio++;
       }
     });
 
-    // Calcola le percentuali
-    statistiche.forEach(stat => {
+    statistiche.forEach((stat) => {
       stat.percentuale = Math.round((stat.conteggio / totale) * 100);
     });
 
@@ -254,8 +241,7 @@ statisticheRecensioni = computed(() => {
     return {
       totale,
       media,
-      barre: statistiche
+      barre: statistiche,
     };
   });
-
 }

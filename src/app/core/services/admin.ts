@@ -8,12 +8,12 @@ export class AdminService {
   private http = inject(HttpClient);
   private readonly API_ADMIN = 'http://localhost:8080/api/admin';
 
-  // Ottiene tutti gli ordini del sistema
+
   getTuttiOrdini(): Observable<Ordine[]> {
     return this.http.get<Ordine[]>(`${this.API_ADMIN}/ordini`);
   }
 
-  // Cambia lo stato (e opzionalmente aggiunge tracking)
+
   aggiornaStato(ordineId: number, nuovoStato: string, tracking?: {corriere: string, codice: string}): Observable<any> {
     return this.http.post(`${this.API_ADMIN}/ordini/${ordineId}/stato`, { 
       stato: nuovoStato,
