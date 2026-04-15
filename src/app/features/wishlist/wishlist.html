@@ -24,16 +24,24 @@
   alt="Copertina di {{ item.libro.titolo }}"
   class="item-img">
             <div class="item-info">
-                <h3>{{ item.libro.titolo }}</h3>
-                
-                <p class="text-muted">
-                  di <strong>{{ item.libro.autore.nome }} {{ item.libro.autore.cognome }}</strong>
-                </p>
-                
-                <p class="text-xs">Editore: {{ item.libro.editore.nome }}</p>
-            
-              </div>
-            
+  <h3>{{ item.libro.titolo }}</h3>
+  
+  <p class="text-muted">
+    di <strong>{{ item.libro.autore.nome }} {{ item.libro.autore.cognome }}</strong>
+  </p>
+
+  <div class="formato-badge-container" style="margin-top: 5px;">
+    @if (item.formato.tipoSupporto === 'EBOOK') {
+      <span class="badge badge-ebook">📱 E-book (Digitale)</span>
+    } @else {
+      <span class="badge badge-cartaceo">
+        📖 {{ item.formato.tipoCopertina === 'RIGIDA' ? 'Copertina Rigida' : 'Copertina Flessibile' }}
+      </span>
+    }
+  </div>
+
+  <p class="text-xs" style="margin-top: 8px;">Editore: {{ item.libro.editore.nome }}</p>
+</div>
             <div class="item-azioni-wishlist">
               <button class="btn btn-accent" (click)="spostaAlCarrello(item.id)">
                 🛒 Sposta nel carrello
