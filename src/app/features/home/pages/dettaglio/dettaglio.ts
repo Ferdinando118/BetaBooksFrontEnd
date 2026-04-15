@@ -218,5 +218,43 @@ eliminaRecensione(id: number): void {
     });
   }
 }
+statisticheRecensioni = computed(() => {
+    const lista = this.recensioni();
+    const totale = lista.length;
+
+    // Struttura base per 5, 4, 3, 2, 1 stelle
+    const statistiche = [5, 4, 3, 2, 1].map(stelle => ({
+      stelle,
+      conteggio: 0,
+      percentuale: 0
+    }));
+
+    // Se non ci sono recensioni, restituisci array vuoto/azzerato
+    if (totale === 0) return { totale, media: 0, barre: statistiche };
+
+    let sommaVoti = 0;
+
+    lista.forEach(r => {
+      sommaVoti += r.valutazione;
+      // Trova l'indice corretto (5 stelle = index 0, 4 stelle = index 1, ecc.)
+      const index = 5 - Math.round(r.valutazione);
+      if (index >= 0 && index <= 4) {
+        statistiche[index].conteggio++;
+      }
+    });
+
+    // Calcola le percentuali
+    statistiche.forEach(stat => {
+      stat.percentuale = Math.round((stat.conteggio / totale) * 100);
+    });
+
+    const media = sommaVoti / totale;
+
+    return {
+      totale,
+      media,
+      barre: statistiche
+    };
+  });
 
 }

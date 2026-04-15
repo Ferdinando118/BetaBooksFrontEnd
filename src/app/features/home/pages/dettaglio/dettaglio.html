@@ -4,6 +4,7 @@
 
 @if (!loading() && libro()) {
   <div class="dettaglio-wrapper">
+    
     <aside class="dettaglio-cover">
       <img
         [src]="getImmagine(formatoSelezionato()?.copertina || libro()!.copertina)"
@@ -13,6 +14,7 @@
           this.src = '/assets/images/default-book.png';
         "
       />
+      
       @if (disponibile()) {
         <button
           class="btn btn-accent w-full"
@@ -31,6 +33,7 @@
     </aside>
 
     <div class="dettaglio-info">
+      
       <div class="card">
         <h1 class="libro-titolo">{{ libro()!.titolo }}</h1>
 
@@ -138,12 +141,9 @@
         }
 
         <div class="prezzo-box" style="margin-top: 20px">
-          <span class="price"
-            >€
-            {{
-              formatoSelezionato() ? (formatoSelezionato()!.prezzo | number: '1.2-2') : 'N/D'
-            }}</span
-          >
+          <span class="price">
+            € {{ formatoSelezionato() ? (formatoSelezionato()!.prezzo | number: '1.2-2') : 'N/D' }}
+          </span>
 
           @if (libro()!.valutazioneMedia) {
             <span class="stelle-media">
@@ -167,7 +167,9 @@
             </button>
           </div>
         }
+
         <hr class="divider" />
+        
         <div style="margin-top: 12px">
           <b>Sull'autore 👤</b>
           <div class="bio-container" [class.expanded]="biografiaEspansa">
@@ -181,6 +183,7 @@
         </div>
 
         <hr class="divider" />
+        
         <div style="margin-top: 12px">
           <b>Sull'editore 🏢</b>
           <div class="bio-container" [class.expanded]="editoreEspanso">
@@ -197,6 +200,49 @@
       <div class="card" style="margin-top: 24px">
         <h2 class="section-title">Recensioni</h2>
         <hr class="divider" />
+
+        @if (statisticheRecensioni().totale > 0) {
+          <div class="amazon-reviews-summary" style="display: flex; gap: 30px; margin-bottom: 24px; flex-wrap: wrap;">
+            
+            <div class="media-container" style="min-width: 200px;">
+              <h3 style="margin: 0 0 10px 0; font-size: 18px;">Recensioni clienti</h3>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="stelle-gialle" style="color: #FFA41C; font-size: 24px;">
+                  {{ stelle(statisticheRecensioni().media) }}
+                </span>
+                <span style="font-size: 18px; font-weight: bold;">
+                  {{ statisticheRecensioni().media | number:'1.1-1' }} su 5
+                </span>
+              </div>
+              <p class="text-muted" style="margin-top: 4px; font-size: 14px;">
+                {{ statisticheRecensioni().totale }} valutazioni globali
+              </p>
+            </div>
+
+            <div class="barre-container" style="flex-grow: 1; max-width: 400px; display: flex; flex-direction: column; gap: 8px;">
+              @for (stat of statisticheRecensioni().barre; track stat.stelle) {
+                <div style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
+                  
+                  <a href="javascript:void(0)" style="color: #007185; text-decoration: none; width: 65px; white-space: nowrap;">
+                    {{ stat.stelle }} stelle
+                  </a>
+                  
+                  <div style="flex-grow: 1; height: 20px; background-color: #F0F2F2; border: 1px solid #E3E6E6; border-radius: 4px; overflow: hidden;">
+                    <div 
+                      style="height: 100%; background-color: #DE7921; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); transition: width 0.5s ease-in-out;"
+                      [style.width.%]="stat.percentuale">
+                    </div>
+                  </div>
+                  
+                  <span style="width: 40px; text-align: right; color: #565959;">
+                    {{ stat.percentuale }}%
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+          <hr class="divider" />
+        }
 
         @if (recensioni().length === 0) {
           <p class="text-muted">Nessuna recensione ancora. Sii il primo!</p>
