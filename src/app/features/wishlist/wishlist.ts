@@ -6,14 +6,14 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-wishlist',
-  standalone: true, 
-  imports: [CommonModule, RouterLink], 
+  standalone: true,
+  imports: [CommonModule, RouterLink],
   templateUrl: './wishlist.html',
-  styleUrl: './wishlist.css'
+  styleUrl: './wishlist.css',
 })
 export class Wishlist implements OnInit {
-  wishlistItems: any[] = []; 
-  
+  wishlistItems: any[] = [];
+
   private wishlistService = inject(WishlistService);
   private auth = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
@@ -30,33 +30,35 @@ export class Wishlist implements OnInit {
 
     this.wishlistService.getWishlistByUser(userId).subscribe({
       next: (items) => {
-        this.wishlistItems = items.map(item => ({
+        this.wishlistItems = items.map((item) => ({
           ...item,
           libro: item.libro || {},
           formato: {
             ...(item.formato || {}),
-            copertina: item.formato?.copertina 
-              ? (item.formato.copertina.startsWith('http') ? item.formato.copertina : urlServer + item.formato.copertina) 
-              : '/assets/images/default-book.png'
-          }
+            copertina: item.formato?.copertina
+              ? item.formato.copertina.startsWith('http')
+                ? item.formato.copertina
+                : urlServer + item.formato.copertina
+              : '/assets/images/default-book.png',
+          },
         }));
-        
-        this.cdr.detectChanges(); 
+
+        this.cdr.detectChanges();
       },
-      error: (err) => console.error("Errore caricamento wishlist:", err)
+      error: (err) => console.error('Errore caricamento wishlist:', err),
     });
   }
 
   spostaAlCarrello(idWishlist: number): void {
     this.wishlistService.spostaNelCarrello(idWishlist).subscribe({
       next: () => {
-        alert("Prodotto spostato nel carrello!");
+        alert('Prodotto spostato nel carrello!');
         this.getWishlist();
       },
       error: (err) => {
-        const messaggio = err.error || "Impossibile spostare il prodotto.";
-        alert(messaggio); 
-      }
+        const messaggio = err.error || 'Impossibile spostare il prodotto.';
+        alert(messaggio);
+      },
     });
   }
 
@@ -64,25 +66,25 @@ export class Wishlist implements OnInit {
     const userId = this.auth.getUserId();
     if (!userId) return;
 
-    const formatId = item.formatId; 
-    
+    const formatId = item.formatId;
+
     this.wishlistService.toggle(userId, formatId, true).subscribe({
       next: () => this.getWishlist(),
       error: (err) => {
-        console.error("Errore durante la rimozione:", err);
-        alert("Errore durante la rimozione.");
-      }
+        console.error('Errore durante la rimozione:', err);
+        alert('Errore durante la rimozione.');
+      },
     });
   }
 
   svuotaWishlist(): void {
-    if (confirm("Sei sicuro di voler rimuovere tutti i prodotti dalla wishlist?")) {
+    if (confirm('Sei sicuro di voler rimuovere tutti i prodotti dalla wishlist?')) {
       const userId = this.auth.getUserId();
       if (!userId) return;
 
       this.wishlistService.svuotaWishlist(userId).subscribe({
         next: () => this.getWishlist(),
-        error: (err) => console.error("Errore durante la pulizia:", err)
+        error: (err) => console.error('Errore durante la pulizia:', err),
       });
     }
   }

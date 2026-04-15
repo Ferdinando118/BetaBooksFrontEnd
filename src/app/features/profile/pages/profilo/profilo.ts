@@ -20,13 +20,13 @@ export class Profilo implements OnInit {
 
   utente: Utente | null = null;
   profiloEsistente: ProfiloUtente | null = null;
-  indirizzi: Indirizzo[] = []; // Ora è un array per gestire la rubrica!
+  indirizzi: Indirizzo[] = []; 
 
-  // Due form separati!
+
   formProfilo: FormGroup;
   formIndirizzo: FormGroup;
 
-  // Stati
+
   loadingProfilo = false;
   salvatoProfilo = false;
 
@@ -34,11 +34,10 @@ export class Profilo implements OnInit {
   loadingIndirizzo = false;
   indirizzoInModifica: Indirizzo | null = null;
 
-  // Modale di conferma eliminazione
+
   mostraModalEliminazione = false;
   indirizzoInEliminazione: number | null = null;
 
-  //proprietà per il cambio pwd
   mostraDialogPassword = false;
   errorePassword = '';
   successoPassword = false;
@@ -77,7 +76,7 @@ export class Profilo implements OnInit {
       descrizione: ['', Validators.required],
     });
 
-    // FORM 2: INDIRIZZO (corretto "citta" in "comune"!)
+    // FORM 2: INDIRIZZO 
     this.formIndirizzo = this.fb.group({
       via: ['', Validators.required],
       civico: ['', Validators.required],
@@ -99,7 +98,7 @@ export class Profilo implements OnInit {
   caricaDati() {
     const idUtente = this.utente!.id;
 
-    // 1. Carica Anagrafica
+  
     this.profiloService.findByUtente(idUtente).subscribe((p) => {
       console.log('Profilo caricato:', p);
       if (p) {
@@ -115,10 +114,10 @@ export class Profilo implements OnInit {
       }
     });
 
-    // 2. Carica Lista Indirizzi
+
     this.caricaIndirizzi();
 
-    // 3. Carica draft del form indirizzo da localStorage
+  
     this.caricaFormDraft();
   }
 
@@ -130,7 +129,7 @@ export class Profilo implements OnInit {
     });
   }
 
-  // ─── GESTIONE PROFILO ──────────────────────────────────────────────
+ 
 
   salvaProfilo(): void {
     if (this.formProfilo.invalid) return;
@@ -141,7 +140,7 @@ export class Profilo implements OnInit {
 
     if (!this.regexTelefono.test(val.telefono)) {
       this.loadingProfilo = false;
-      //alert('Il numero di telefono deve contenere esattamente 10 cifre numeriche');
+   
       this.errors = 'Il numero di telefono deve contenere esattamente 10 cifre numeriche';
       return;
     }
@@ -165,13 +164,13 @@ export class Profilo implements OnInit {
     this.profiloService.saveProfilo(pReq).subscribe(() => {
       this.loadingProfilo = false;
       this.salvatoProfilo = true;
-      this.profiloEsistente = pReq; // <--- Aggiorna i dati locali con quelli appena salvati
+      this.profiloEsistente = pReq;
 
-      this.cdr.detectChanges(); // <--- AGGIUNGI QUESTO QUI!
+      this.cdr.detectChanges(); 
 
       setTimeout(() => {
         this.salvatoProfilo = false;
-        this.cdr.detectChanges(); // <--- Serve anche qui per far sparire il messaggio "✅ Profilo salvato!"
+        this.cdr.detectChanges(); 
       }, 3000);
     });
   }
@@ -181,22 +180,22 @@ export class Profilo implements OnInit {
   apriFormIndirizzo(indirizzo?: Indirizzo) {
     this.mostraFormIndirizzo = true;
     if (indirizzo) {
-      // Modalità Modifica
+      // modalità Modifica
       this.indirizzoInModifica = indirizzo;
       this.formIndirizzo.patchValue(indirizzo);
     } else {
-      // Modalità Nuovo
+      // modalità Nuovo
       this.indirizzoInModifica = null;
       this.formIndirizzo.reset({ paese: 'Italia' });
     }
-    // Salva il draft quando apri il form
+    // salva il draft quando apri il form
     this.salvaFormDraft();
   }
 
   chiudiFormIndirizzo() {
     this.mostraFormIndirizzo = false;
     this.indirizzoInModifica = null;
-    // Pulisci il draft quando chiudi il form
+    // pulisci il draft quando chiudi il form
     this.pulisciFormDraft();
   }
 
@@ -205,7 +204,7 @@ export class Profilo implements OnInit {
     this.loadingIndirizzo = true;
     const val = this.formIndirizzo.value;
 
-    // Se è il primo indirizzo che aggiunge, lo rendiamo Predefinito
+    // se è il primo indirizzo che aggiunge, lo rendiamo predefinito
     const isDefault = this.indirizzi.length === 0 || (this.indirizzoInModifica?.isDefault ?? false);
 
     const iReq = {
@@ -223,10 +222,9 @@ export class Profilo implements OnInit {
 
     this.profiloService.saveIndirizzo(iReq).subscribe(() => {
       this.loadingIndirizzo = false;
-      // Pulisci il draft dopo il salvataggio
       this.pulisciFormDraft();
       this.chiudiFormIndirizzo();
-      this.caricaIndirizzi(); // Ricarichiamo la rubrica dal database!
+      this.caricaIndirizzi(); 
     });
   }
 
@@ -254,7 +252,7 @@ export class Profilo implements OnInit {
   chiudiModalEliminazione() {
     this.mostraModalEliminazione = false;
     this.indirizzoInEliminazione = null;
-    // Mantieni il draft del form anche quando chiudi la modale
+
   }
 
   // ─── METODI PERSISTENZA FORM (localStorage) ────────────────────────
@@ -362,7 +360,7 @@ export class Profilo implements OnInit {
 
   preparaModifica(recensione: any): void {
     this.recensioneInModifica = recensione;
-    this.mostraFormRecensione = true; // Mostriamo il form!
+    this.mostraFormRecensione = true; 
 
     this.formRecensione.patchValue({
       valutazione: recensione.valutazione,
@@ -384,7 +382,7 @@ export class Profilo implements OnInit {
       next: () => {
         this.mostraFormRecensione = false;
         this.recensioneInModifica = null;
-        this.caricaRecensioni(); // Ricarica la lista aggiornata
+        this.caricaRecensioni(); 
       },
       error: (err) => {
         console.error("Errore durante l'aggiornamento:", err);
@@ -403,7 +401,6 @@ export class Profilo implements OnInit {
     if (confirm('Sei sicuro di voler eliminare questa recensione?')) {
       this.recensioneService.delete(id).subscribe({
         next: () => {
-          // Ricarica usando il metodo corretto senza parametri extra
           this.caricaRecensioni();
         },
         error: (err) => {

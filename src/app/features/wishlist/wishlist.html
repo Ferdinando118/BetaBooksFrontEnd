@@ -1,16 +1,15 @@
 <div class="carrello-wrapper">
   <div class="wishlist-layout">
     <div class="header-wishlist">
-    <h1 class="page-title">❤️ LA TUA WISHLIST</h1>
-        @if (wishlistItems && wishlistItems.length > 0) {
-      <button class="btn btn-outline" (click)="svuotaWishlist()">Svuota Wishlist</button>
-    }
-  </div>
-    
+      <h1 class="page-title">❤️ LA TUA WISHLIST</h1>
+      @if (wishlistItems && wishlistItems.length > 0) {
+        <button class="btn btn-outline" (click)="svuotaWishlist()">Svuota Wishlist</button>
+      }
+    </div>
 
     @if (wishlistItems.length === 0) {
       <div class="empty card">
-        <p style="font-size: 48px;">✨</p>
+        <p style="font-size: 48px">✨</p>
         <p>La tua wishlist è vuota</p>
         <a routerLink="/" class="btn btn-orange mt-16">Sfoglia il catalogo</a>
       </div>
@@ -18,34 +17,38 @@
       <div class="items-list">
         @for (item of wishlistItems; track item.id) {
           <div class="item-card card">
-            <img 
-  [src]="item.formato.copertina" 
-  (error)="item.formato.copertina = '/assets/images/default-book.png'" 
-  alt="Copertina di {{ item.libro.titolo }}"
-  class="item-img">
+            <img
+              [src]="item.formato.copertina"
+              (error)="item.formato.copertina = '/assets/images/default-book.png'"
+              alt="Copertina di {{ item.libro.titolo }}"
+              class="item-img"
+            />
             <div class="item-info">
-  <h3>{{ item.libro.titolo }}</h3>
-  
-  <p class="text-muted">
-    di <strong>{{ item.libro.autore.nome }} {{ item.libro.autore.cognome }}</strong>
-  </p>
+              <h3>{{ item.libro.titolo }}</h3>
 
-  <div class="formato-badge-container" style="margin-top: 5px;">
-    @if (item.formato.tipoSupporto === 'EBOOK') {
-      <span class="badge badge-ebook">📱 E-book (Digitale)</span>
-    } @else {
-      <span class="badge badge-cartaceo">
-        📖 {{ item.formato.tipoCopertina === 'RIGIDA' ? 'Copertina Rigida' : 'Copertina Flessibile' }}
-      </span>
-    }
-  </div>
+              <p class="text-muted">
+                di <strong>{{ item.libro.autore.nome }} {{ item.libro.autore.cognome }}</strong>
+              </p>
 
-  <p class="text-xs" style="margin-top: 8px;">Editore: {{ item.libro.editore.nome }}</p>
-</div>
+              <div class="formato-badge-container" style="margin-top: 5px">
+                @if (item.formato.tipoSupporto === 'EBOOK') {
+                  <span class="badge badge-ebook">📱 E-book (Digitale)</span>
+                } @else {
+                  <span class="badge badge-cartaceo">
+                    📖
+                    {{
+                      item.formato.tipoCopertina === 'RIGIDA'
+                        ? 'Copertina Rigida'
+                        : 'Copertina Flessibile'
+                    }}
+                  </span>
+                }
+              </div>
+
+              <p class="text-xs" style="margin-top: 8px">Editore: {{ item.libro.editore.nome }}</p>
+            </div>
             <div class="item-azioni-wishlist">
-              <button class="btn btn-accent" (click)="spostaAlCarrello(item.id)">
-                Carrello →
-              </button>
+              <button class="btn btn-accent" (click)="spostaAlCarrello(item.id)">Carrello →</button>
               <button class="btn-cestino" (click)="rimuoviDallaWishlist(item)" title="Rimuovi">
                 🗑
               </button>
