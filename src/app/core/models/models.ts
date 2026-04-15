@@ -1,6 +1,6 @@
 // ── ENUM ──────────────────────────────────────────
 export enum RuoloUtente   { USER = 'USER', ADMIN = 'ADMIN' }
-export enum StatoOrdine   { IN_ATTESA = 'IN_ATTESA', SPEDITO = 'SPEDITO', CONSEGNATO = 'CONSEGNATO' }
+export enum StatoOrdine   { IN_ATTESA = 'IN_ATTESA', SPEDITO = 'SPEDITO', CONSEGNATO = 'CONSEGNATO', ANNULLATO = 'ANNULLATO' }
 export enum MetodoPagamento { CARTA = 'CARTA', PAYPAL = 'PAYPAL', CONSEGNA = 'CONSEGNA', BONIFICO = 'BONIFICO' }
 export enum FiltroTemporale {
   ULTIMI_30_GIORNI = 'ULTIMI_30_GIORNI',

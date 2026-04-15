@@ -179,6 +179,7 @@
 .badge-info      { background: #dbeafe; color: #1e40af; }
 .badge-success   { background: #d1fae5; color: #065f46; }
 .badge-secondary { background: #f1f5f9; color: #475569; }
+.badge-danger    { background: #fee2e2; color: #991b1b; }
 
 /* Preview immagini */
 .ordine-items-preview { display: flex; align-items: center; gap: 5px; }
@@ -325,6 +326,22 @@
   background: linear-gradient(135deg, #122a4f 0%, #1e4066 100%);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(26,58,107,0.25);
+}
+
+.btn.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.75rem;
+}
+
+.btn.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn.btn-danger:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────── */

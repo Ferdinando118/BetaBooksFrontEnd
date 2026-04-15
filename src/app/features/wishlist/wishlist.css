@@ -147,3 +147,22 @@
   .item-card { flex-wrap: wrap; justify-content: center; text-align: center; }
   .item-azioni-wishlist { justify-content: center; width: 100%; }
 }
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badge-ebook {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.badge-cartaceo {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
