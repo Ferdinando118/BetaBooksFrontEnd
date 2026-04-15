@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
   ],
   imports: [
     CommonModule,
-    ReactiveFormsModule, // Necessario per il form del Profilo
+    ReactiveFormsModule, 
     ProfileRoutingModule,
     FormsModule
   ]

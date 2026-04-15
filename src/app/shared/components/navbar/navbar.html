@@ -11,12 +11,21 @@
 
     <div class="navbar-actions">
       @if (auth.isLoggedIn()) {
-        <a routerLink="/wishlist" routerLinkActive="active" class="icon-link" title="I miei desideri">❤️</a>
+        <a
+          routerLink="/wishlist"
+          routerLinkActive="active"
+          class="icon-link"
+          title="I miei desideri"
+          >❤️</a
+        >
         <a routerLink="/cart" routerLinkActive="active" class="icon-link">🛒</a>
 
         <div class="user-dropdown-container">
           <button class="avatar-btn" (click)="toggleDropdown()">
-            <div class="avatar-circle" [style.border]="auth.isAdmin() ? '2px solid #ffc107' : 'none'">
+            <div
+              class="avatar-circle"
+              [style.border]="auth.isAdmin() ? '2px solid #ffc107' : 'none'"
+            >
               {{ getIniziale() }}
             </div>
             <span class="arrow" [class.open]="dropdownAperto">▼</span>
@@ -32,19 +41,44 @@
               </div>
               <hr class="dropdown-divider" />
               @if (auth.isAdmin()) {
-                <a routerLink="/admin/spedizioni" class="dropdown-item admin-link" (click)="dropdownAperto = false">📦 Spedizioni</a>
-                <a routerLink="/admin/tabelle" class="dropdown-item admin-link" (click)="dropdownAperto = false">📂 Anagrafiche</a>
-                <a routerLink="/admin/audit" class="dropdown-item admin-link" (click)="dropdownAperto = false">🔍 Audit Log</a>
+                <a
+                  routerLink="/admin/spedizioni"
+                  class="dropdown-item admin-link"
+                  (click)="dropdownAperto = false"
+                  >📦 Spedizioni</a
+                >
+                <a
+                  routerLink="/admin/tabelle"
+                  class="dropdown-item admin-link"
+                  (click)="dropdownAperto = false"
+                  >📂 Anagrafiche</a
+                >
+                <a
+                  routerLink="/admin/audit"
+                  class="dropdown-item admin-link"
+                  (click)="dropdownAperto = false"
+                  >🔍 Audit Log</a
+                >
                 <hr class="dropdown-divider" />
               }
               @if (auth.grant().utente?.validato == false) {
-                <button class="dropdown-item text-warning" [disabled]="loading" (click)="mandaVerifica()">
-                  {{ loading ? 'Mail inviata a ' + auth.grant().utente?.email : '✉️ Convalida Mail' }}
+                <button
+                  class="dropdown-item text-warning"
+                  [disabled]="loading"
+                  (click)="mandaVerifica()"
+                >
+                  {{
+                    loading ? 'Mail inviata a ' + auth.grant().utente?.email : '✉️ Convalida Mail'
+                  }}
                 </button>
                 <hr class="dropdown-divider" />
               }
-              <a routerLink="/profile" class="dropdown-item" (click)="dropdownAperto = false">👤 Il mio profilo</a>
-              <a routerLink="/profile/ordini" class="dropdown-item" (click)="dropdownAperto = false">📦 I miei ordini</a>
+              <a routerLink="/profile" class="dropdown-item" (click)="dropdownAperto = false"
+                >👤 Il mio profilo</a
+              >
+              <a routerLink="/profile/ordini" class="dropdown-item" (click)="dropdownAperto = false"
+                >📦 I miei ordini</a
+              >
               <hr class="dropdown-divider" />
               <button class="dropdown-item text-danger" (click)="logout()">🚪 Esci</button>
             </div>

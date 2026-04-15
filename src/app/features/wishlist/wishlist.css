@@ -58,7 +58,7 @@
 .btn-accent:hover {
   background-color: var(--bb-orange-dark); 
 }
-/* Cestino (condiviso col carrello) */
+
 .btn-cestino {
   background-color: var(--bb-gray-100);
   border: 1px solid var(--bb-gray-200);
@@ -95,15 +95,15 @@
   font-size: 26px;
   font-weight: 700;
   color: var(--bb-blue);
-  margin-bottom: 0;     /* Fondamentale: non deve avere margini extra */
+  margin-bottom: 0;    
   white-space: nowrap;  
   flex-shrink: 1;       
 }
 
 /* Bottone Svuota */
 .btn-outline-danger {
-  flex-shrink: 0;       /* Impedisce al bottone di restringersi o deformarsi */
-  white-space: nowrap;  /* Il testo dentro il bottone non deve andare a capo */
+  flex-shrink: 0;      
+  white-space: nowrap;  
   background-color: transparent;
   border: 1px solid #dc2626;
   color: #dc2626;
@@ -125,16 +125,16 @@
   color: var(--bb-gray-400);
 }
 
-/* Pulsante stile Arancione (da usare per Sfoglia il catalogo) */
+/* Pulsante stile Arancione */
 .btn-orange {
-  background-color: var(--bb-orange); /* Assicurati che questa variabile sia definita */
+  background-color: var(--bb-orange); 
   color: white;
   padding: 10px 20px;
   border-radius: var(--bb-radius-sm);
   border: none;
   font-weight: 600;
   cursor: pointer;
-  text-decoration: none; /* Rimuove la sottolineatura dai link */
+  text-decoration: none;
   display: inline-block;
 }
 

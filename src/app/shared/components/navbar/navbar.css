@@ -1,4 +1,4 @@
-/* 1. CONTENITORE ESTERNO: Fissaggio in alto ed Effetto Vetro */
+
 .navbar {
   position: sticky;
   top: 0;
@@ -10,13 +10,12 @@
   
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  /* Nota: rimosso display:flex da qui per evitare lo schiacciamento */
+
 }
 
-/* 2. CONTENITORE INTERNO: Allineamento e spazi (Logo a sx, Azioni a dx) */
 .navbar-inner {
   display: flex;
-  justify-content: space-between; /* Imprescindibile per distanziare logo e bottoni */
+  justify-content: space-between; 
   align-items: center;
   width: 100%;
   max-width: 1200px;
@@ -25,7 +24,7 @@
   height: 70px; 
 }
 
-/* --- LOGO --- */
+
 .navbar-logo {
   display: flex;
   align-items: center;
@@ -41,7 +40,7 @@
 }
 
 .logo-img:hover {
-  transform: scale(1.05); /* Effetto zoom al passaggio del mouse */
+  transform: scale(1.05); 
 }
 
 /* --- LINK CENTRALI --- */
@@ -68,7 +67,7 @@
   color: #2563eb; 
 }
 
-/* La linea colorata sotto ai link */
+
 .navbar-links a::after {
   content: '';
   position: absolute;
@@ -122,7 +121,7 @@
 
 /* --- MENU MOBILE (HAMBURGER E DROPDOWN) --- */
 .hamburger {
-  display: none; /* Nascosto su PC */
+  display: none; 
   flex-direction: column;
   gap: 5px;
   background: none;
@@ -140,7 +139,7 @@
 }
 
 .mobile-menu {
-  display: none; /* Nascosto di default */
+  display: none; 
   flex-direction: column;
   background: white; 
   border-bottom: 1px solid #eee;
@@ -168,7 +167,7 @@
   background: rgba(0, 82, 204, 0.08); 
 }
 
-/* Badge Carrello Mobile riparato */
+/* Badge Carrello Mobile  */
 .mobile-cart-link {
   position: relative;
 }
@@ -186,20 +185,20 @@
   font-weight: bold;
 }
 
-/* --- MEDIA QUERIES (Per nascondere il centro su telefoni) --- */
+
 @media screen and (max-width: 768px) {
   .navbar-links,
   .navbar-actions {
-    display: none; /* Nasconde il menu PC sui telefoni */
+    display: none; 
   }
   
   .hamburger {
-    display: flex; /* Mostra l'hamburger sui telefoni */
+    display: flex; 
   }
 }
-/* --- DROPDOWN UTENTE (NUOVO) --- */
+/* --- DROPDOWN UTENTE  --- */
 .user-dropdown-container {
-  position: relative; /* Fondamentale per posizionare il menu sotto */
+  position: relative; 
 }
 
 /* Il bottone trigger (Avatar + Freccia) */
@@ -240,7 +239,7 @@
   transition: transform 0.2s ease;
 }
 .arrow.open {
-  transform: rotate(180deg); /* Gira in su quando aperto */
+  transform: rotate(180deg);
 }
 
 /* IL MENU VERO E PROPRIO */

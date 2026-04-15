@@ -1,7 +1,7 @@
 .footer {
-  background: #ffffff;             /* Sfondo bianco puro */
-  color: #333333;                  /* Testo principale scuro per leggibilità */
-  border-top: 1px solid #eeeeee;   /* Una sottile linea di separazione in alto */
+  background: #ffffff;            
+  color: #333333;                  
+  border-top: 1px solid #eeeeee;  
   margin-top: 48px;
   padding: 32px 20px;
 }
@@ -26,11 +26,11 @@
   font-size: 13px; 
   font-weight: 400; 
   margin-top: 4px; 
-  color: #666666; /* Grigio medio */
+  color: #666666; 
 }
 
-/* Colori del logo testuale (se lo usi ancora accanto all'immagine) */
-.logo-beta  { color: var(--bb-blue); }   /* Blu scuro invece che bianco */
+/* Colori del logo testuale  */
+.logo-beta  { color: var(--bb-blue); }   
 .logo-books { color: var(--bb-orange); }
 
 .footer-links { 
@@ -39,25 +39,25 @@
 }
 
 .footer-links a { 
-  color: #555555; /* Link grigio scuro */
+  color: #555555; 
   font-size: 14px; 
   text-decoration: none; 
   transition: color 0.2s;
 }
 
 .footer-links a:hover { 
-  color: var(--bb-blue); /* I link diventano blu al passaggio del mouse */
+  color: var(--bb-blue); 
 }
 
 .footer-copy { 
   font-size: 12px; 
-  color: #999999; /* Copyright molto chiaro */
+  color: #999999;
 }
 
 /* Immagine Logo */
 .logo-img {
-  height: 80px;      /* Ridotto leggermente per eleganza, 100px era molto grande */
-  width: auto;       /* 'auto' è meglio di un valore fisso per non schiacciare il logo */
+  height: 80px;     
+  width: auto;       
   display: block;
   margin-bottom: 8px;
   transition: transform 0.3s ease;
