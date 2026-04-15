@@ -18,9 +18,10 @@
       <div class="filtri-container">
         <div class="filtro-group">
           <label>Stato:</label>
-          <select [(ngModel)]="filtroCompletati" (change)="onFiltroChange()">
-            <option [ngValue]="false">In corso</option>
-            <option [ngValue]="true">Consegnati</option>
+          <select [(ngModel)]="filtroStato" (change)="onFiltroChange()">
+            @for (opt of opzioniStato; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
           </select>
         </div>
         <div class="filtro-group">
@@ -83,6 +84,9 @@
 
                 <div class="tracking-container">
                   <p class="text-muted mb-2">Stato Spedizione: <strong>{{ ordine.tracking?.codice }}</strong></p>
+                  @if (ordine.stato === 'IN_ATTESA') {
+                    <button class="btn btn-danger btn-sm" (click)="annullaOrdine(ordine.id)">Annulla Ordine</button>
+                  }
                   <div class="stepper-wrapper">
                     <div class="stepper-item" [class.completed]="ordine.tracking?.stato === 'PREPARAZIONE' || ordine.tracking?.stato === 'IN_TRANSITO' || ordine.tracking?.stato === 'CONSEGNATO'">
                       <div class="step-counter">1</div>
