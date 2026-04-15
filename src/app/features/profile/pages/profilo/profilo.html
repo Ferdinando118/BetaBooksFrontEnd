@@ -196,6 +196,24 @@
     }
   </div>
 
+  <div class="card mt-4">
+    <h2 class="section-title">Le mie Recensioni</h2>
+    @if (recensioni.length === 0) {
+      <p class="text-muted">Non hai ancora scritto recensioni.</p>
+    } @else {
+      @for (r of recensioni; track r.id) {
+        <div class="review-item mb-3">
+          <div class="d-flex justify-content-between">
+            <strong>{{ r.titoloLibro }}</strong>
+            <span class="rating-star">{{ r.valutazione }}/5 ★</span>
+          </div>
+          <p class="mb-1 mt-1 text-dark">{{ r.descrizione }}</p>
+          <small class="text-muted">{{ r.data | date: 'dd MMM yyyy' }}</small>
+        </div>
+      }
+    }
+  </div>
+
   <!-- Modale di Conferma Eliminazione -->
   @if (mostraModalEliminazione) {
     <div class="modal-overlay" (click)="chiudiModalEliminazione()">

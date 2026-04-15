@@ -136,7 +136,7 @@ export class Dettaglio implements OnInit {
 
  inviaRecensione(): void {
     if (this.formRecensione.invalid) return;
-
+console.log(this.auth.grant().utente);
     const utenteLoggato = this.auth.grant().utente;
     if (!utenteLoggato) {
       this.erroreRecensione.set("Devi effettuare il login per lasciare una recensione.");
@@ -149,12 +149,13 @@ export class Dettaglio implements OnInit {
       descrizione: this.formRecensione.value.descrizione,
       idLibro: this.libro()?.id,
       idUtente: utenteLoggato.id 
+      
     };
-
+console.log(utenteLoggato.id);
     // 2. Se stiamo modificando, aggiungiamo l'ID della recensione!
     if (this.recensioneInModifica) {
       req.id = this.recensioneInModifica.id; 
-      
+console.log(this.recensioneInModifica.id + 'e ' + req.id );
       this.recensioneService.update(req).subscribe({
         next: () => {
           this.recensioneInModifica = null; // Reset dello stato di modifica

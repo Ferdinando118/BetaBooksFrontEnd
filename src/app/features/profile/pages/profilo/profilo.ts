@@ -6,6 +6,7 @@ import { AuthService } from '../../../../core/services/auth';
 import { ProfiloService } from '../../../../core/services/profilo';
 import { Utente, ProfiloUtente, Indirizzo } from '../../../../core/models/models';
 import { ChangeDetectorRef } from '@angular/core';
+import { RecensioneService } from '../../../../core/services/recensione';
 
 @Component({
   selector: 'app-profilo',
@@ -46,6 +47,8 @@ export class Profilo implements OnInit {
   regexPrefisso = /^\+[0-9]{2}$/;
   errors = '';
 
+  recensioni: any[] = [];
+
   formPassword = {
     vecchiaPassword: '',
     nuovaPassword: '',
@@ -57,6 +60,7 @@ export class Profilo implements OnInit {
     private fb: FormBuilder,
     private profiloService: ProfiloService,
     private cdr: ChangeDetectorRef,
+    private recensioneService: RecensioneService,
   ) {
     // FORM 1: ANAGRAFICA
     this.formProfilo = this.fb.group({
@@ -90,9 +94,17 @@ export class Profilo implements OnInit {
 
     // 1. Carica Anagrafica
     this.profiloService.findByUtente(idUtente).subscribe((p) => {
+      console.log('Profilo caricato:', p);
       if (p) {
         this.profiloEsistente = p;
-        this.formProfilo.patchValue({ nome: p.nome, cognome: p.cognome, prefisso: p.telefono?.substring(0,3) , telefono: p.telefono?.substring(3) });
+        this.formProfilo.patchValue({
+          nome: p.nome,
+          cognome: p.cognome,
+          prefisso: p.telefono?.substring(0, 3),
+          telefono: p.telefono?.substring(3),
+        });
+        console.log('Chiamo caricaRecensioni con idProfilo:', p.id);
+         this.caricaRecensioni();
       }
     });
 
@@ -101,6 +113,9 @@ export class Profilo implements OnInit {
 
     // 3. Carica draft del form indirizzo da localStorage
     this.caricaFormDraft();
+
+   
+    
   }
 
   caricaIndirizzi() {
@@ -116,7 +131,7 @@ export class Profilo implements OnInit {
   salvaProfilo(): void {
     if (this.formProfilo.invalid) return;
 
-    this.errors='';
+    this.errors = '';
     this.loadingProfilo = true;
     const val = this.formProfilo.value;
 
@@ -327,5 +342,22 @@ export class Profilo implements OnInit {
           this.errorePassword = err.error?.message ?? 'Errore durante il cambio password.';
         },
       });
+  }
+
+  caricaRecensioni(): void {
+    console.log('profiloEsistente:', this.profiloEsistente);
+    if (!this.profiloEsistente?.id ) return;
+
+    this.recensioneService.getByProfilo(this.profiloEsistente?.id).subscribe({
+      next: (res) => {
+        console.log('Recensioni ricevute:', res);
+        this.recensioni = res;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Errore caricamento recensioni', err);
+      },
+    });
+
   }
 }
