@@ -234,10 +234,16 @@
   border: 1px solid #bae6fd;
 }
 
-.badge-cartaceo {
+.badge-flessibile{
   background-color: #fef3c7; /* Giallino carta */
   color: #92400e;           /* Marrone/Ambra scuro */
   border: 1px solid #fde68a;
+}
+
+.badge-rigida {
+  background-color: #fef2f2; /* Rosso chiarissimo e delicato */
+  color: #991b1b;           /* Rosso scuro/bordò professionale */
+  border: 1px solid #fecaca;  /* Bordino rosso pastello */
 }
 
 /* Distanziamento per non appiccicare i testi */

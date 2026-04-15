@@ -34,15 +34,19 @@
     di <strong>{{ item.autoreNome }} {{ item.autoreCognome }}</strong>
   </p>
 
-  <div class="formato-badge-container" style="margin-bottom: 8px;">
-    @if (item.tipoSupporto === 'EBOOK') {
-      <span class="badge badge-ebook">📱 E-book</span>
-    } @else {
-      <span class="badge badge-cartaceo">
-        📖 {{ item.tipoCopertina === 'RIGIDA' ? 'Copertina Rigida' : 'Copertina Flessibile' }}
-      </span>
-    }
-  </div>
+<div class="formato-badge-container" style="margin-bottom: 8px;">
+  @if (item.tipoSupporto === 'EBOOK') {
+    <span class="badge badge-ebook">📱 E-book</span>
+    
+  } @else if (item.tipoCopertina === 'RIGIDA') {
+    <span class="badge badge-rigida">📖 Copertina Rigida</span>
+    
+  } @else {
+    <span class="badge badge-flessibile">📖 Copertina Flessibile</span>
+  }
+</div>
+
+
   <p class="text-xs">Editore: {{ item.editoreNome }}</p>
   <p class="item-prezzo-unit">€ {{ item.prezzoUnitario | number:'1.2-2' }} cad.</p>
 </div>
