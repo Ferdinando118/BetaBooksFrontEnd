@@ -33,5 +33,11 @@ export class RecensioneService {
     return this.http.put<any>(`http://localhost:8080/api/recensione/update`, req);
   }
 
+  getByProfilo(idProfilo: number): Observable<Recensione[]> {
+    const params = new HttpParams().set('idProfilo', idProfilo.toString());
+    // Nota: il tuo backend restituisce un Object che è una List<RecensioneDTO>
+    return this.http.get<Recensione[]>(`${this.apiUrl}/getByProfilo`, { params });
+  }
+
 } 
 

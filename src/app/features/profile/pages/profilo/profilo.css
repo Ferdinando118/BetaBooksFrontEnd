@@ -781,3 +781,154 @@
 .phone-combined-container .form-control:focus {
   z-index: 2;
 }
+
+/* Container Principale */
+.profilo-content {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Navigazione Tabs */
+.profilo-nav-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.profilo-nav-tabs .btn {
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary { background-color: #007bff; color: white; border: none; }
+.btn-outline { border: 1px solid #ddd; color: #555; background: white; }
+.btn-outline:hover { background: #f8f9fa; border-color: #ccc; }
+.active { background-color: #007bff !important; color: white !important; box-shadow: 0 4px 12px rgba(0,123,255,0.2); }
+
+/* Card Style */
+.card {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Form Layout */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.4rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+/* Input Telefono Combinato */
+.phone-combined-container {
+  display: flex;
+  gap: 0.5rem;
+}
+.prefisso-input { width: 80px; text-align: center; }
+
+/* Rubrica Indirizzi */
+.indirizzo-card {
+  transition: transform 0.2s;
+}
+
+.border-primary {
+  border: 2px solid #007bff !important;
+  background-color: #f0f7ff;
+}
+
+.btn-icon {
+  background: #f8f9fa;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 5px 10px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.edit-btn:hover { background: #e3f2fd; }
+.delete-btn:hover { background: #fee2e2; }
+
+/* Recensioni */
+.review-item {
+  border-left: 4px solid #007bff;
+  background: #fcfcfc;
+  padding: 1rem;
+  border-radius: 0 8px 8px 0;
+}
+
+.rating-star { color: #ffc107; font-weight: bold; }
+
+/* Modali e Overlay */
+.modal-overlay, .overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content, .dialog {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 450px;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Messaggi di Errore/Successo */
+.errore { color: #dc3545; font-size: 0.85rem; margin-top: 0.5rem; font-weight: 500; }
+.text-success { color: #28a745 !important; }

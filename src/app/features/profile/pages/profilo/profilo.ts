@@ -6,6 +6,7 @@ import { AuthService } from '../../../../core/services/auth';
 import { ProfiloService } from '../../../../core/services/profilo';
 import { Utente, ProfiloUtente, Indirizzo } from '../../../../core/models/models';
 import { ChangeDetectorRef } from '@angular/core';
+import { RecensioneService } from '../../../../core/services/recensione';
 
 @Component({
   selector: 'app-profilo',
@@ -46,6 +47,11 @@ export class Profilo implements OnInit {
   regexPrefisso = /^\+[0-9]{2}$/;
   errors = '';
 
+  formRecensione: FormGroup;
+  recensioni: any[] = [];
+  recensioneInModifica: any | null = null;
+  mostraFormRecensione = false;
+
   formPassword = {
     vecchiaPassword: '',
     nuovaPassword: '',
@@ -57,6 +63,7 @@ export class Profilo implements OnInit {
     private fb: FormBuilder,
     private profiloService: ProfiloService,
     private cdr: ChangeDetectorRef,
+    private recensioneService: RecensioneService,
   ) {
     // FORM 1: ANAGRAFICA
     this.formProfilo = this.fb.group({
@@ -64,6 +71,10 @@ export class Profilo implements OnInit {
       cognome: ['', Validators.required],
       telefono: [''],
       prefisso: [''],
+    });
+    this.formRecensione = this.fb.group({
+      valutazione: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
+      descrizione: ['', Validators.required],
     });
 
     // FORM 2: INDIRIZZO (corretto "citta" in "comune"!)
@@ -90,9 +101,17 @@ export class Profilo implements OnInit {
 
     // 1. Carica Anagrafica
     this.profiloService.findByUtente(idUtente).subscribe((p) => {
+      console.log('Profilo caricato:', p);
       if (p) {
         this.profiloEsistente = p;
-        this.formProfilo.patchValue({ nome: p.nome, cognome: p.cognome, prefisso: p.telefono?.substring(0,3) , telefono: p.telefono?.substring(3) });
+        this.formProfilo.patchValue({
+          nome: p.nome,
+          cognome: p.cognome,
+          prefisso: p.telefono?.substring(0, 3),
+          telefono: p.telefono?.substring(3),
+        });
+        console.log('Chiamo caricaRecensioni con idProfilo:', p.id);
+        this.caricaRecensioni();
       }
     });
 
@@ -116,7 +135,7 @@ export class Profilo implements OnInit {
   salvaProfilo(): void {
     if (this.formProfilo.invalid) return;
 
-    this.errors='';
+    this.errors = '';
     this.loadingProfilo = true;
     const val = this.formProfilo.value;
 
@@ -327,5 +346,71 @@ export class Profilo implements OnInit {
           this.errorePassword = err.error?.message ?? 'Errore durante il cambio password.';
         },
       });
+  }
+
+  caricaRecensioni(): void {
+    if (!this.profiloEsistente?.id) return;
+
+    this.recensioneService.getByProfilo(this.profiloEsistente.id).subscribe({
+      next: (res) => {
+        this.recensioni = res;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Errore caricamento recensioni', err),
+    });
+  }
+
+  preparaModifica(recensione: any): void {
+    this.recensioneInModifica = recensione;
+    this.mostraFormRecensione = true; // Mostriamo il form!
+
+    this.formRecensione.patchValue({
+      valutazione: recensione.valutazione,
+      descrizione: recensione.descrizione,
+    });
+
+    this.cdr.detectChanges();
+  }
+
+  salvaModificaRecensione(): void {
+    if (this.formRecensione.invalid || !this.recensioneInModifica) return;
+
+    const datiAggiornati = {
+      ...this.recensioneInModifica,
+      ...this.formRecensione.value,
+    };
+
+    this.recensioneService.update(datiAggiornati).subscribe({
+      next: () => {
+        this.mostraFormRecensione = false;
+        this.recensioneInModifica = null;
+        this.caricaRecensioni(); // Ricarica la lista aggiornata
+      },
+      error: (err) => {
+        console.error("Errore durante l'aggiornamento:", err);
+        alert('Errore nel salvataggio della recensione.');
+      },
+    });
+  }
+
+  annullaModificaRecensione(): void {
+    this.mostraFormRecensione = false;
+    this.recensioneInModifica = null;
+    this.formRecensione.reset();
+  }
+
+  eliminaRecensione(id: number): void {
+    if (confirm('Sei sicuro di voler eliminare questa recensione?')) {
+      this.recensioneService.delete(id).subscribe({
+        next: () => {
+          // Ricarica usando il metodo corretto senza parametri extra
+          this.caricaRecensioni();
+        },
+        error: (err) => {
+          console.error("Errore durante l'eliminazione:", err);
+          alert('Impossibile eliminare la recensione.');
+        },
+      });
+    }
   }
 }

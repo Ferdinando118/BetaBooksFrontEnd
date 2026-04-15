@@ -196,6 +196,58 @@
     }
   </div>
 
+  <div class="card mt-4">
+    <h2 class="section-title">Le mie Recensioni</h2>
+
+    @if (mostraFormRecensione) {
+      <div class="edit-review-box border p-3 mb-4 bg-light rounded">
+        <h4>Modifica Recensione per: {{ recensioneInModifica?.titoloLibro }}</h4>
+        <form [formGroup]="formRecensione" (ngSubmit)="salvaModificaRecensione()">
+          <div class="mb-2">
+            <label>Valutazione (1-5)</label>
+            <input
+              type="number"
+              formControlName="valutazione"
+              class="form-control"
+              min="1"
+              max="5"
+            />
+          </div>
+          <div class="mb-2">
+            <label>Descrizione</label>
+            <textarea formControlName="descrizione" class="form-control" rows="3"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">Aggiorna</button>
+          <button
+            type="button"
+            class="btn btn-secondary btn-sm"
+            (click)="annullaModificaRecensione()"
+          >
+            Annulla
+          </button>
+        </form>
+      </div>
+    }
+
+    @if (recensioni.length === 0) {
+      <p class="text-muted">Non hai ancora scritto recensioni.</p>
+    } @else {
+      @for (r of recensioni; track r.id) {
+        <div class="review-item mb-3">
+          <div class="d-flex justify-content-between">
+            <strong>{{ r.titoloLibro }}</strong>
+            <span class="rating-star">{{ r.valutazione }}/5 ★</span>
+          </div>
+          <p class="mb-1 mt-1 text-dark">{{ r.descrizione }}</p>
+          <small class="text-muted">{{ r.data | date: 'dd MMM yyyy' }}</small>
+
+          <button class="btn btn-sm btn-outline" (click)="preparaModifica(r)">✏️</button>
+          <button class="btn btn-sm btn-outline" (click)="eliminaRecensione(r.id)">🗑️</button>
+        </div>
+      }
+    }
+  </div>
+
   <!-- Modale di Conferma Eliminazione -->
   @if (mostraModalEliminazione) {
     <div class="modal-overlay" (click)="chiudiModalEliminazione()">
