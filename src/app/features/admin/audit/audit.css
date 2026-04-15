@@ -48,15 +48,15 @@ table {
 }
 
 th, td {
-  padding: 12px 15px; /* Spazio interno per non avere tutto appiccicato */
+  padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
 
 /* Larghezze fisse per evitare che il JSON sposti tutto */
-td:nth-child(1) { width: 150px; } /* Data */
-td:nth-child(2) { width: 150px; } /* Tabella */
-td:nth-child(3) { width: 100px; } /* Operazione */
+td:nth-child(1) { width: 150px; } 
+td:nth-child(2) { width: 150px; } 
+td:nth-child(3) { width: 100px; } 
 
 /* Centra solo l'intestazione della colonna Dettagli */
 th:nth-child(4) {
@@ -119,11 +119,11 @@ small { font-weight: bold; display: block; margin-bottom: 3px; }
 }
 
 .search-input:focus {
-    border-color: #007bff; /* Blu coerente con il tuo stile */
+    border-color: #007bff; 
     box-shadow: 0 4px 10px rgba(0, 123, 255, 0.15);
 }
 
-/* Select per l'operazione (aggiunta) */
+/* Select per l'operazione */
 .filter-select {
     padding: 12px 15px;
     border: 2px solid #e0f0f8;

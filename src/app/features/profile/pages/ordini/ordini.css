@@ -1,11 +1,11 @@
-/* ── LAYOUT (identico a profilo) ─────────────────────── */
+/* ── LAYOUT  ─────────────────────── */
 .profilo-content {
   max-width: 1000px;
   margin: 30px auto;
   padding: 0 20px;
 }
 
-/* ── TAB NAV (identico a profilo) ────────────────────── */
+/* ── TAB NAV ────────────────────── */
 .profilo-nav-tabs {
   display: flex;
   gap: 12px;

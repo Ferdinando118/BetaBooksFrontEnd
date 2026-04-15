@@ -13,16 +13,16 @@
 /* Layout a due colonne */
 .main-layout {
     display: flex;
-    gap: 30px; /* Spazio tra pulsanti e tabella */
+    gap: 30px; 
     align-items: flex-start;
 }
 
 /* Menu Pulsanti Verticali */
 .tab-selector {
     display: flex;
-    flex-direction: column; /* Verticali */
+    flex-direction: column;
     gap: 15px;
-    min-width: 250px; /* Larghezza fissa per i pulsanti */
+    min-width: 250px; 
 }
 
 .tab-selector button {
@@ -90,7 +90,7 @@
     background-color: #28a745;
     color: white;
     border: none;
-    padding: 12px 25px; /* Aumentato il padding laterale */
+    padding: 12px 25px; 
     border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
@@ -272,7 +272,7 @@ textarea.form-input {
     gap: 15px;
 }
 
-/* Aggiungi questi se non li hai già nel CSS della modale */
+
 .btn-cancel {
     background-color: #edf2f7;
     color: #4a5568;
@@ -311,7 +311,7 @@ textarea.form-input {
     padding: 20px 25px;
     border-top: 1px solid #edf2f7;
     display: flex;
-    justify-content: flex-end; /* Li sposta a destra */
+    justify-content: flex-end; 
     gap: 15px;
 }
 

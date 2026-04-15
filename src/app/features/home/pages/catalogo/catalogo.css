@@ -240,7 +240,7 @@
 
 .btn-edit,
 .btn-delete {
-  position: static; /* dentro .overlay-admin, non servono coordinate assolute */
+  position: static; 
 }
 
 /* ── Body (info libro) ────────────────────────────────── */
@@ -367,7 +367,7 @@
 }
 
 .filters-drawer.open {
-  max-height: 600px; /* Abbastanza alto da contenere il form */
+  max-height: 600px;
   opacity: 1;
   padding: 25px;
   border: 1px solid #f1f5f9;

@@ -2,14 +2,14 @@
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
-    table-layout: fixed; /* rende le colonne di larghezza fissa */
+    table-layout: fixed; 
 }
 
 /* Allineamento celle e intestazioni */
 .admin-table th, 
 .admin-table td {
     padding: 12px 15px;
-    text-align: left; /* Allinea tutto a sinistra di base */
+    text-align: left;
     vertical-align: middle;
     border-bottom: 1px solid #eee;
     overflow: hidden;
@@ -85,7 +85,7 @@
 .CONSEGNATO { background: #d1e7dd; color: #0f5132; }
 .ANNULLATO { background: #f8d7da; color: #842029; }
 
-/* --- Stili Form Modale (Uguali a Autori) --- */
+/* --- Stili Form Modale --- */
 .modal-body {
     padding: 25px;
     display: flex;
@@ -115,7 +115,7 @@
     background-color: #f8fafc;
 }
 
-/* --- Footer e Bottoni (Uguali a Autori) --- */
+/* --- Footer e Bottoni --- */
 .modal-footer {
     padding: 20px 25px;
     border-top: 1px solid #edf2f7;
