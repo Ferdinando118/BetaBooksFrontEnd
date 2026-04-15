@@ -18,8 +18,11 @@
       <div class="items-list">
         @for (item of wishlistItems; track item.id) {
           <div class="item-card card">
-            <img [src]="item.copertina" alt="Copertina" class="item-img">
-            
+            <img 
+  [src]="item.formato.copertina" 
+  (error)="item.formato.copertina = '/assets/images/default-book.png'" 
+  alt="Copertina di {{ item.libro.titolo }}"
+  class="item-img">
             <div class="item-info">
                 <h3>{{ item.libro.titolo }}</h3>
                 
