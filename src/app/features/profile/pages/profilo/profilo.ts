@@ -47,7 +47,10 @@ export class Profilo implements OnInit {
   regexPrefisso = /^\+[0-9]{2}$/;
   errors = '';
 
+  formRecensione: FormGroup;
   recensioni: any[] = [];
+  recensioneInModifica: any | null = null;
+  mostraFormRecensione = false;
 
   formPassword = {
     vecchiaPassword: '',
@@ -68,6 +71,10 @@ export class Profilo implements OnInit {
       cognome: ['', Validators.required],
       telefono: [''],
       prefisso: [''],
+    });
+    this.formRecensione = this.fb.group({
+      valutazione: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
+      descrizione: ['', Validators.required],
     });
 
     // FORM 2: INDIRIZZO (corretto "citta" in "comune"!)
@@ -104,7 +111,7 @@ export class Profilo implements OnInit {
           telefono: p.telefono?.substring(3),
         });
         console.log('Chiamo caricaRecensioni con idProfilo:', p.id);
-         this.caricaRecensioni();
+        this.caricaRecensioni();
       }
     });
 
@@ -113,9 +120,6 @@ export class Profilo implements OnInit {
 
     // 3. Carica draft del form indirizzo da localStorage
     this.caricaFormDraft();
-
-   
-    
   }
 
   caricaIndirizzi() {
@@ -345,19 +349,68 @@ export class Profilo implements OnInit {
   }
 
   caricaRecensioni(): void {
-    console.log('profiloEsistente:', this.profiloEsistente);
-    if (!this.profiloEsistente?.id ) return;
+    if (!this.profiloEsistente?.id) return;
 
-    this.recensioneService.getByProfilo(this.profiloEsistente?.id).subscribe({
+    this.recensioneService.getByProfilo(this.profiloEsistente.id).subscribe({
       next: (res) => {
-        console.log('Recensioni ricevute:', res);
         this.recensioni = res;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Errore caricamento recensioni', err);
-      },
+      error: (err) => console.error('Errore caricamento recensioni', err),
+    });
+  }
+
+  preparaModifica(recensione: any): void {
+    this.recensioneInModifica = recensione;
+    this.mostraFormRecensione = true; // Mostriamo il form!
+
+    this.formRecensione.patchValue({
+      valutazione: recensione.valutazione,
+      descrizione: recensione.descrizione,
     });
 
+    this.cdr.detectChanges();
+  }
+
+  salvaModificaRecensione(): void {
+    if (this.formRecensione.invalid || !this.recensioneInModifica) return;
+
+    const datiAggiornati = {
+      ...this.recensioneInModifica,
+      ...this.formRecensione.value,
+    };
+
+    this.recensioneService.update(datiAggiornati).subscribe({
+      next: () => {
+        this.mostraFormRecensione = false;
+        this.recensioneInModifica = null;
+        this.caricaRecensioni(); // Ricarica la lista aggiornata
+      },
+      error: (err) => {
+        console.error("Errore durante l'aggiornamento:", err);
+        alert('Errore nel salvataggio della recensione.');
+      },
+    });
+  }
+
+  annullaModificaRecensione(): void {
+    this.mostraFormRecensione = false;
+    this.recensioneInModifica = null;
+    this.formRecensione.reset();
+  }
+
+  eliminaRecensione(id: number): void {
+    if (confirm('Sei sicuro di voler eliminare questa recensione?')) {
+      this.recensioneService.delete(id).subscribe({
+        next: () => {
+          // Ricarica usando il metodo corretto senza parametri extra
+          this.caricaRecensioni();
+        },
+        error: (err) => {
+          console.error("Errore durante l'eliminazione:", err);
+          alert('Impossibile eliminare la recensione.');
+        },
+      });
+    }
   }
 }
