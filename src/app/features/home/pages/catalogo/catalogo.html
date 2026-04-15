@@ -9,42 +9,68 @@
   </div>
 }
 
-<div class="container filtri-bar">
-  <div class="search-wrapper">
-    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="11" cy="11" r="8"/>
-      <path d="m21 21-4.35-4.35"/>
-    </svg>
-    <input
-      type="text"
-      [(ngModel)]="ricerca"
-      (ngModelChange)="aggiornaFiltri()"
-      placeholder="Cerca titolo, autore o editore...">
+<div class="container filter-section">
+  <div class="toggle-container">
+    <button class="btn-funnel" [class.active]="showFilters()" (click)="toggleFilters()">
+      <svg class="icon-funnel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+      </svg>
+      <span>{{ showFilters() ? 'Chiudi' : 'Cerca e Filtra' }}</span>
+    </button>
   </div>
 
-  <select [(ngModel)]="categoriaSelezionata" (ngModelChange)="aggiornaFiltri()">
-    <option value="">Tutte le categorie</option>
-    @for (cat of categorie(); track cat) {
-      <option [value]="cat">{{ cat }}</option>
-    }
-  </select>
+  <div class="filters-drawer" [class.open]="showFilters()">
+    <div class="drawer-content">
+      
+      <div class="filter-group full-width">
+        <label>Cosa stai cercando?</label>
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input
+            type="text"
+            [(ngModel)]="ricerca"
+            (ngModelChange)="aggiornaFiltri()"
+            placeholder="Titolo, autore o editore...">
+        </div>
+      </div>
 
-  <select [(ngModel)]="ordinamento" (ngModelChange)="aggiornaFiltri()">
-    <option value="titolo">A → Z</option>
-    <option value="prezzo-asc">Prezzo ↑</option>
-    <option value="prezzo-desc">Prezzo ↓</option>
-  </select>
+      <div class="filter-group">
+        <label>Categoria</label>
+        <select [(ngModel)]="categoriaSelezionata" (ngModelChange)="aggiornaFiltri()">
+          <option value="">Tutte le categorie</option>
+          @for (cat of categorie(); track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+      </div>
 
-  <label class="checkbox-label">
-    <input type="checkbox" [(ngModel)]="soloPreferiti" (ngModelChange)="aggiornaFiltri()">
-    <span>Solo preferiti</span>
-  </label>
+      <div class="filter-group">
+        <label>Ordina per</label>
+        <select [(ngModel)]="ordinamento" (ngModelChange)="aggiornaFiltri()">
+          <option value="titolo">Nome A-Z</option>
+          <option value="prezzo-asc">Prezzo: Crescente</option>
+          <option value="prezzo-desc">Prezzo: Decrescente</option>
+        </select>
+      </div>
 
-  <button class="btn btn-outline btn-sm" (click)="reset()">Reset</button>
+      <div class="filter-group flex-row">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="soloPreferiti" (ngModelChange)="aggiornaFiltri()">
+          <span class="custom-check"></span>
+          Solo preferiti
+        </label>
+      </div>
+
+      <div class="filter-group align-end">
+        <button class="btn-reset-text" (click)="reset()">Svuota filtri</button>
+      </div>
+      
+    </div>
+  </div>
 </div>
 
 <div class="container risultati-info">
-  <span>{{ libriFiltrati().length }} libri trovati</span>
+  <p>Risultati: <strong>{{ libriFiltrati().length }}</strong> libri trovati</p>
 </div>
 
 @if (loading()) {

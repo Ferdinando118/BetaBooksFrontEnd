@@ -39,6 +39,14 @@ export class Catalogo implements OnInit {
   ordinamento = 'titolo';
   soloPreferiti = false;
 
+
+  // Aggiungi questo tra i Signals per lo Stato (riga 30 circa)
+showFilters = signal(false);
+
+// Aggiungi questo metodo tra i Metodi Utility
+toggleFilters(): void {
+  this.showFilters.update(v => !v);
+}
   libriFiltrati = computed(() => {
     let risultati = [...this.libri()];
 
